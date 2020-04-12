@@ -3,6 +3,7 @@
 import { ExtensionContext, workspace } from 'vscode';
 import { LanguageClient, LanguageClientOptions, ServerOptions } from 'vscode-languageclient';
 import { Monto } from './monto';
+import { platform } from 'os';
 
 let client: LanguageClient;
 
@@ -12,7 +13,9 @@ export function activate(context: ExtensionContext) {
 
     let folders = workspace.workspaceFolders || []
 
-    let effektCmd = config.get<string>("executable") || "effekt"
+    let defaultEffekt = platform() == 'win32' ? "effekt.cmd" : "effekt";
+
+    let effektCmd = config.get<string>("executable") || defaultEffekt
 
     let args: string[] = []
 

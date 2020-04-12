@@ -46,7 +46,6 @@
             "properties": {
                 "effekt.executable": {
                     "type": "string",
-                    "default": "effekt",
                     "description": "Path to the effekt executable (you need to restart vscode after changing this setting)."
                 },
                 "effekt.showExplanations": {
