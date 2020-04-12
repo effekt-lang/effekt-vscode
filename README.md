@@ -4,6 +4,9 @@ VSCode Language Server Client for the Effekt language.
 
 This VSCode extension is based on the example by [Tony Sloane](https://bitbucket.org/inkytonik/minijava-vscode/src/master/).
 
+## Getting Started
+After installing the .vsix file, you need to set the path to the `effekt` binary. For Mac OS and unix users this probably works out of the box after installing `effekt` with npm (that is, once the `effekt` command is in your path). For Windows users, you need to set the path to `effekt.cmd`.
+
 ## Features
 
 On file open and save, the Effekt compiler will be run and any resulting diagnostics will be displayed.
