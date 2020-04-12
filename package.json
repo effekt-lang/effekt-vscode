@@ -2,6 +2,10 @@
     "name": "effekt",
     "displayName": "effekt",
     "description": "The Effekt language",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/effekt-lang/effekt-vscode.git"
+    },
     "version": "0.1.1",
     "publisher": "b-studios",
     "engines": {
