@@ -12,12 +12,9 @@ export function activate(context: ExtensionContext) {
 
     let folders = workspace.workspaceFolders || []
 
-    let compilerPath = config.get<string>("compiler") || ""
+    let effektCmd = config.get<string>("executable") || "effekt"
 
-    let args: string[] = [
-        "-jar",
-        compilerPath
-    ]
+    let args: string[] = []
 
     // add each workspace folder as an include
     folders.forEach(f => {
@@ -25,18 +22,16 @@ export function activate(context: ExtensionContext) {
         args.push(f.uri.fsPath);
     })
 
-    let java = "java";
-
     args.push("--server")
 
     let serverOptions: ServerOptions = {
         run: {
-            command: java,
+            command: effektCmd,
             args: args,
             options: {}
         },
         debug: {
-            command: java,
+            command: effektCmd,
             args: args.concat(["--debug"]),
             options: {}
         }

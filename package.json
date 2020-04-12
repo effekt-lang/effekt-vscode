@@ -2,7 +2,7 @@
     "name": "effekt",
     "displayName": "effekt",
     "description": "The Effekt language",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "publisher": "b-studios",
     "engines": {
         "vscode": "^1.30.0"
@@ -40,10 +40,10 @@
             "type": "object",
             "title": "Effekt",
             "properties": {
-                "effekt.compiler": {
+                "effekt.executable": {
                     "type": "string",
-                    "default": "/Users/jonathan/Desktop/github/effekt/target/scala-0.21/effekt.jar",
-                    "description": "Path to the effekt compiler jar (you need to restart vscode after changing this setting)."
+                    "default": "effekt",
+                    "description": "Path to the effekt executable (you need to restart vscode after changing this setting)."
                 },
                 "effekt.showExplanations": {
                     "type": "boolean",
