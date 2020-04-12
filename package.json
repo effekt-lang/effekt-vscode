@@ -50,11 +50,6 @@
                     "default": true,
                     "description": "Display additional information when hovering over identifier."
                 },
-                "effekt.showOutline": {
-                    "type": "boolean",
-                    "default": false,
-                    "description": "Show a source form outline."
-                },
                 "effekt.showTarget": {
                     "type": "boolean",
                     "default": false,
@@ -64,11 +59,6 @@
                     "type": "boolean",
                     "default": false,
                     "description": "Show the translated Core (System Ξ)."
-                },
-                "effekt.updateOnChange": {
-                    "type": "boolean",
-                    "default": false,
-                    "description": "By default, updates are processed when a relevant file is opened or saved. If this setting is true, they are also updated after each change."
                 }
             }
         },
