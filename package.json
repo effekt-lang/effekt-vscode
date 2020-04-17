@@ -15,31 +15,39 @@
         "Other"
     ],
     "activationEvents": [
-        "onLanguage:effekt"
+        "onLanguage:effekt",
+        "onLanguage:literaleffekt"
     ],
     "main": "./out/extension",
     "contributes": {
-        "languages": [
-            {
-                "id": "effekt",
-                "extensions": [
-                    ".eff",
-                    ".effekt"
-                ],
-                "aliases": [
-                    "Effekt",
-                    "effekt"
-                ],
-                "configuration": "./language-configuration.json"
-            }
-        ],
-        "grammars": [
-            {
-                "language": "effekt",
-                "scopeName": "source.effekt",
-                "path": "./syntaxes/effekt.tmLanguage.json"
-            }
-        ],
+        "languages": [{
+            "id": "effekt",
+            "extensions": [
+                ".eff",
+                ".effekt"
+            ],
+            "aliases": [
+                "Effekt",
+                "effekt"
+            ],
+            "configuration": "./language-configuration.json"
+        }, {
+            "id": "literaleffekt",
+            "extensions": [
+                ".md"
+            ],
+            "aliases": ["literaleffekt"],
+            "configuration": "./language-configuration.json"
+        }],
+        "grammars": [{
+            "language": "effekt",
+            "scopeName": "source.effekt",
+            "path": "./syntaxes/effekt.tmLanguage.json"
+        },{
+            "language": "literaleffekt",
+            "scopeName": "source.literaleffekt",
+            "path": "./syntaxes/literaleffekt.tmLanguage.json"
+        }],
         "configuration": {
             "type": "object",
             "title": "Effekt",

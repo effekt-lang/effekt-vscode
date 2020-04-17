@@ -41,12 +41,13 @@ export function activate(context: ExtensionContext) {
     };
 
     let clientOptions: LanguageClientOptions = {
-        documentSelector: [
-            {
-                scheme: 'file',
-                language: 'effekt'
-            }
-        ],
+        documentSelector: [{
+            scheme: 'file',
+            language: 'effekt'
+        }, {
+            scheme: 'file',
+            language: 'literaleffekt'
+        }],
         diagnosticCollectionName: "effekt"
     };
 
