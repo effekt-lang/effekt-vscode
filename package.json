@@ -16,7 +16,7 @@
     ],
     "activationEvents": [
         "onLanguage:effekt",
-        "onLanguage:literaleffekt"
+        "onLanguage:markdown"
     ],
     "main": "./out/extension",
     "contributes": {
@@ -32,11 +32,9 @@
             ],
             "configuration": "./language-configuration.json"
         }, {
-            "id": "literaleffekt",
-            "extensions": [
-                ".md"
-            ],
-            "aliases": ["literaleffekt"],
+            "id": "markdown",
+            "extensions": [".md"],
+            "aliases": ["markdown"],
             "configuration": "./language-configuration.json"
         }],
         "grammars": [{
@@ -44,8 +42,8 @@
             "scopeName": "source.effekt",
             "path": "./syntaxes/effekt.tmLanguage.json"
         },{
-            "language": "literaleffekt",
-            "scopeName": "source.literaleffekt",
+            "language": "markdown",
+            "scopeName": "source.markdown",
             "path": "./syntaxes/literaleffekt.tmLanguage.json"
         }],
         "configuration": {

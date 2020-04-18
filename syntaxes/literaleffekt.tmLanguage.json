@@ -4,10 +4,12 @@
     "patterns": [{
         "begin": "```\n",
         "end" : "```\n",
-        "name": "source.effekt",
+        "name": "markup.fenced_code.block.markdown",
         "patterns": [{
             "include": "source.effekt"
         }]
+    }, {
+        "include":  "text.html.markdown"
     }],
-    "scopeName": "source.literaleffekt"
+    "scopeName": "source.markdown"
 }

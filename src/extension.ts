@@ -46,7 +46,7 @@ export function activate(context: ExtensionContext) {
             language: 'effekt'
         }, {
             scheme: 'file',
-            language: 'literaleffekt'
+            language: 'markdown'
         }],
         diagnosticCollectionName: "effekt"
     };
