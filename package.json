@@ -44,7 +44,7 @@
         },{
             "language": "markdown",
             "scopeName": "source.markdown",
-            "path": "./syntaxes/literaleffekt.tmLanguage.json"
+            "path": "./syntaxes/literateeffekt.tmLanguage.json"
         }],
         "configuration": {
             "type": "object",
