@@ -1,6 +1,6 @@
 'use strict';
 
-import { ExtensionContext, workspace, window, TextEditor, Range, Position, DecorationOptions } from 'vscode';
+import { ExtensionContext, workspace, window, Range, DecorationOptions } from 'vscode';
 import { LanguageClient, LanguageClientOptions, ServerOptions } from 'vscode-languageclient';
 import { Monto } from './monto';
 import { platform } from 'os';
@@ -69,7 +69,7 @@ export function activate(context: ExtensionContext) {
     })
 
     const holeDelimiterDecoration = window.createTextEditorDecorationType({
-        opacity: '0.75',
+        opacity: '0.5',
         borderRadius: '4pt',
         light: { backgroundColor: "rgba(0,0,0,0.05)" },
 		dark: { backgroundColor: "rgba(255,255,255,0.05)" }
@@ -121,7 +121,7 @@ export function activate(context: ExtensionContext) {
             addDelimiter(match.index, match.index + 2)
         }
 
-        while((match = input().match(holeOpen)) && match != null && match.index != undefined) {
+        while ((match = input().match(holeOpen)) && match != null && match.index != undefined) {
             offset = offset + match.index
             const begin = offset
             addDelimiter(offset, offset + 2)
@@ -129,7 +129,7 @@ export function activate(context: ExtensionContext) {
             if (match != null && match.index != undefined) {
                 offset = offset + match.index
                 const end = offset
-                addHole(begin, end)
+                addHole(begin + 2, end)
                 addDelimiter(offset, offset + 2)
             }
         }
