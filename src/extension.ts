@@ -64,10 +64,6 @@ export function activate(context: ExtensionContext) {
     // ---
     // It would be nice if there was a way to reuse the scopes of the tmLanguage file
 
-    const holeDecoration = window.createTextEditorDecorationType({
-        opacity: '0.75',
-    })
-
     const holeDelimiterDecoration = window.createTextEditorDecorationType({
         opacity: '0.5',
         borderRadius: '4pt',
@@ -83,11 +79,9 @@ export function activate(context: ExtensionContext) {
     function scheduleDecorations() {
 		if (timeout) { clearTimeout(timeout) }
 		timeout = setTimeout(decorate, 50);
-	}
+    }
 
-    const holeOpen = /<{/
-    const holeClose = /}>/
-    const holeRegex = /<>/g
+    const holeRegex = /<>|<{|}>/g
 
     /**
      * TODO clean this up -- this is really just hacked together...
@@ -98,12 +92,8 @@ export function activate(context: ExtensionContext) {
         const text = editor.document.getText()
         const positionAt = editor.document.positionAt
 
-        let offset = 0;
-        let holes: DecorationOptions[] = []
         let holeDelimiters: DecorationOptions[] = []
         let match;
-
-        function input() { return text.substring(offset) }
 
         function addDelimiter(from: number, to: number) {
             const begin = positionAt(from)
@@ -111,30 +101,10 @@ export function activate(context: ExtensionContext) {
             holeDelimiters.push({ range: new Range(begin, end) })
         }
 
-        function addHole(from: number, to: number) {
-            const begin = positionAt(from)
-            const end = positionAt(to)
-            holes.push({ range: new Range(begin, end) })
-        }
-
         while (match = holeRegex.exec(text)) {
             addDelimiter(match.index, match.index + 2)
         }
 
-        while ((match = input().match(holeOpen)) && match != null && match.index != undefined) {
-            offset = offset + match.index
-            const begin = offset
-            addDelimiter(offset, offset + 2)
-            match = input().match(holeClose)
-            if (match != null && match.index != undefined) {
-                offset = offset + match.index
-                const end = offset
-                addHole(begin + 2, end)
-                addDelimiter(offset, offset + 2)
-            }
-        }
-
-        editor.setDecorations(holeDecoration, holes)
         editor.setDecorations(holeDelimiterDecoration, holeDelimiters)
     }
 
