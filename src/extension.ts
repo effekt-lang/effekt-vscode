@@ -84,7 +84,7 @@ export function activate(context: ExtensionContext) {
     const holeRegex = /<>|<{|}>/g
 
     /**
-     * TODO clean this up -- this is really just hacked together...
+     * TODO clean this up -- ideally move it to the language server
      */
     function decorate() {
         if (!editor) { return; }
