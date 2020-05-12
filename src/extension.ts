@@ -13,7 +13,11 @@ export function activate(context: ExtensionContext) {
 
     let folders = workspace.workspaceFolders || []
 
-    let defaultEffekt = platform() == 'win32' ? "effekt.cmd" : "effekt";
+    let defaultEffekt = "effekt";
+    let os = platform();
+
+    if (os == 'win32') { defaultEffekt = "effekt.cmd" }
+    else if (os == 'linux' || os == 'freebsd' || os == 'openbsd') { defaultEffekt = "effekt.sh" }
 
     let effektCmd = config.get<string>("executable") || defaultEffekt
 
