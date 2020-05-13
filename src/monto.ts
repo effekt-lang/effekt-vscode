@@ -128,9 +128,9 @@ export namespace Monto {
         });
 
         workspace.onDidChangeConfiguration(event => {
-            if (event.affectsConfiguration(name)) {
+            // if (event.affectsConfiguration(name)) {
                 sendConfigurationToServer(client, name);
-            }
+            // }
         });
 
         context.subscriptions.push(
