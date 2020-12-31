@@ -68,6 +68,16 @@
                     "type": "boolean",
                     "default": false,
                     "description": "Show the translated Core (System Ξ)."
+                },
+                "effekt.remoteDebug": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Start effekt server in debug mode and remotely connect to it."
+                },
+                "effekt.remoteDebugPort": {
+                    "type": "integer",
+                    "default": 5007,
+                    "description": "Port of the remote effekt server."
                 }
             }
         },
@@ -95,7 +105,7 @@
         "test": "npm run compile && node ./node_modules/vscode/bin/test"
     },
     "dependencies": {
-        "vscode-languageclient": "^5.2.1"
+        "vscode-languageclient": "^6.1.3"
     },
     "devDependencies": {
         "typescript": "^2.6.1",
