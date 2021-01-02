@@ -4,8 +4,6 @@ import { ExtensionContext, workspace, window, Range, DecorationOptions, commands
 import { LanguageClient, LanguageClientOptions, ServerOptions, StreamInfo, TransportKind, VersionedTextDocumentIdentifier } from 'vscode-languageclient';
 import { Monto } from './monto';
 import { platform } from 'os';
-import { inferEffect } from "./commands";
-import { print } from 'util';
 import { symlinkSync } from 'fs';
 import { execArgv } from 'process';
 
@@ -37,8 +35,6 @@ export function activate(context: ExtensionContext) {
     });
 
     args.push("--server");
-    args.push("--debug");
-
 
     let remoteDebugMode = config.get<boolean>("remoteDebug");
     let debugPort: any = config.get<number>("remoteDebugPort");
@@ -46,7 +42,7 @@ export function activate(context: ExtensionContext) {
     let serverOptions: any;
 
     if(remoteDebugMode) {
-        console.log("Starting effekt server in remote debug mode");
+        console.log("Trying to connect to remote effect server on port " + debugPort);
         serverOptions = () => {
             // Connect to language server via socket
             let socket: any = net.connect({ port: debugPort }); //defaults to 5007
@@ -57,7 +53,6 @@ export function activate(context: ExtensionContext) {
             return Promise.resolve(result);
         };
     } else {
-        console.log("Starting effekt server in non-remote mode");
         serverOptions = {
             run: {
                 command: effektCmd,
@@ -66,19 +61,34 @@ export function activate(context: ExtensionContext) {
             },
             debug: {
                 command: effektCmd,
-                args: args, //.concat(["--debug"]),
-                transport: { 
+                //module: "",
+                args: args.concat(["--debug"]),
+                options: {
+                    // execPath: effektCmd
+                }
+                /*
+                transport: {
                     kind: TransportKind.socket,
-                    port: debugPort,
-                },
-                options: {}
+                    port: debugPort
+                }
+                */
             }
         };
     }
 
-    console.log("Exec Args: " + execArgv);
-    console.log("Args: " + args);
-    console.log("Effekt path: "+ effektCmd);
+    // from vscode language-client
+    // https://github.com/microsoft/vscode-languageserver-node/blob/bf274d873fb915be6bed64e5093cbe512aa8db5e/client/src/node/main.ts#L242
+    function startedInDebugMode() {
+        let args = process.execArgv;
+        if (args) {
+            return args.some((arg) => /^--debug=?/.test(arg) || /^--debug-brk=?/.test(arg) || /^--inspect=?/.test(arg) || /^--inspect-brk=?/.test(arg));
+        }
+        ;
+        return false;
+    }
+
+
+
 
     let clientOptions: LanguageClientOptions = {
         documentSelector: [{
@@ -95,8 +105,7 @@ export function activate(context: ExtensionContext) {
         'effektLanguageServer',
         'Effekt Language Server',
         serverOptions,
-        clientOptions,
-        true
+        clientOptions
     );
 
     Monto.setup("effekt", context, client);
@@ -149,7 +158,7 @@ export function activate(context: ExtensionContext) {
         let match;
 
         function addDelimiter(from: number, to: number, delimiters: DecorationOptions[]) {
-            const begin = positionAt(from)
+            const begin = positionAt(from);
             const end = positionAt(to)
             delimiters.push({ range: new Range(begin, end) })
         }
@@ -183,10 +192,6 @@ export function activate(context: ExtensionContext) {
     scheduleDecorations();
     
 
-    let commandDisposable = commands.registerCommand(
-        "extension.addConsoleLog",
-        inferEffect
-    );
 
     //testing document selector - wil this work for .effekt files?
     let docSelector = {
@@ -195,9 +200,35 @@ export function activate(context: ExtensionContext) {
     };
 
 
-    context.subscriptions.push(commandDisposable);
 
+    console.log("Starting effekt server.");
     context.subscriptions.push(client.start());
+
+
+    if (startedInDebugMode()) {
+        /*Effekt server should have been started with "--debug" flag and should be listening on a port.
+            Hence we start a second process for listening on that port. */
+
+        let listenerClient: LanguageClient = new LanguageClient(
+            'effektLanguageServerDebug',
+            'Effekt Language Server Debug',
+            () => {
+                // Connect to language server via socket
+                let socket: any = net.connect({ port: debugPort }); //defaults to 5007
+                let result: StreamInfo = {
+                    writer: socket,
+                    reader: socket
+                };
+                return Promise.resolve(result);
+            },
+            clientOptions
+        );
+
+        console.log("Effekt server was started in debug mode - trying to listen on port " + debugPort + ".");
+        context.subscriptions.push(listenerClient.start());
+    }
+
+    console.log("Exec Args: " + execArgv);
 }
 
 export function deactivate(): Thenable<void> | undefined {
