@@ -1,16 +1,17 @@
 'use strict';
 
-import { ExtensionContext, workspace, window, Range, DecorationOptions, commands, languages } from 'vscode';
-import { LanguageClient, LanguageClientOptions, ServerOptions, StreamInfo, TransportKind, VersionedTextDocumentIdentifier } from 'vscode-languageclient';
+import { ExtensionContext, workspace, window, Range, DecorationOptions } from 'vscode';
+import { LanguageClient, LanguageClientOptions, StreamInfo } from 'vscode-languageclient';
 import { Monto } from './monto';
 import { platform } from 'os';
-import { symlinkSync } from 'fs';
+//import { symlinkSync } from 'fs';
 import { execArgv } from 'process';
 
 const net = require('net');
 
 
 let client: LanguageClient;
+let listenerClient: LanguageClient;
 
 export function activate(context: ExtensionContext) {
 
@@ -61,17 +62,8 @@ export function activate(context: ExtensionContext) {
             },
             debug: {
                 command: effektCmd,
-                //module: "",
                 args: args.concat(["--debug"]),
-                options: {
-                    // execPath: effektCmd
-                }
-                /*
-                transport: {
-                    kind: TransportKind.socket,
-                    port: debugPort
-                }
-                */
+                options: {}
             }
         };
     }
@@ -134,7 +126,7 @@ export function activate(context: ExtensionContext) {
 
     // based on https://github.com/microsoft/vscode-extension-samples/blob/master/decorator-sample/src/extension.ts
     let timeout: NodeJS.Timer;
-    let editor = window.activeTextEditor
+    let editor = window.activeTextEditor;
 
     function scheduleDecorations() {
         if (timeout) { clearTimeout(timeout) }
@@ -150,8 +142,8 @@ export function activate(context: ExtensionContext) {
     function decorate() {
         if (!editor) { return; }
 
-        const text = editor.document.getText()
-        const positionAt = editor.document.positionAt
+        const text = editor.document.getText();
+        const positionAt = editor.document.positionAt;
 
         let holeDelimiters: DecorationOptions[] = []
         let effectDelimiters: DecorationOptions[] = []
@@ -190,16 +182,6 @@ export function activate(context: ExtensionContext) {
     }, null, context.subscriptions);
 
     scheduleDecorations();
-    
-
-
-    //testing document selector - wil this work for .effekt files?
-    let docSelector = {
-        language: "effekt",
-        scheme: "file"
-    };
-
-
 
     console.log("Starting effekt server.");
     context.subscriptions.push(client.start());
@@ -209,7 +191,7 @@ export function activate(context: ExtensionContext) {
         /*Effekt server should have been started with "--debug" flag and should be listening on a port.
             Hence we start a second process for listening on that port. */
 
-        let listenerClient: LanguageClient = new LanguageClient(
+        listenerClient = new LanguageClient(
             'effektLanguageServerDebug',
             'Effekt Language Server Debug',
             () => {
@@ -232,8 +214,11 @@ export function activate(context: ExtensionContext) {
 }
 
 export function deactivate(): Thenable<void> | undefined {
-	if (!client) {
+    if (listenerClient){
+        listenerClient.stop();
+    }
+    if (!client) {
 		return undefined;
-	}
-	return client.stop();
+    }
+    return client.stop();
 }
