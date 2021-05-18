@@ -109,7 +109,7 @@ export function activate(context: ExtensionContext) {
         borderRadius: '4pt',
         light: { backgroundColor: "rgba(127,127,127,0.05)", color: "rgba(0,255,0,1.0)"},
         dark: { backgroundColor: "rgba(255,255,255,0.05)", color: "rgba(0,255,0,1.0)" },
-        before: {contentText: 'Effekt:', backgroundColor: "rgba(100,100,100,1)"}
+        before: {contentText: '\t'}
     })
 
 
@@ -168,17 +168,30 @@ export function activate(context: ExtensionContext) {
     // }
 
     function decorateTypeAnnotations(document: TextDocument) {
-        if (editor?.document.languageId === "effekt") {
-            client.sendRequest(ExecuteCommandRequest.type, { command: "getTypeAnnotations", arguments: [document.uri.toString()] }).then(
-                (val) => {
-                    console.log("getTypeAnnotations return type: " + typeof (val));
-                    //console.log(JSON.stringify(val, undefined, 2));
-                    var objArray = val as Array<TypeAnnotation>;
-                    addTypeAnnotations(objArray);
-                }
-            );
-        }
+        // if (editor?.document.languageId === "effekt") {
+        //     client.sendRequest(ExecuteCommandRequest.type, { command: "getTypeAnnotations", arguments: [document.uri.toString()] }).then(
+        //         (val) => {
+        //             console.log("getTypeAnnotations return type: " + typeof (val));
+        //             //console.log(JSON.stringify(val, undefined, 2));
+        //             var objArray = val as Array<TypeAnnotation>;
+        //             addTypeAnnotations(objArray);
+        //         }
+        //     );
+        // }
     }
+
+    function decorateEffectIntroductions(document: TextDocument) {
+        if (editor?.document.languageId === "effekt") {
+                client.sendRequest(ExecuteCommandRequest.type, { command: "getEffectIntroductions", arguments: [document.uri.toString()] }).then(
+                    (val) => {
+                        console.log("getEffectIntroductions return type: " + typeof (val));
+                        //console.log(JSON.stringify(val, undefined, 2));
+                        var objArray = val as Array<TypeAnnotation>;
+                    }
+                );
+            }
+    }
+
 
     // workspace.onDidSaveTextDocument(document => {
     //     decorateTypeAnnotations(document);
@@ -206,6 +219,7 @@ export function activate(context: ExtensionContext) {
         }
 
         decorateTypeAnnotations(editor.document);
+        decorateEffectIntroductions(editor.document);
     }
 
 
@@ -247,6 +261,7 @@ export function activate(context: ExtensionContext) {
     const clearAnnotationsCommand = 'effekt.clearAnnotations';
     const inferEffectsCommand = 'effekt.inferEffects';
     const inferPassedEffectsCommand = 'effekt.inferPassedEffects';
+    const getPassedCapabilitiesCommand = 'effekt.getPassedCapabilities';
 
     class Name {
         parent: any;
@@ -305,30 +320,97 @@ export function activate(context: ExtensionContext) {
         eff: Effect | undefined;
     }
 
+    class CapabilityHint {
+        constructor(){
+            this.capabilities = [];
+            this.line = 0;
+            this.column = 0;
+        }
+        capabilities: Array<string>;
+        line: number;
+        column: number;
+    }
+
+    /**
+     * Get the column of the last character in the given line.
+     * @param line line number of which we want the last characters column
+     * @returns the column number of the last character of that line or the number "8000" if undefined
+     */
+    function getEndOfLine(line: number) {
+        let endCol = editor?.document.lineAt(line).range.end.character;
+        return endCol? endCol : 8000;
+    }
+
+    function stripCapabilityName(capabilityName: string) {
+        return capabilityName.replace(/\$capability/g, '');
+    }
+
+    function stripCapabilityNames(capabilityNames: Array<string>) {
+        let res = "";
+        if(capabilityNames.length > 0){
+            res = capabilityNames.toString();
+            res = stripCapabilityName(res);
+        }
+        return res;
+    }
+
+
+    const getPassedCapabilitiesHandler = () => {
+        var pos = editor?.selection.active;
+        if(pos){
+            client.sendRequest(ExecuteCommandRequest.type, { command: "getPassedCapabilities", arguments: [editor?.document.uri.toString()]} ).then(
+                (val) => {
+                    console.log("Unbekannter return type: " + typeof(val));
+                    console.log(JSON.stringify(val, undefined, 2));
+                    var res = JSON.parse(val as string);
+                    //var res = Object.assign({ 'value': Array}, val);
+                    console.log(res);
+                    console.log(typeof(res));
+                    let decorations: Array<DecorationOptions> = [];
+                    res.forEach(element => {
+                        var e = (element as CapabilityHint);
+                        console.log("Decorating ", e);
+                        let endCol = getEndOfLine(e.line-1);
+                        console.log("EndCol: ", endCol);
+                        let startPos = new Position(e.line-1, endCol);
+                        let endPos = new Position(e.line-1, endCol + e.capabilities.toString().length);
+                        const decoration: DecorationOptions = { range: new Range(startPos, endPos),
+                            renderOptions: {
+                                after: {
+                                    contentText: '<' + stripCapabilityNames(e.capabilities) + '>',
+                                    backgroundColor: "rgba(211, 211, 211,0.4)"
+                                }
+                            }, hoverMessage: 'Introduced effects: '+ stripCapabilityNames(e.capabilities) };
+                        decorations.push(decoration);
+                    });
+                    editor?.setDecorations(effectDecoration, decorations);
+                }
+            );
+        }
+    }
+
     const inferPassedEffectsHandler = () => {
         var pos = editor?.selection.active;
         if(pos){
             client.sendRequest(ExecuteCommandRequest.type, { command: "getCapabilityArguments", arguments: [pos, editor?.document.uri.toString()]} ).then(
                 (val) => {
-                    if(isString(val)){
-                        console.log(val);
-                    }
-                    else {
-                        console.log("Unbekannter return type: " + typeof(val));
-                        console.log(JSON.stringify(val, undefined, 2));
-                        var res = JSON.parse(val as string);
-                        //var res = Object.assign({ 'value': Array}, val);
-                        console.log(res);
-                        console.log(typeof(res))
-                        const quickPick = window.createQuickPick();
-                        // quickPick.items = [{label: "Info", description: res.eff.toString()}];
-                        
-                        let itemList: QuickPickItem[] = [];
-                        res.forEach((tpe) => itemList.push({label: "Info", description: tpe}));
-                        quickPick.items = itemList;
-                        quickPick.onDidHide(() => quickPick.dispose());
-                        quickPick.show();
-                    }
+                    console.log("Unbekannter return type: " + typeof(val));
+                    console.log(JSON.stringify(val, undefined, 2));
+                    var res = JSON.parse(val as string);
+                    //var res = Object.assign({ 'value': Array}, val);
+                    console.log(res);
+                    console.log(typeof(res))
+                    const quickPick = window.createQuickPick();
+                    // quickPick.items = [{label: "Info", description: res.eff.toString()}];
+                    
+                    let itemList: QuickPickItem[] = [];
+                    res.forEach((tpe) => itemList.push({label: "Info", description: tpe}));
+                    quickPick.items = itemList;
+                    quickPick.onDidHide(() => quickPick.dispose());
+                    quickPick.show();
+                    const decoration: DecorationOptions = { range: new Range(editor?.selection.active as Position, editor?.selection.active as Position),
+                        renderOptions: {after: {contentText: res[0] + '>'}}, hoverMessage: 'Effects: '+res[0] };
+                    editor?.setDecorations(effectDecoration, [decoration]);
                 }
             );
         }
@@ -445,6 +527,7 @@ export function activate(context: ExtensionContext) {
     context.subscriptions.push(commands.registerCommand(clearAnnotationsCommand, commandHandler));
     context.subscriptions.push(commands.registerCommand(inferEffectsCommand, inferEffectsHandler));
     context.subscriptions.push(commands.registerCommand(inferPassedEffectsCommand, inferPassedEffectsHandler));
+    context.subscriptions.push(commands.registerCommand(getPassedCapabilitiesCommand, getPassedCapabilitiesHandler));
     // if (startedInDebugMode() && !remoteDebugMode) {
     //     /*Effekt server should have been started with "--debug" flag and should be listening on a port.
     //         Hence we start a second process for listening on that port. */
