@@ -1,7 +1,6 @@
 'use strict';
-
-import { ExtensionContext, workspace, window, Range, DecorationOptions, languages, commands, Position, TextDocument, QuickPickItem } from 'vscode';
-import { ExecuteCommandRequest, HoverRequest, integer, LanguageClient, LanguageClientOptions, StreamInfo, VersionedTextDocumentIdentifier } from 'vscode-languageclient';
+import { Uri, ExtensionContext, workspace, window, Range, DecorationOptions, languages, commands, Position, TextDocument, QuickPickItem, MarkdownString, IndentAction } from 'vscode';
+import { ExecuteCommandRequest, HoverRequest, integer, LanguageClient, LanguageClientOptions, MarkedString, MarkupContent, StreamInfo, VersionedTextDocumentIdentifier } from 'vscode-languageclient';
 import { Monto } from './monto';
 import { platform } from 'os';
 //import { symlinkSync } from 'fs';
@@ -109,8 +108,17 @@ export function activate(context: ExtensionContext) {
         borderRadius: '4pt',
         light: { backgroundColor: "rgba(127,127,127,0.05)", color: "rgba(0,255,0,1.0)"},
         dark: { backgroundColor: "rgba(255,255,255,0.05)", color: "rgba(0,255,0,1.0)" },
+        before: {contentText: '\t'},
+        gutterIconPath: "C:\Users\timne\source\repos\effekt\effekt-vscode\resoures\icons\outline_login_black_24dp.png"
+    });
+
+    const unhandledEffectDecoration = window.createTextEditorDecorationType({
+        opacity: '0.5',
+        borderRadius: '4pt',
+        light: { backgroundColor: "rgba(127,127,127,0.05)", color: "rgba(0,255,0,1.0)"},
+        dark: { backgroundColor: "rgba(255,255,255,0.05)", color: "rgba(0,255,0,1.0)" },
         before: {contentText: '\t'}
-    })
+    });
 
 
     // Decorate holes
@@ -220,6 +228,8 @@ export function activate(context: ExtensionContext) {
 
         decorateTypeAnnotations(editor.document);
         decorateEffectIntroductions(editor.document);
+        getPassedCapabilitiesHandler();
+        getUnhandledCapabilitiesHandler();
     }
 
 
@@ -262,6 +272,8 @@ export function activate(context: ExtensionContext) {
     const inferEffectsCommand = 'effekt.inferEffects';
     const inferPassedEffectsCommand = 'effekt.inferPassedEffects';
     const getPassedCapabilitiesCommand = 'effekt.getPassedCapabilities';
+    const getUnhandledCapabilitiesCommand = 'effekt.getUnhandledCapabilities';
+    const getCapabilityReceiverCommand = 'effekt.getCapabilityReceiver';
 
     class Name {
         parent: any;
@@ -320,13 +332,24 @@ export function activate(context: ExtensionContext) {
         eff: Effect | undefined;
     }
 
+    class Capability {
+        constructor(){
+            this.name = "";
+        }
+        name: string;
+        scopeStart: any;
+        scopeEnd: any;
+    }
+
     class CapabilityHint {
         constructor(){
             this.capabilities = [];
+            this.capabilityIDs = null;
             this.line = 0;
             this.column = 0;
         }
-        capabilities: Array<string>;
+        capabilities: Array<Capability>;
+        capabilityIDs: any;
         line: number;
         column: number;
     }
@@ -369,25 +392,40 @@ export function activate(context: ExtensionContext) {
                     let decorations: Array<DecorationOptions> = [];
                     res.forEach(element => {
                         var e = (element as CapabilityHint);
-                        console.log("Decorating ", e);
+                        console.log("Decorating passed capability ", e);
                         let endCol = getEndOfLine(e.line-1);
                         console.log("EndCol: ", endCol);
                         let startPos = new Position(e.line-1, endCol);
                         let endPos = new Position(e.line-1, endCol + e.capabilities.toString().length);
-                        const decoration: DecorationOptions = { range: new Range(startPos, endPos),
-                            renderOptions: {
-                                after: {
-                                    contentText: '<' + stripCapabilityNames(e.capabilities) + '>',
-                                    backgroundColor: "rgba(211, 211, 211,0.4)"
-                                }
-                            }, hoverMessage: 'Introduced effects: '+ stripCapabilityNames(e.capabilities) };
-                        decorations.push(decoration);
+                        
+                        var arg = [{IDs: e.capabilities, scopeStart: e.capabilities[0].scopeStart, scopeEnd: e.capabilities[0].scopeEnd}]; //[{message: stripCapabilityNames(e.capabilities)}];
+
+                        const commandUri = Uri.parse(`command:effekt.clearAnnotations?${encodeURIComponent(JSON.stringify(arg))}`);
+                        let messageString = new MarkdownString(`[Show capability scope](${commandUri})`);
+                        messageString.isTrusted = true;
+                        console.log("Appending command: ", commandUri);
+
+                        e.capabilities.forEach(capability => {
+                            const decoration: DecorationOptions = { range: new Range(startPos, endPos),
+                                renderOptions: {
+                                    after: {
+                                        contentText: '<' + stripCapabilityNames([capability.name]) + '>',
+                                        backgroundColor: "rgba(211, 211, 211,0.4)",
+                                        color: "rgb(80,80,80)"
+                                    }
+                                },
+                                hoverMessage: [messageString, "Hello, Hover Message"] };
+                            decorations.push(decoration);
+                        });
+
+                        
                     });
                     editor?.setDecorations(effectDecoration, decorations);
+                    console.log("########### TAB SIZE:", window.activeTextEditor?.options.tabSize, "Insert spaces:", window.activeTextEditor?.options.insertSpaces);
                 }
             );
         }
-    }
+    };
 
     const inferPassedEffectsHandler = () => {
         var pos = editor?.selection.active;
@@ -414,6 +452,89 @@ export function activate(context: ExtensionContext) {
                 }
             );
         }
+    };
+
+
+    // use Annotations.CapabilityBinder in the server to identify capability binders
+    const getUnhandledCapabilitiesHandler = () => {
+        var pos = editor?.selection.active;
+        if(pos){
+            client.sendRequest(ExecuteCommandRequest.type, { command: "getUnhandledCapabilities", arguments: [editor?.document.uri.toString()]} ).then(
+                (val) => {
+                    console.log("Unbekannter return type: " + typeof(val));
+                    console.log(JSON.stringify(val, undefined, 2));
+                    var res = JSON.parse(val as string);
+                    //var res = Object.assign({ 'value': Array}, val);
+                    console.log(res);
+                    console.log(typeof(res));
+                    let decorations: Array<DecorationOptions> = [];
+                    res.forEach(element => {
+                        var e = (element as CapabilityHint);
+                        console.log("Decorating unhandled capability ", e);
+                        let endCol = getEndOfLine(e.line-1);
+                        console.log("EndCol: ", endCol);
+                        
+
+                        var i = 0;
+                        e.capabilities.forEach(capability => {
+                            let startPos = new Position(e.line-1, endCol + i);
+                            let endPos = new Position(e.line-1, endCol + capability.name.length);
+                            i = capability.name.length + 1;
+                            const decoration: DecorationOptions = { range: new Range(startPos, endPos),
+                                renderOptions: {
+                                    after: {
+                                        contentText: '<' + stripCapabilityNames([capability.name]) + '>',
+                                        backgroundColor: "rgba(200, 200, 200,0.4)",
+                                        color: "rgb(160,80,80)"
+                                    }
+                                }, hoverMessage: 'Bound capability: '+ stripCapabilityNames([capability.name]) };
+                            decorations.push(decoration);
+                        });
+
+                        
+                    });
+                    editor?.setDecorations(unhandledEffectDecoration, decorations);
+                }
+            );
+        }
+    };
+
+
+    const getCapabilityReceiverHandler = () => {
+        client.sendRequest(ExecuteCommandRequest.type, { command: "getCapabilityReceiver", arguments: [editor?.document.uri.toString()]} ).then(
+            (val) => {
+                console.log("Unbekannter return type: " + typeof(val));
+                console.log(JSON.stringify(val, undefined, 2));
+                var res = JSON.parse(val as string);
+                //var res = Object.assign({ 'value': Array}, val);
+                console.log(res);
+                console.log(typeof(res));
+                let decorations: Array<DecorationOptions> = [];
+                res.forEach(element => {
+                    var e = (element as CapabilityHint);
+                    console.log("Decorating unhandled capability ", e);
+                    let endCol = getEndOfLine(e.line-1);
+                    console.log("EndCol: ", endCol);
+                    let startPos = new Position(e.line-1, endCol);
+                    let endPos = new Position(e.line-1, endCol + e.capabilities.toString().length);
+
+                    e.capabilities.forEach(capability => {
+                        const decoration: DecorationOptions = { range: new Range(startPos, endPos),
+                            renderOptions: {
+                                after: {
+                                    contentText: '<' + stripCapabilityNames([capability.name]) + '>',
+                                    backgroundColor: "rgba(200, 200, 200,0.4)",
+                                    color: "rgb(160,80,80)"
+                                }
+                            }, hoverMessage: 'Bound capability: '+ stripCapabilityNames([capability.name]) };
+                        decorations.push(decoration);
+                    });
+
+                    
+                });
+                editor?.setDecorations(unhandledEffectDecoration, decorations);
+            }
+        );
     }
 
     const inferEffectsHandler = () => {
@@ -424,18 +545,6 @@ export function activate(context: ExtensionContext) {
             var end = new Position(pos.line, pos.character+4);
             var elem = editor?.document.getText(new Range(start, end));
             console.log(elem);
-
-            client.sendRequest(ExecuteCommandRequest.type, { command: "println", arguments: [elem]}).then(
-                (val) => {
-                    if(isString(val)){
-                        console.log(val);
-                    }
-                    else {
-                        console.log("Unbekannter return type: " + typeof(val));
-                        console.log(val);
-                    }
-                }
-            );
 
             client.sendRequest(ExecuteCommandRequest.type, { command: "getCapabilityBinders", arguments: [pos, editor?.document.uri.toString()]} ).then(
                     (val) => {
@@ -463,9 +572,22 @@ export function activate(context: ExtensionContext) {
         }
     };
 
-    const commandHandler = (message: string = 'Hello') => {
-        console.log(`Sending ${message} to server!!!`);
-        editor?.setDecorations(effectDecoration, []);
+
+
+
+    const scopeDecoration = window.createTextEditorDecorationType({
+        light: { backgroundColor: "rgba(127,127,127,0.15)"},
+        dark: { backgroundColor: "rgba(255,255,255,0.15)"},
+    });
+
+    const commandHandler = (args: {IDs: [any], scopeStart: any, scopeEnd: any}) => {
+        console.log(args);
+        console.log("Received parameter IDs:")
+        args.IDs.forEach((element: { id: any; }) => {
+            console.log(element.id);
+        });
+        editor?.setDecorations(scopeDecoration, [new Range(new Position(args.scopeStart.line-1, args.scopeStart.column-1),
+            new Position(args.scopeEnd.line-1, args.scopeEnd.column-1)]);
         // client.sendRequest(ExecuteCommandRequest.type, { command: "getTypeAnnotations", arguments: [window.activeTextEditor?.document.uri.toString()]}).then(
         //     (val) => {
         //         if(isString(val)){
@@ -528,6 +650,8 @@ export function activate(context: ExtensionContext) {
     context.subscriptions.push(commands.registerCommand(inferEffectsCommand, inferEffectsHandler));
     context.subscriptions.push(commands.registerCommand(inferPassedEffectsCommand, inferPassedEffectsHandler));
     context.subscriptions.push(commands.registerCommand(getPassedCapabilitiesCommand, getPassedCapabilitiesHandler));
+    context.subscriptions.push(commands.registerCommand(getUnhandledCapabilitiesCommand, getUnhandledCapabilitiesHandler));
+    context.subscriptions.push(commands.registerCommand(getCapabilityReceiverCommand, getCapabilityReceiverHandler));
     // if (startedInDebugMode() && !remoteDebugMode) {
     //     /*Effekt server should have been started with "--debug" flag and should be listening on a port.
     //         Hence we start a second process for listening on that port. */

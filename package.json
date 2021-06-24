@@ -116,7 +116,22 @@
             {
                 "category": "Effekt",
                 "command": "effekt.inferPassedEffects",
-                "title": "Get passed effects"
+                "title": "Get effects passed to this function"
+            },
+            {
+                "category": "Effekt",
+                "command": "effekt.getPassedCapabilities",
+                "title": "Get Passed Capabilities"
+            },
+            {
+                "category": "Effekt",
+                "command": "effekt.getUnhandledCapabilities",
+                "title": "Get Unhandled Capabilities"
+            },
+            {
+                "category": "Effekt",
+                "command": "effekt.getCapabilityReceiver",
+                "title": "Get capability receiver"
             }
         ],
         "keybindings": [
@@ -140,6 +155,18 @@
                 {
                     "command": "effekt.inferPassedEffects",
                     "group": "effektGroup@3"
+                },
+                {
+                    "command": "effekt.getPassedCapabilities",
+                    "group": "effektGroup@4"
+                },
+                {
+                    "command": "effekt.getUnhandledCapabilities",
+                    "group": "effektGroup@5"
+                },
+                {
+                    "command": "effekt.getCapabilityReceiver",
+                    "group": "effektGroup@6"
                 }
             ]
         }
