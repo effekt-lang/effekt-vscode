@@ -253,7 +253,9 @@ export function activate(context: ExtensionContext) {
     }, null, context.subscriptions);
 
     workspace.onDidChangeTextDocument(event => {
+        console.log("!!!!! onDidChangeTextDocument triggered !!!!!");
         if (editor && event.document === editor.document) {
+            console.log("!!!!! Triggering decorations update !!!!!");
             triggerUpdateDecorations();
         }
     }, null, context.subscriptions);
