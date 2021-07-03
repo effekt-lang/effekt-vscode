@@ -588,8 +588,9 @@ export function activate(context: ExtensionContext) {
         args.IDs.forEach((element: { id: any; }) => {
             console.log(element.id);
         });
-        editor?.setDecorations(scopeDecoration, [new Range(new Position(args.scopeStart.line-1, args.scopeStart.column-1),
-            new Position(args.scopeEnd.line-1, args.scopeEnd.column-1)]);
+        let scopeRange = new Range(new Position(args.scopeStart.line-1, args.scopeStart.column-1),
+        new Position(args.scopeEnd.line-1, args.scopeEnd.column-1))
+        editor?.setDecorations(scopeDecoration, [scopeRange]);
         // client.sendRequest(ExecuteCommandRequest.type, { command: "getTypeAnnotations", arguments: [window.activeTextEditor?.document.uri.toString()]}).then(
         //     (val) => {
         //         if(isString(val)){
