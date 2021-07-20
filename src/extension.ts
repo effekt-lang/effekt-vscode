@@ -175,61 +175,20 @@ export function activate(context: ExtensionContext) {
 
     // }
 
-    function decorateTypeAnnotations(document: TextDocument) {
-        // if (editor?.document.languageId === "effekt") {
-        //     client.sendRequest(ExecuteCommandRequest.type, { command: "getTypeAnnotations", arguments: [document.uri.toString()] }).then(
-        //         (val) => {
-        //             console.log("getTypeAnnotations return type: " + typeof (val));
-        //             //console.log(JSON.stringify(val, undefined, 2));
-        //             var objArray = val as Array<TypeAnnotation>;
-        //             addTypeAnnotations(objArray);
-        //         }
-        //     );
-        // }
-    }
 
-    function decorateEffectIntroductions(document: TextDocument) {
-        if (editor?.document.languageId === "effekt") {
-                client.sendRequest(ExecuteCommandRequest.type, { command: "getEffectIntroductions", arguments: [document.uri.toString()] }).then(
-                    (val) => {
-                        console.log("getEffectIntroductions return type: " + typeof (val));
-                        //console.log(JSON.stringify(val, undefined, 2));
-                        var objArray = val as Array<TypeAnnotation>;
-                    }
-                );
-            }
-    }
+    
 
-
-    // workspace.onDidSaveTextDocument(document => {
-    //     decorateTypeAnnotations(document);
-    // });
-
-
-    // window.onDidChangeActiveTextEditor(ed => {
-    //     editor = ed;
-    //     scheduleDecorations();
-    // }, null, context.subscriptions);
-
-    // workspace.onDidChangeTextDocument(event => {
-    //     if (editor && event.document === editor.document) {
-    //         //reset all decorations first
-    //         currentDocumentAnnotations = [];
-    //         scheduleDecorations();
-    //     }
-    // }, null, context.subscriptions);
-
-    //scheduleDecorations();
 
     function updateDecorations() {
         if (!editor) {
             return;
         }
 
-        decorateTypeAnnotations(editor.document);
-        decorateEffectIntroductions(editor.document);
-        getPassedCapabilitiesHandler();
-        getUnhandledCapabilitiesHandler();
+        if(editor.document.languageId == "effekt" || editor.document.languageId == "markdown"){
+            getCapabilitiesInfo();
+            //getPassedCapabilitiesHandler();
+            //getUnhandledCapabilitiesHandler();
+        }
     }
 
 
@@ -244,6 +203,35 @@ export function activate(context: ExtensionContext) {
     if (editor) {
         triggerUpdateDecorations();
     }
+
+
+    let capabilityScopes: { hoverRange: Range; scopeRange: Range; }[] = [];
+
+    window.onDidChangeTextEditorSelection(ev => {
+        console.log("Cursor position changed", ev);
+        console.log(capabilityScopes)
+        let current = ev.selections[0].active;
+        
+        let removeScopeDecorations = true;
+        capabilityScopes.forEach((v, i) => {
+
+            if(current.line == v.hoverRange.end.line){
+                if(current.character >= v.hoverRange.start.character && current.character <= v.hoverRange.end.character){
+                    console.log("Found a capability scope matching current cursor position ", current.line, "x", current.character);
+                    removeScopeDecorations = false;
+                    commandHandler({
+                        IDs: [1],
+                        scopeStart: v.scopeRange.start,
+                        scopeEnd: v.scopeRange.end
+                    });
+                }
+            }
+        })
+        if(removeScopeDecorations){
+            editor?.setDecorations(scopeDecoration, []);
+        }
+
+    });
 
     window.onDidChangeActiveTextEditor(ed => {
         editor = ed;
@@ -379,8 +367,140 @@ export function activate(context: ExtensionContext) {
         return res;
     }
 
+    // CapabilityInfo(capabilityKind: String, capabilityName: String, sourceRange: LSPRange, scopeRange: LSPRange)
+    class CapabilityInfo {
+        constructor(obj: {capabilityKind: string, capabilityName: string, sourceRange: Range, scopeRange: Range}){
+            this.capabilityKind = obj.capabilityKind;
+            this.capabilityName = stripCapabilityName(obj.capabilityName);
+            this.sourceRange = obj.sourceRange;
+            this.scopeRange = obj.scopeRange;
+        }
+        capabilityKind: string;
+        capabilityName: string;
+        sourceRange: Range;
+        scopeRange: Range;
+    }
 
-    const getPassedCapabilitiesHandler = () => {
+    const capabilityBinderDecoration = window.createTextEditorDecorationType({
+        opacity: '0.5',
+        borderRadius: '4pt',
+        light: { backgroundColor: "rgba(127,127,127,0.05)", color: "rgba(0,255,0,1.0)"},
+        dark: { backgroundColor: "rgba(255,255,255,0.05)", color: "rgba(0,255,0,1.0)" },
+    });
+
+    function displayCapabilityBinders(capabilityBinders: CapabilityInfo[]){
+
+        
+    }
+
+    const capabilityReceiverDecoration = window.createTextEditorDecorationType({
+        borderRadius: '4pt',
+        light: { backgroundColor: "rgba(206, 224, 220,0.05)"},
+        dark: { backgroundColor: "rgba(180,130,145,0.05)"},
+    });
+
+    function displayCapabilityReceivers(capabilityReceivers: CapabilityInfo[]){
+        capabilityReceivers.forEach(cr => {
+            capabilityScopes.push({hoverRange: cr.sourceRange, scopeRange: cr.scopeRange})
+        })
+
+        //let decoRanges = capabilityArguments.map(ca => ca.sourceRange)
+        let decorations: DecorationOptions[] = [];
+
+        capabilityReceivers.forEach(ca => {
+            const decoration: DecorationOptions = { 
+                range: ca.sourceRange,
+                renderOptions: {
+                    after: {
+                        contentText: ' Ξ',
+                        fontStyle: "bold"
+                    },
+                    light: {
+                        after: {
+                            color: "rgb(165, 36, 61)"
+                        }
+                    },
+                    dark: {
+                        after: {
+                            color: "rgb(180, 130, 145)"
+                        }
+                    }
+                }
+            };
+            decorations.push(decoration);
+        })
+        
+        editor?.setDecorations(capabilityReceiverDecoration, decorations)
+    }
+
+    const capabilityArgumentDecoration = window.createTextEditorDecorationType({
+        opacity: '0.5',
+        borderRadius: '4pt',
+        light: { backgroundColor: "rgba(127,127,127,0.05)", color: "rgba(0,255,0,1.0)"},
+        dark: { backgroundColor: "rgba(255,255,255,0.05)", color: "rgba(0,255,0,1.0)" },
+        after: {
+            contentText: "<!>"
+        }
+    });
+
+    function displayCapabilityArguments(capabilityArguments: CapabilityInfo[]){
+        capabilityArguments.forEach(ca => {
+            capabilityScopes.push({hoverRange: ca.sourceRange, scopeRange: ca.scopeRange})
+        })
+
+        //let decoRanges = capabilityArguments.map(ca => ca.sourceRange)
+        let decorations: DecorationOptions[] = [];
+
+        capabilityArguments.forEach(ca => {
+            const decoration: DecorationOptions = { 
+                range: ca.sourceRange,
+                renderOptions: {
+                    after: {
+                        contentText: '<' + ca.capabilityName + '>',
+                        backgroundColor: "rgba(211, 211, 211,0.4)",
+                        color: "rgb(80,80,80)"
+                    }
+                }
+            };
+            decorations.push(decoration);
+        })
+        
+        editor?.setDecorations(capabilityArgumentDecoration, decorations)
+    }
+
+    /**
+     * Visualize capability infos depending on their capabilityKind
+     * @param response an array of capability infos
+     */
+    function displayCapabilitiesInfo(response: CapabilityInfo[]) {
+        capabilityScopes = [];
+        displayCapabilityBinders(response.filter(r => r.capabilityKind == "CapabilityBinder"));
+        displayCapabilityReceivers(response.filter(r => r.capabilityKind == "CapabilityReceiver"));
+        displayCapabilityArguments(response.filter(r => r.capabilityKind == "CapabilityArgument"));
+    }
+    
+
+    /**
+     * asynchronously request the LSP server for info on capabilities (introductions, binding sites, scopes etc.) and store that info for visualisation
+     */
+    async function getCapabilitiesInfo() {
+        client.sendRequest(ExecuteCommandRequest.type, { command: "getCapabilitiesInfo", arguments: [editor?.document.uri.toString()]}).then(
+            response_json => {
+                console.log("Response raw:\n", response_json)
+                var response = JSON.parse(response_json as string) as CapabilityInfo[];
+                let capabilitiesInfo = response.map(element => {
+                    return(new CapabilityInfo(element))
+                });
+                console.log("CapabilitiesInfo:\n", capabilitiesInfo);
+                displayCapabilitiesInfo(capabilitiesInfo);
+            }
+        )
+    }
+
+
+
+
+    async function getPassedCapabilitiesHandler() {
         var pos = editor?.selection.active;
         if(pos){
             client.sendRequest(ExecuteCommandRequest.type, { command: "getPassedCapabilities", arguments: [editor?.document.uri.toString()]} ).then(
@@ -392,6 +512,9 @@ export function activate(context: ExtensionContext) {
                     console.log(res);
                     console.log(typeof(res));
                     let decorations: Array<DecorationOptions> = [];
+                    
+                    capabilityScopes = [];
+
                     res.forEach(element => {
                         var e = (element as CapabilityHint);
                         console.log("Decorating passed capability ", e);
@@ -419,6 +542,19 @@ export function activate(context: ExtensionContext) {
                                 hoverMessage: [messageString, "Hello, Hover Message"] };
                             decorations.push(decoration);
                         });
+
+                        console.log("Scope start:", e.capabilities[0].scopeStart, ", type:", typeof(e.capabilities[0].scopeStart))
+
+                        let scopeStart = new Position(e.capabilities[0].scopeStart.line-1, e.capabilities[0].scopeStart.column-1)
+                        let scopeEnd = new Position(e.capabilities[0].scopeEnd.line-1, e.capabilities[0].scopeEnd.column-1)
+
+                        let scope = {
+                            hoverRange: new Range(new Position(e.line-1, 0), new Position(e.line-1, endCol)),
+                            scopeRange: new Range(scopeStart, scopeEnd)
+                        }
+                        console.log("About to push a capabilty scope: ");
+                        capabilityScopes.push(scope);
+                        console.log("Pushed capability scope:", capabilityScopes);
 
                         
                     });
@@ -578,8 +714,8 @@ export function activate(context: ExtensionContext) {
 
 
     const scopeDecoration = window.createTextEditorDecorationType({
-        light: { backgroundColor: "rgba(127,127,127,0.15)"},
-        dark: { backgroundColor: "rgba(255,255,255,0.15)"},
+        light: { backgroundColor: "rgba(180, 130, 145,0.25)"},
+        dark: { backgroundColor: "rgba(185, 207, 212,0.25)"},
     });
 
     const commandHandler = (args: {IDs: [any], scopeStart: any, scopeEnd: any}) => {
@@ -588,22 +724,11 @@ export function activate(context: ExtensionContext) {
         args.IDs.forEach((element: { id: any; }) => {
             console.log(element.id);
         });
-        let scopeRange = new Range(new Position(args.scopeStart.line-1, args.scopeStart.column-1),
-        new Position(args.scopeEnd.line-1, args.scopeEnd.column-1))
+        let scopeRange = new Range(new Position(args.scopeStart.line, args.scopeStart.character),
+            new Position(args.scopeEnd.line, args.scopeEnd.character)
+        )
+        console.log("Adding scope decoration from", {l: args.scopeStart.line, c: args.scopeStart.character}, "to", {l: args.scopeEnd.line, c: args.scopeEnd.character}  )
         editor?.setDecorations(scopeDecoration, [scopeRange]);
-        // client.sendRequest(ExecuteCommandRequest.type, { command: "getTypeAnnotations", arguments: [window.activeTextEditor?.document.uri.toString()]}).then(
-        //     (val) => {
-        //         if(isString(val)){
-        //             console.log(val);
-        //         }
-        //         else {
-        //             console.log("Unbekannter return type: " + typeof(val));
-        //             //console.log(JSON.stringify(val, undefined, 2));
-        //             var objArray = val as Array<TypeAnnotation>;
-        //             addTypeAnnotations(objArray);
-        //         }
-        //     }
-        // );  //.then(() => console.log(message));
     };
 
     var currentTypeAnnotations: TypeAnnotation[] = [];
@@ -695,3 +820,4 @@ export function deactivate(): Thenable<void> | undefined {
     }
     return client.stop();
 }
+
