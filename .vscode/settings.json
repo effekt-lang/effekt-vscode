@@ -28,5 +28,8 @@
         "tsc",
         "tstart",
         "usr"
-    ]
+    ],
+    "files.watcherExclude": {
+        "**/target": true
+    }
 }

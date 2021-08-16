@@ -1,20 +1,21 @@
 'use strict';
-import { Uri, ExtensionContext, workspace, window, Range, DecorationOptions, languages, commands, Position, TextDocument, QuickPickItem, MarkdownString, IndentAction } from 'vscode';
-import { ExecuteCommandRequest, HoverRequest, integer, LanguageClient, LanguageClientOptions, MarkedString, MarkupContent, StreamInfo, VersionedTextDocumentIdentifier } from 'vscode-languageclient';
+import { Uri, ExtensionContext, workspace, window, Range, DecorationOptions, languages, commands, Position, TextDocument, QuickPickItem, MarkdownString, CodeLens, Command, CodeLensProvider, HoverProvider, Hover, CancellationToken } from 'vscode';
+import { ExecuteCommandRequest, LanguageClient, LanguageClientOptions, StreamInfo, ServerOptions } from 'vscode-languageclient';
 import { Monto } from './monto';
 import { platform } from 'os';
 //import { symlinkSync } from 'fs';
 import { execArgv } from 'process';
-import * as rpc from "vscode-jsonrpc"
-import { isString, print } from 'util';
+import { isString } from 'util';
 
 const net = require('net');
 
 
 let client: LanguageClient;
-let listenerClient: LanguageClient;
+
 
 export function activate(context: ExtensionContext) {
+
+    console.log("Activating Effekt extension");
 
     let config = workspace.getConfiguration("effekt");
     let folders = workspace.workspaceFolders || []
@@ -23,9 +24,9 @@ export function activate(context: ExtensionContext) {
     let os = platform();
 
     if (os == 'win32') { defaultEffekt = "effekt.cmd" }
-    else if (os == 'linux' || os == 'freebsd' || os == 'openbsd') { defaultEffekt = "effekt.sh" }
+    else if (os == 'linux' || os == 'freebsd' || os == 'openbsd') { defaultEffekt = "/usr/local/bin/effekt.sh" }
 
-    let effektCmd = config.get<string>("executable") || defaultEffekt
+    let effektCmd = defaultEffekt // config.get<string>("executable") || 
 
     let args: string[] = []
 
@@ -37,48 +38,47 @@ export function activate(context: ExtensionContext) {
 
     args.push("--server");
 
+    let serverOptions: ServerOptions = {
+        run: {
+            command: effektCmd,
+            args: args,
+            options: {
+                shell: true
+            }
+        },
+        debug: {
+            command: effektCmd,
+            args: args,
+            options: {
+                shell: true
+            }
+        }
+    };
+
+
     let remoteDebugMode = config.get<boolean>("remoteDebug");
     let debugPort: any = config.get<number>("remoteDebugPort");
 
-    let serverOptions: any;
-
-    if(remoteDebugMode) {
-        console.log("Trying to connect to remote effect server on port " + debugPort);
-        serverOptions = () => {
-            // Connect to language server via socket
-            let socket: any = net.connect({ port: debugPort }); //defaults to 5007
-            let result: StreamInfo = {
-                writer: socket,
-                reader: socket
-            };
-            return Promise.resolve(result);
+    let remoteDebugServerOptions: any = () => {
+        // Connect to language server via socket
+        let socket: any = net.connect({ port: debugPort }); //defaults to 5007
+        let result: StreamInfo = {
+            writer: socket,
+            reader: socket
         };
-    } else {
-        serverOptions = {
-            run: {
-                command: effektCmd,
-                args: args,
-                options: {}
-            }
-            // ,
-            // debug: {
-            //     command: effektCmd,
-            //     args: args.concat(["--debug"]),
-            //     options: {}
-            // }
-        };
-    }
+        return Promise.resolve(result);
+    };
 
     // from vscode language-client
     // https://github.com/microsoft/vscode-languageserver-node/blob/bf274d873fb915be6bed64e5093cbe512aa8db5e/client/src/node/main.ts#L242
-    function startedInDebugMode() {
-        let args = process.execArgv;
-        if (args) {
-            return args.some((arg) => /^--debug=?/.test(arg) || /^--debug-brk=?/.test(arg) || /^--inspect=?/.test(arg) || /^--inspect-brk=?/.test(arg));
-        }
-        ;
-        return false;
-    }
+    // function startedInDebugMode() {
+    //     let args = process.execArgv;
+    //     if (args) {
+    //         return args.some((arg) => /^--debug=?/.test(arg) || /^--debug-brk=?/.test(arg) || /^--inspect=?/.test(arg) || /^--inspect-brk=?/.test(arg));
+    //     }
+    //     ;
+    //     return false;
+    // }
 
 
     let clientOptions: LanguageClientOptions = {
@@ -92,13 +92,17 @@ export function activate(context: ExtensionContext) {
         diagnosticCollectionName: "effekt"
     };
 
+
     client = new LanguageClient(
         'effektLanguageServer',
         'Effekt Language Server',
-        serverOptions,
+        remoteDebugMode ? remoteDebugServerOptions : serverOptions,
         clientOptions
     );
 
+    client.onReady().then(() => {
+        console.log("effektLanguageServer ready");
+    })
 
     Monto.setup("effekt", context, client);
 
@@ -125,12 +129,12 @@ export function activate(context: ExtensionContext) {
     // ---
     // It would be nice if there was a way to reuse the scopes of the tmLanguage file
 
-    const holeDelimiterDecoration = window.createTextEditorDecorationType({
-        opacity: '0.5',
-        borderRadius: '4pt',
-        light: { backgroundColor: "rgba(0,0,0,0.05)" },
-        dark: { backgroundColor: "rgba(255,255,255,0.05)" }
-    })
+    // const holeDelimiterDecoration = window.createTextEditorDecorationType({
+    //     opacity: '0.5',
+    //     borderRadius: '4pt',
+    //     light: { backgroundColor: "rgba(0,0,0,0.05)" },
+    //     dark: { backgroundColor: "rgba(255,255,255,0.05)" }
+    // })
 
 
     // based on https://github.com/microsoft/vscode-extension-samples/blob/master/decorator-sample/src/extension.ts
@@ -142,8 +146,8 @@ export function activate(context: ExtensionContext) {
     //     timeout = setTimeout(decorate, 50);
     // }
 
-    const holeRegex = /<>|<{|}>/g
-    const effectRegex = /\/ *[a-zA-Z]* *=|\/ *{ *[a-zA-Z]* *} =/g
+    // const holeRegex = /<>|<{|}>/g
+    // const effectRegex = /\/ *[a-zA-Z]* *=|\/ *{ *[a-zA-Z]* *} =/g
 
     /**
      * TODO clean this up -- ideally move it to the language server
@@ -185,7 +189,7 @@ export function activate(context: ExtensionContext) {
         }
 
         if(editor.document.languageId == "effekt" || editor.document.languageId == "markdown"){
-            getCapabilitiesInfo();
+            //getCapabilitiesInfo();
             //getPassedCapabilitiesHandler();
             //getUnhandledCapabilitiesHandler();
         }
@@ -205,7 +209,7 @@ export function activate(context: ExtensionContext) {
     }
 
 
-    let capabilityScopes: { hoverRange: Range; scopeRange: Range; }[] = [];
+    let capabilityScopes: { capabilityName: string, hoverRange: Range; scopeRange: Range; }[] = [];
 
     window.onDidChangeTextEditorSelection(ev => {
         console.log("Cursor position changed", ev);
@@ -220,7 +224,7 @@ export function activate(context: ExtensionContext) {
                     console.log("Found a capability scope matching current cursor position ", current.line, "x", current.character);
                     removeScopeDecorations = false;
                     commandHandler({
-                        IDs: [1],
+                        capabilityName: v.capabilityName,
                         scopeStart: v.scopeRange.start,
                         scopeEnd: v.scopeRange.end
                     });
@@ -228,7 +232,7 @@ export function activate(context: ExtensionContext) {
             }
         })
         if(removeScopeDecorations){
-            editor?.setDecorations(scopeDecoration, []);
+            editor?.setDecorations(scopeDecorationType, []);
         }
 
     });
@@ -254,73 +258,93 @@ export function activate(context: ExtensionContext) {
         }
     }, null, context.subscriptions);
 
-    console.log("Starting effekt server.");
-    context.subscriptions.push(client.start());
 
+    const startClientCommand = 'effekt.startClient';
+    const stopClientCommand = 'effekt.stopClient';
 
     const clearAnnotationsCommand = 'effekt.clearAnnotations';
+    const showCapabilityOriginCommand = 'effekt.showCapabilityOrigin';
     const inferEffectsCommand = 'effekt.inferEffects';
     const inferPassedEffectsCommand = 'effekt.inferPassedEffects';
     const getPassedCapabilitiesCommand = 'effekt.getPassedCapabilities';
     const getUnhandledCapabilitiesCommand = 'effekt.getUnhandledCapabilities';
     const getCapabilityReceiverCommand = 'effekt.getCapabilityReceiver';
 
-    class Name {
-        parent: any;
-        localName: string | undefined;
+
+    // Provide codelens for effekt files
+    class effektCodeLensProvider implements CodeLensProvider {
+
+        async provideCodeLenses(document: TextDocument): Promise<CodeLens[]> {
+
+            let capabilitiesInfo = await getCapabilitiesInfo();
+            return capabilitiesInfo.map(ca => {   
+                let com: Command;
+                if(ca.capabilityKind == "CapabilityBinder"){
+                    com = {
+                        command: showCapabilityOriginCommand,
+                        title: 'Origin of <'+ca.capabilityName+'>',
+                        arguments: [ca, capabilitiesInfo]
+                    }
+                } else {
+                    com = {
+                        command: clearAnnotationsCommand,
+                        title: 'Scope of <'+ca.capabilityName+'>',
+                        arguments: [{capabilityName: ca.capabilityName, scopeStart: ca.scopeRange.start, scopeEnd: ca.scopeRange.end}]
+                    }
+                }
+                return new CodeLens(ca.sourceRange, com)
+            })
+        }
+
+        async resolveCodeLens(codeLens: CodeLens, token: CancellationToken): Promise<CodeLens> {
+            console.log("Resolving codelens ", codeLens);
+            return codeLens;
+        }
     }
 
-    class Effect {
-        name: Name | undefined;
-        id: number | undefined;
-        bitmap$0: boolean | undefined;
-    }
+    let codeLensProviderDisposable = languages.registerCodeLensProvider(
+        [{
+            scheme: 'file',
+            language: 'effekt'
+        }, {
+            scheme: 'file',
+            language: 'markdown'
+        }],
+        new effektCodeLensProvider()
+      );
 
-    class UserFun {
-        name: Name | undefined;
-        tparams: {} | undefined;
-        params: {} | undefined;
-        ret: {} | undefined;
-        decl: {} | undefined;
-        id: number | undefined;
-        bitmap$0: string | undefined;
-    };
+    context.subscriptions.push(codeLensProviderDisposable);
 
-    class TypeAnnotation {
-        column: number = 0;
-        line: number = 0;
-        effects: Effect[] = [];
-    }
-
-    class Annotation {
-        column: number = 0;
-        line: number = 0;
-        content: string | undefined;
-    }
-
-    //list of all drawn Annotations of the current document
-    let currentDocumentAnnotations: Annotation[] = [];
-
-    currentDocumentAnnotations.includes = (element: Annotation, fromIndex?: number | undefined) => {
-        var retval = false;
-        currentDocumentAnnotations.forEach((ann, i, arr) => {
-            if(ann.column === element.column && ann.line === element.line && ann.content === element.content){
-                retval = true;
-                return;
+    // Provide hover for effekt files
+    class effektHoverProvider implements HoverProvider {
+        async provideHover(document: TextDocument, position: Position, token: CancellationToken): Promise<Hover | null | undefined> 
+        {
+            let capabilitiesInfo = await getCapabilitiesInfo();
+            // return a hover with the capability name of the first capability that matches the position
+            let hover = capabilitiesInfo.filter(ca => {
+                return ca.sourceRange.start.line <= position.line && ca.sourceRange.end.line >= position.line;
+            })[1];
+            if(hover){
+                return new Hover(hover.capabilityName, hover.sourceRange);
             }
-        });
-        return retval;
-    };
-
-
-    class EffectItem implements QuickPickItem {
-        label: string = "";
-        description: string | undefined;
+            return undefined;
+        }
     }
 
-    class CapabilityType {
-        eff: Effect | undefined;
-    }
+    let hoverProviderDisposable = languages.registerHoverProvider(
+        [{
+            scheme: 'file',
+            language: 'effekt'
+        }, {
+            scheme: 'file',
+            language: 'markdown'
+        }],
+        new effektHoverProvider()
+    );
+
+    context.subscriptions.push(hoverProviderDisposable);
+
+
 
     class Capability {
         constructor(){
@@ -371,9 +395,9 @@ export function activate(context: ExtensionContext) {
     class CapabilityInfo {
         constructor(obj: {capabilityKind: string, capabilityName: string, sourceRange: Range, scopeRange: Range}){
             this.capabilityKind = obj.capabilityKind;
-            this.capabilityName = stripCapabilityName(obj.capabilityName);
-            this.sourceRange = obj.sourceRange;
-            this.scopeRange = obj.scopeRange;
+            this.capabilityName = obj.capabilityName;
+            this.sourceRange = new Range(obj.sourceRange.start.line, obj.sourceRange.start.character, obj.sourceRange.end.line, obj.sourceRange.end.character);
+            this.scopeRange = new Range(obj.scopeRange.start.line, obj.scopeRange.start.character, obj.scopeRange.end.line, obj.scopeRange.end.character);
         }
         capabilityKind: string;
         capabilityName: string;
@@ -381,16 +405,43 @@ export function activate(context: ExtensionContext) {
         scopeRange: Range;
     }
 
+
+
+
     const capabilityBinderDecoration = window.createTextEditorDecorationType({
-        opacity: '0.5',
-        borderRadius: '4pt',
-        light: { backgroundColor: "rgba(127,127,127,0.05)", color: "rgba(0,255,0,1.0)"},
-        dark: { backgroundColor: "rgba(255,255,255,0.05)", color: "rgba(0,255,0,1.0)" },
+        borderRadius: '4pt'
     });
 
     function displayCapabilityBinders(capabilityBinders: CapabilityInfo[]){
 
-        
+        let decorations: DecorationOptions[] = [];
+
+        capabilityBinders.forEach(cb => {
+            let binderDecorationPosition = new Range(cb.sourceRange.start, cb.sourceRange.end)
+
+            const decoration: DecorationOptions = { 
+                range: binderDecorationPosition,
+                renderOptions: {
+                    after: {
+                        // contentText:  ' '+ cb.capabilityName +' =>',
+                        fontStyle: "bold"
+                    },
+                    light: {
+                        after: {
+                            color: "rgb(194, 194, 194)"
+                        }
+                    },
+                    dark: {
+                        after: {
+                            color: "rgb(102, 102, 102)"
+                        }
+                    }
+                }
+            };
+            decorations.push(decoration);
+        })
+
+        editor?.setDecorations(capabilityBinderDecoration, decorations) 
     }
 
     const capabilityReceiverDecoration = window.createTextEditorDecorationType({
@@ -401,7 +452,7 @@ export function activate(context: ExtensionContext) {
 
     function displayCapabilityReceivers(capabilityReceivers: CapabilityInfo[]){
         capabilityReceivers.forEach(cr => {
-            capabilityScopes.push({hoverRange: cr.sourceRange, scopeRange: cr.scopeRange})
+            capabilityScopes.push({capabilityName: cr.capabilityName, hoverRange: cr.sourceRange, scopeRange: cr.scopeRange})
         })
 
         //let decoRanges = capabilityArguments.map(ca => ca.sourceRange)
@@ -433,19 +484,15 @@ export function activate(context: ExtensionContext) {
         editor?.setDecorations(capabilityReceiverDecoration, decorations)
     }
 
+
+
     const capabilityArgumentDecoration = window.createTextEditorDecorationType({
-        opacity: '0.5',
         borderRadius: '4pt',
-        light: { backgroundColor: "rgba(127,127,127,0.05)", color: "rgba(0,255,0,1.0)"},
-        dark: { backgroundColor: "rgba(255,255,255,0.05)", color: "rgba(0,255,0,1.0)" },
-        after: {
-            contentText: "<!>"
-        }
     });
 
     function displayCapabilityArguments(capabilityArguments: CapabilityInfo[]){
         capabilityArguments.forEach(ca => {
-            capabilityScopes.push({hoverRange: ca.sourceRange, scopeRange: ca.scopeRange})
+            capabilityScopes.push({capabilityName: ca.capabilityName, hoverRange: ca.sourceRange, scopeRange: ca.scopeRange})
         })
 
         //let decoRanges = capabilityArguments.map(ca => ca.sourceRange)
@@ -456,9 +503,18 @@ export function activate(context: ExtensionContext) {
                 range: ca.sourceRange,
                 renderOptions: {
                     after: {
-                        contentText: '<' + ca.capabilityName + '>',
-                        backgroundColor: "rgba(211, 211, 211,0.4)",
-                        color: "rgb(80,80,80)"
+                        contentText: ' Ξ',
+                        fontStyle: "bold"
+                    },
+                    light: {
+                        after: {
+                            color: "rgb(36, 165, 140)"
+                        }
+                    },
+                    dark: {
+                        after: {
+                            color: "rgb(130, 180, 162)"
+                        }
                     }
                 }
             };
@@ -484,17 +540,20 @@ export function activate(context: ExtensionContext) {
      * asynchronously request the LSP server for info on capabilities (introductions, binding sites, scopes etc.) and store that info for visualisation
      */
     async function getCapabilitiesInfo() {
-        client.sendRequest(ExecuteCommandRequest.type, { command: "getCapabilitiesInfo", arguments: [editor?.document.uri.toString()]}).then(
-            response_json => {
-                console.log("Response raw:\n", response_json)
-                var response = JSON.parse(response_json as string) as CapabilityInfo[];
-                let capabilitiesInfo = response.map(element => {
-                    return(new CapabilityInfo(element))
-                });
-                console.log("CapabilitiesInfo:\n", capabilitiesInfo);
-                displayCapabilitiesInfo(capabilitiesInfo);
-            }
-        )
+        let infos = client.sendRequest(ExecuteCommandRequest.type, { command: "getCapabilitiesInfo", arguments: [editor?.document.uri.toString()]}).then(
+                response_json => {
+                    console.log("Response raw:\n", response_json)
+                    var response = JSON.parse(response_json as string) as CapabilityInfo[];
+                    let capabilitiesInfo = response.map(element => {
+                        return(new CapabilityInfo(element))
+                    });
+                    console.log("CapabilitiesInfo:\n", capabilitiesInfo);
+                    // globalCapabilitiesInfo = capabilitiesInfo
+                    displayCapabilitiesInfo(capabilitiesInfo);
+                    return capabilitiesInfo;
+                }
+            );
+        return infos
     }
 
 
@@ -515,8 +574,7 @@ export function activate(context: ExtensionContext) {
                     
                     capabilityScopes = [];
 
-                    res.forEach(element => {
-                        var e = (element as CapabilityHint);
+                    res.forEach((e: CapabilityHint) => {
                         console.log("Decorating passed capability ", e);
                         let endCol = getEndOfLine(e.line-1);
                         console.log("EndCol: ", endCol);
@@ -549,6 +607,7 @@ export function activate(context: ExtensionContext) {
                         let scopeEnd = new Position(e.capabilities[0].scopeEnd.line-1, e.capabilities[0].scopeEnd.column-1)
 
                         let scope = {
+                            capabilityName: "TEEEEEEEEEEEST",
                             hoverRange: new Range(new Position(e.line-1, 0), new Position(e.line-1, endCol)),
                             scopeRange: new Range(scopeStart, scopeEnd)
                         }
@@ -580,7 +639,7 @@ export function activate(context: ExtensionContext) {
                     // quickPick.items = [{label: "Info", description: res.eff.toString()}];
                     
                     let itemList: QuickPickItem[] = [];
-                    res.forEach((tpe) => itemList.push({label: "Info", description: tpe}));
+                    res.forEach((tpe: string) => itemList.push({label: "Info", description: tpe}));
                     quickPick.items = itemList;
                     quickPick.onDidHide(() => quickPick.dispose());
                     quickPick.show();
@@ -606,8 +665,7 @@ export function activate(context: ExtensionContext) {
                     console.log(res);
                     console.log(typeof(res));
                     let decorations: Array<DecorationOptions> = [];
-                    res.forEach(element => {
-                        var e = (element as CapabilityHint);
+                    res.forEach((e: CapabilityHint) => {
                         console.log("Decorating unhandled capability ", e);
                         let endCol = getEndOfLine(e.line-1);
                         console.log("EndCol: ", endCol);
@@ -648,8 +706,7 @@ export function activate(context: ExtensionContext) {
                 console.log(res);
                 console.log(typeof(res));
                 let decorations: Array<DecorationOptions> = [];
-                res.forEach(element => {
-                    var e = (element as CapabilityHint);
+                res.forEach((e: CapabilityHint) => {
                     console.log("Decorating unhandled capability ", e);
                     let endCol = getEndOfLine(e.line-1);
                     console.log("EndCol: ", endCol);
@@ -700,7 +757,7 @@ export function activate(context: ExtensionContext) {
                             // quickPick.items = [{label: "Info", description: res.eff.toString()}];
                             
                             let itemList: QuickPickItem[] = [];
-                            res.forEach((tpe) => itemList.push({label: "Info", description: tpe}));
+                            res.forEach((tpe: string) => itemList.push({label: "Info", description: tpe}));
                             quickPick.items = itemList;
                             quickPick.onDidHide(() => quickPick.dispose());
                             quickPick.show();
@@ -713,108 +770,89 @@ export function activate(context: ExtensionContext) {
 
 
 
-    const scopeDecoration = window.createTextEditorDecorationType({
+    const scopeDecorationType = window.createTextEditorDecorationType({
         light: { backgroundColor: "rgba(180, 130, 145,0.25)"},
         dark: { backgroundColor: "rgba(185, 207, 212,0.25)"},
+        
     });
 
-    const commandHandler = (args: {IDs: [any], scopeStart: any, scopeEnd: any}) => {
+    const showCapabilityOrigin = (capability: CapabilityInfo, capabilitiesInfo: CapabilityInfo[]) => {
+        console.log("showCapabilityOrigin: ", capability);
+        /** 
+         * search for capabilities in globalCapabilitiesInfo that meet the following requirements:
+         * 1. the capabilities name must match capability.CapabilityName
+         * 2. the capabilities sourceRange must be in capability.scopeRange
+         */
+
+        let matches: Range[] = capabilitiesInfo.map(ca => {
+            if(ca != capability && ca.capabilityName == capability.capabilityName && ca.capabilityKind != capability.capabilityKind){
+                console.log("Found match: ", ca)
+                try {    
+                    if(capability.scopeRange.contains(ca.sourceRange)){
+                        console.log("Highlighting capability");
+                        return ca.sourceRange;
+                    }   
+                } catch (error) {
+                    console.log(error)
+                }
+            }
+            return new Range(0,0,0,0)
+        });
+
+        editor?.setDecorations(scopeDecorationType, matches);
+
+    }
+
+    const commandHandler = (args: {capabilityName: string, scopeStart: any, scopeEnd: any}) => {
         console.log(args);
         console.log("Received parameter IDs:")
-        args.IDs.forEach((element: { id: any; }) => {
-            console.log(element.id);
-        });
+
         let scopeRange = new Range(new Position(args.scopeStart.line, args.scopeStart.character),
             new Position(args.scopeEnd.line, args.scopeEnd.character)
         )
+        const scopeDecoration: DecorationOptions = {
+            range: scopeRange,
+            hoverMessage: 'Scope of '+args.capabilityName 
+        };
+        
+        
         console.log("Adding scope decoration from", {l: args.scopeStart.line, c: args.scopeStart.character}, "to", {l: args.scopeEnd.line, c: args.scopeEnd.character}  )
-        editor?.setDecorations(scopeDecoration, [scopeRange]);
+        editor?.setDecorations(scopeDecorationType, [scopeDecoration]);
     };
 
-    var currentTypeAnnotations: TypeAnnotation[] = [];
+   
+    context.subscriptions.push(commands.registerCommand(startClientCommand, () => {
+        console.log("Starting client");
+        console.log("Starting language server client with options:\n", serverOptions);
+        context.subscriptions.push(client.start());
+        console.log("Client started:", client.diagnostics);
+    }));
 
-    const typeAnnotationDecorationType = window.createTextEditorDecorationType({
-        cursor: 'crosshair',
-        // use a themable color. See package.json for the declaration and default values.
-        backgroundColor: { id: 'myextension.largeNumberBackground' },
-        after: {
-            border: "1px solid black",
-            backgroundColor: "rgba(190, 170, 170, 0.6)",
-            color: "black"
-        }
-    });
-    
 
-    function addTypeAnnotations(annotations: TypeAnnotation[]){
-        // reset type annotations
-        editor?.setDecorations(effectDecoration, []);
-        // and then set the current type annotations
-        const typeAnnotationDecorationOptions: DecorationOptions[] = [];
-        let lc = editor?.document.lineCount;
-        annotations.forEach((value) => {
-            let myobj: TypeAnnotation = Object.assign(new TypeAnnotation(), value);
-            myobj.effects.forEach((e, i, arr) => {
-                if(lc && myobj.line-1 < lc){
-                    var ann = new Annotation();
-                    ann.content = e.name?.localName;
-                    ann.column = myobj.column;
-                    ann.line = myobj.line;
-
-                    //if(!currentDocumentAnnotations.includes(ann)){
-                    //currentDocumentAnnotations.push(ann);
-                    var startPos = new Position(myobj.line-1, myobj.column-1);
-                    var endPos = new Position(myobj.line-1, myobj.column-1);
-                    const decoration: DecorationOptions = { range: new Range(startPos, endPos),
-                                renderOptions: {after: {contentText: ann.content}}, hoverMessage: 'Effects: '+ann.content };
-                    typeAnnotationDecorationOptions.push(decoration);
-                }
-            });
-            
+       
+    context.subscriptions.push(commands.registerCommand(stopClientCommand, () => {
+        console.log("Stopping client");
+        client.stop().then(() => {
+            console.log("Client stopped");
         });
-        editor?.setDecorations(effectDecoration, typeAnnotationDecorationOptions);
-    }
-
+    }));
+    
     context.subscriptions.push(commands.registerCommand(clearAnnotationsCommand, commandHandler));
+    context.subscriptions.push(commands.registerCommand(showCapabilityOriginCommand, showCapabilityOrigin))
     context.subscriptions.push(commands.registerCommand(inferEffectsCommand, inferEffectsHandler));
     context.subscriptions.push(commands.registerCommand(inferPassedEffectsCommand, inferPassedEffectsHandler));
     context.subscriptions.push(commands.registerCommand(getPassedCapabilitiesCommand, getPassedCapabilitiesHandler));
     context.subscriptions.push(commands.registerCommand(getUnhandledCapabilitiesCommand, getUnhandledCapabilitiesHandler));
     context.subscriptions.push(commands.registerCommand(getCapabilityReceiverCommand, getCapabilityReceiverHandler));
-    // if (startedInDebugMode() && !remoteDebugMode) {
-    //     /*Effekt server should have been started with "--debug" flag and should be listening on a port.
-    //         Hence we start a second process for listening on that port. */
-
-    //     listenerClient = new LanguageClient(
-    //         'effektLanguageServerDebug',
-    //         'Effekt Language Server Debug',
-    //         () => {
-    //             // Connect to language server via socket
-    //             let socket: any = net.connect({ port: debugPort }); //defaults to 5007
-    //             let result: StreamInfo = {
-    //                 writer: socket,
-    //                 reader: socket
-    //             };
-    //             return Promise.resolve(result);
-    //         },
-    //         clientOptions
-    //     );
-
-    //     console.log("Effekt server was started in debug mode - trying to listen on port " + debugPort + ".");
-    //     context.subscriptions.push(listenerClient.start());
-    // }
-
+   
     console.log("Exec Args: " + execArgv);
 
-    client.onNotification(ExecuteCommandRequest.type, () => console.log("Bla"));
-    client.onRequest(ExecuteCommandRequest.type, () => console.log("Bla"));
+    context.subscriptions.push(client.start());
 
 
 }
 
 export function deactivate(): Thenable<void> | undefined {
-    if (listenerClient){
-        listenerClient.stop();
-    }
     if (!client) {
         return undefined;
     }

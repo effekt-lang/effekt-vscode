@@ -1,7 +1,6 @@
 import { commands, ExtensionContext, EventEmitter, Range, Selection, TextDocumentContentProvider, TextEditor, TextEditorRevealType, TextEditorSelectionChangeEvent, Uri, ViewColumn, workspace, window } from 'vscode';
-import { NotificationType } from 'vscode-jsonrpc';
-import { LanguageClient, DidChangeConfigurationNotification } from 'vscode-languageclient';
-
+import { DidChangeConfigurationNotification, NotificationType } from 'vscode-languageclient';
+import { LanguageClient } from 'vscode-languageclient';
 export namespace Monto {
 
     // Products
@@ -144,6 +143,7 @@ export namespace Monto {
         client.clientOptions.initializationOptions = workspace.getConfiguration(name);
 
         client.onReady().then(_ => {
+            console.log("Language client ready");
             client.onNotification(PublishProduct.type, product => {
                 saveProduct(product);
                 showProduct(product);
