@@ -17,8 +17,7 @@ jobs:
     - run: npm install
     - name: Package VSCode extension into .vsix file
       run: vsce package
-    - name: Test the VSCode extension
-      run: xvfb-run -a npm test
-        if: runner.os == 'Linux'
-      run: npm test
+    - run: xvfb-run -a npm test
+      if: runner.os == 'Linux'
+    - run: npm test
         if: runner.os != 'Linux'
