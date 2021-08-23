@@ -6,10 +6,10 @@
         "type": "git",
         "url": "https://github.com/effekt-lang/effekt-vscode.git"
     },
-    "version": "0.1.4",
+    "version": "0.1.5",
     "publisher": "b-studios",
     "engines": {
-        "vscode": "^1.30.0"
+        "vscode": "^1.59.0"
     },
     "categories": [
         "Other"
@@ -69,6 +69,11 @@
                     "default": true,
                     "description": "Display additional information when hovering over identifier."
                 },
+                "effekt.enableCodeLenses": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable code lenses for effekt files."
+                },
                 "effekt.showTarget": {
                     "type": "boolean",
                     "default": false,
@@ -94,44 +99,34 @@
                     "default": [
                         "println"
                     ]
+                },
+                "effekt.internal.showOutput": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Show output of effekt commands."
+                },
+                "effekt.internal.testSetting": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Just a demo setting."
                 }
             }
         },
         "commands": [
             {
                 "category": "Effekt",
+                "command": "effekt.startClient",
+                "title": "Start the effect language client"
+            },
+            {
+                "category": "Effekt",
+                "command": "effekt.stopClient",
+                "title": "Stop the effect language client"
+            },
+            {
+                "category": "Effekt",
                 "command": "effekt.selectLinkedEditors",
                 "title": "Focus Product Editors"
-            },
-            {
-                "category": "Effekt",
-                "command": "effekt.clearAnnotations",
-                "title": "Clear effect annotations."
-            },
-            {
-                "category": "Effekt",
-                "command": "effekt.inferEffects",
-                "title": "Infer effects"
-            },
-            {
-                "category": "Effekt",
-                "command": "effekt.inferPassedEffects",
-                "title": "Get effects passed to this function"
-            },
-            {
-                "category": "Effekt",
-                "command": "effekt.getPassedCapabilities",
-                "title": "Get Passed Capabilities"
-            },
-            {
-                "category": "Effekt",
-                "command": "effekt.getUnhandledCapabilities",
-                "title": "Get Unhandled Capabilities"
-            },
-            {
-                "category": "Effekt",
-                "command": "effekt.getCapabilityReceiver",
-                "title": "Get capability receiver"
             }
         ],
         "keybindings": [
@@ -143,50 +138,26 @@
             }
         ],
         "menus": {
-            "editor/context": [
-                {
-                    "command": "effekt.clearAnnotations",
-                    "group": "effektGroup@1"
-                },
-                {
-                    "command": "effekt.inferEffects",
-                    "group": "effektGroup@2"
-                },
-                {
-                    "command": "effekt.inferPassedEffects",
-                    "group": "effektGroup@3"
-                },
-                {
-                    "command": "effekt.getPassedCapabilities",
-                    "group": "effektGroup@4"
-                },
-                {
-                    "command": "effekt.getUnhandledCapabilities",
-                    "group": "effektGroup@5"
-                },
-                {
-                    "command": "effekt.getCapabilityReceiver",
-                    "group": "effektGroup@6"
-                }
-            ]
+            "editor/context": []
         }
     },
     "scripts": {
         "vscode:prepublish": "npm run compile",
         "compile": "tsc -p ./",
         "watch": "tsc -watch -p ./",
-        "postinstall": "node ./node_modules/vscode/bin/install",
-        "test": "npm run compile && node ./node_modules/vscode/bin/test"
+        "pretest": "npm run compile",
+        "test": "node ./out/test/runTest.js"
     },
     "dependencies": {
-        "vscode-languageclient": "^6.1.3"
+        "vscode-languageclient": "^5.2.1",
+        "@vscode/test-electron": "1.6.2"
     },
     "devDependencies": {
-        "vscode-jsonrpc": "^6.0.0",
-        "typescript": "^4.1.3",
-        "vscode": "^1.1.26",
-        "tslint": "^5.8.0",
+        "@types/mocha": "^9.0.0",
         "@types/node": "^7.0.43",
-        "@types/mocha": "^2.2.42"
+        "@types/vscode": "^1.59.0",
+        "tslint": "^5.8.0",
+        "typescript": "^4.3.5",
+        "@types/glob": "^7.1.4"
     }
 }
