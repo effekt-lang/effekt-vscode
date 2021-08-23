@@ -143,7 +143,6 @@ export namespace Monto {
         client.clientOptions.initializationOptions = workspace.getConfiguration(name);
 
         client.onReady().then(_ => {
-            console.log("Language client ready");
             client.onNotification(PublishProduct.type, product => {
                 saveProduct(product);
                 showProduct(product);
