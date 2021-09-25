@@ -1,7 +1,7 @@
 'use strict';
 
-import { ExtensionContext, workspace, window, Range, DecorationOptions } from 'vscode';
-import { LanguageClient, LanguageClientOptions, ServerOptions } from 'vscode-languageclient';
+import { ExtensionContext, workspace, window, Range, DecorationOptions, Location } from 'vscode';
+import { LanguageClient, LanguageClientOptions, ServerOptions, ExecuteCommandRequest } from 'vscode-languageclient';
 import { Monto } from './monto';
 import { platform } from 'os';
 
@@ -75,6 +75,9 @@ export function activate(context: ExtensionContext) {
 		dark: { backgroundColor: "rgba(255,255,255,0.05)" }
     })
 
+    // the decorations themselves don't have styles. Only the added before-elements.
+    const captureDecoration = window.createTextEditorDecorationType({})
+
 
     // based on https://github.com/microsoft/vscode-extension-samples/blob/master/decorator-sample/src/extension.ts
     let timeout: NodeJS.Timer;
@@ -87,10 +90,46 @@ export function activate(context: ExtensionContext) {
 
     const holeRegex = /<>|<{|}>/g
 
+    function updateCaptures() {
+        if (!editor) { return; }
+
+        client.sendRequest(ExecuteCommandRequest.type, { command: "inferredCaptures", arguments: [{
+            uri: editor.document.uri.toString()
+        }]}).then(
+            (result : [{ location: Location, captureText: string }]) => {
+                if (!editor) { return; }
+
+                let captureAnnotations: DecorationOptions[] = []
+
+                result.forEach(response => {
+                    if (!editor) { return; }
+                    const loc = response.location
+                    if (loc.uri != editor.document.uri) return;
+
+                    captureAnnotations.push({
+                        range:  loc.range,
+                        renderOptions: {
+                            before: {
+                            contentText: response.captureText,
+                            backgroundColor: "rgba(170,210,255,0.3)",
+                            color: "rgba(50,50,50,0.5)",
+                            fontStyle: "italic",
+                            margin: "0 0.5em 0 0.5em"
+                            }
+                        }
+                    })
+                })
+
+                if (!editor) { return; }
+                return editor.setDecorations(captureDecoration, captureAnnotations)
+            }
+        );
+    }
+
     /**
      * TODO clean this up -- ideally move it to the language server
      */
-    function decorate() {
+    function updateHoles() {
         if (!editor) { return; }
 
         const text = editor.document.getText()
@@ -112,6 +151,10 @@ export function activate(context: ExtensionContext) {
         editor.setDecorations(holeDelimiterDecoration, holeDelimiters)
     }
 
+    function decorate() {
+        updateHoles()
+    }
+
     window.onDidChangeActiveTextEditor(ed => {
 		editor = ed;
 		scheduleDecorations();
@@ -124,6 +167,10 @@ export function activate(context: ExtensionContext) {
     }, null, context.subscriptions);
 
 	scheduleDecorations();
+
+    workspace.onDidSaveTextDocument(ev => {
+        setTimeout(updateCaptures, 50)
+    })
 
     context.subscriptions.push(client.start());
 }
