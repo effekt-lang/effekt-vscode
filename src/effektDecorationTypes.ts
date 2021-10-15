@@ -1,5 +1,5 @@
 import { window } from 'vscode';
-
+var path = require('path')
 
 /**
  * A decoration used to decorate a capability binder.
@@ -34,7 +34,65 @@ export const capabilityArgumentDecoration = window.createTextEditorDecorationTyp
  * Decoration type used to highlight a capability scope
  */
 export const scopeDecorationType = window.createTextEditorDecorationType({
-    light: { backgroundColor: "rgba(180, 130, 145,0.125)"},
-    dark: { backgroundColor: "rgba(185, 207, 212,0.125)"},
+    light: {
+        backgroundColor: "rgba(180, 130, 145,0.125)",
+        gutterIconPath: path.join(__dirname, '..', 'icons', 'scope_bar_light.svg'),
+        gutterIconSize: "contain",
+        after: {
+            backgroundColor: "rgba(180, 130, 145,0.125)",
+        },
+        before: {
+            backgroundColor: "rgba(180, 130, 145,0.125)",
+        }
+    },
+    dark: {
+        backgroundColor: "rgba(185, 207, 212,0.125)",
+        gutterIconPath: path.join(__dirname, '..', 'icons', 'scope_bar_dark.svg'),
+        gutterIconSize: "contain",
+        after: {
+            backgroundColor: "rgba(185, 207, 212,0.125)",
+        },
+        before: {
+            backgroundColor: "rgba(185, 207, 212,0.125)",
+        }
+    }
+    
+});
+
+
+/**
+ * Decoration type used to highlight a capabilitys origin
+ */
+ export const originDecorationType = window.createTextEditorDecorationType({
+    light: {
+        backgroundColor: "rgba(180, 130, 145,0.125)",
+        gutterIconPath: path.join(__dirname, '..', 'icons', 'scope_bar_light.svg'),
+        gutterIconSize: "contain",
+        after: {
+            backgroundColor: "rgba(180, 130, 145,0.125)",
+        },
+        before: {
+            backgroundColor: "rgba(180, 130, 145,0.125)",
+        }
+    },
+    dark: {
+        backgroundColor: "rgba(185, 207, 212,0.125)",
+        gutterIconPath: path.join(__dirname, '..', 'icons', 'scope_bar_dark.svg'),
+        gutterIconSize: "contain",
+        after: {
+            backgroundColor: "rgba(185, 207, 212,0.125)",
+        },
+        before: {
+            backgroundColor: "rgba(185, 207, 212,0.125)",
+        }
+    },
+    before: {
+        color: "rgba(210, 210, 210, 0.25)",
+        fontWeight: "bold"
+    },
+    after: {
+        color: "rgba(210, 210, 210, 0.25)",
+        fontWeight: "bold"
+    }
     
 });

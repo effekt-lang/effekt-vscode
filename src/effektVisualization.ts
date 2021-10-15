@@ -1,6 +1,8 @@
 import { DecorationOptions, TextEditor, Range } from 'vscode';
 import { CapabilityScope, CapabilityInfo } from './effektLSPTypes';
 import { capabilityReceiverDecoration, capabilityBinderDecoration, capabilityArgumentDecoration } from './effektDecorationTypes';
+var path = require('path')
+
 
 /**
  * Visualize information about capability receivers provided by the LSP server.
@@ -21,16 +23,18 @@ export function displayCapabilityReceivers(editor: TextEditor | undefined, capab
             range: ca.sourceRange,
             renderOptions: {
                 after: {
-                    contentText: ' Ξ',
-                    fontStyle: "bold"
+                    contentText: ' «',
+                    fontWeight: "bold"
                 },
                 light: {
                     after: {
+                        // contentIconPath: path.join(__dirname, '..', 'icons', 'scope_bar_light.svg'),
                         color: "rgb(165, 36, 61)"
                     }
                 },
                 dark: {
                     after: {
+                        // contentIconPath: path.join(__dirname, '..', 'icons', 'scope_bar_dark.svg'),
                         color: "rgb(180, 130, 145)"
                     }
                 }
@@ -103,11 +107,11 @@ export function displayCapabilityArguments(editor: TextEditor | undefined, capab
             range: ca.sourceRange,
             renderOptions: {
                 after: {
-                    contentText: ' Ξ',
-                    fontStyle: "bold"
+                    contentText: ' »',
+                    fontWeight: "bold" 
                 },
                 light: {
-                    after: {
+                    after: {                        
                         color: "rgb(36, 165, 140)"
                     }
                 },

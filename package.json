@@ -120,6 +120,11 @@
             },
             {
                 "category": "Effekt",
+                "command": "effekt.toggleCodeLenses",
+                "title": "Disable or enable effekt CodeLenses"
+            },
+            {
+                "category": "Effekt",
                 "command": "effekt.stopClient",
                 "title": "Stop the effect language client"
             },

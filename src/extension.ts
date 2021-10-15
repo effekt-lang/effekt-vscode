@@ -10,10 +10,10 @@ import { platform } from 'os';
 import { CapabilityInfo, CapabilityScope } from './effektLSPTypes'
 
 // import own decoration types
-import { scopeDecorationType } from './effektDecorationTypes'
+import { scopeDecorationType, originDecorationType } from './effektDecorationTypes'
 
 // import necessary commands for the effekt extension
-import { startClientCommand, stopClientCommand, highlightScopeCommand, showCapabilityOriginCommand } from './effektCommands';
+import { startClientCommand, stopClientCommand, highlightScopeCommand, showCapabilityOriginCommand, toggleCodeLensesCommand } from './effektCommands';
 
 import { effektCodeLensProvider } from './effektCodeLensProvider';
 
@@ -161,24 +161,21 @@ export function activate(context: ExtensionContext) {
 
     /**
      * Whenever we change the cursor position, we want to update
-     * the currently visualized scope of a capabilitie, if there is any
+     * the currently visualized scope of a capability, if there is any
      * at the current cursor position.
      * TODO: this is both unstable and unelegant. Should be replaced
      * by a query to the language server that returns a list of all
      * capability scopes at the current cursor position.
      */
     window.onDidChangeTextEditorSelection(ev => {
-        console.log("Cursor position changed", ev);
-        console.log(capabilityScopes)
         let current = ev.selections[0].active;
         
-        let removeScopeDecorations = true;
+        let removeScopeAndOriginDecorations = true;
         capabilityScopes.forEach((v, i) => {
 
             if(current.line == v.hoverRange.end.line){
                 if(current.character >= v.hoverRange.start.character && current.character <= v.hoverRange.end.character){
-                    console.log("Found a capability scope matching current cursor position ", current.line, "x", current.character);
-                    removeScopeDecorations = false;
+                    removeScopeAndOriginDecorations = false;
                     highlightScope({
                         capabilityName: v.capabilityName,
                         scopeStart: v.scopeRange.start,
@@ -187,8 +184,9 @@ export function activate(context: ExtensionContext) {
                 }
             }
         })
-        if(removeScopeDecorations){
+        if(removeScopeAndOriginDecorations){
             editor?.setDecorations(scopeDecorationType, []);
+            editor?.setDecorations(originDecorationType, []);
         }
 
     });
@@ -224,9 +222,18 @@ export function activate(context: ExtensionContext) {
     workspace.onDidSaveTextDocument(document => {
         if(editor && document === editor.document){
             updateDecorationsSafely(editor);
+            effektCodeLenes.updateCodeLenses();
         }
     }, null, context.subscriptions);
 
+
+    /**
+     * Global codeLensProvider that can be managed by the extension.
+     * Defining this here allows us to adjust the code lens provider
+     * during runtime. Otherwise it would be "gone" after passing it
+     * to registerCodeLensProvider.
+     */
+    let effektCodeLenes = new effektCodeLensProvider(getCapabilitiesInfo, config.get<boolean>('enableCodeLenses'))
 
 
     /**
@@ -242,10 +249,19 @@ export function activate(context: ExtensionContext) {
                 scheme: 'file',
                 language: 'markdown'
             }],
-            new effektCodeLensProvider(getCapabilitiesInfo)
+            effektCodeLenes
         );
         context.subscriptions.push(codeLensProviderDisposable);
     }
+
+    /**
+     * Toggle the codeLensProvider
+     */
+    const toggleCodeLenses = () => {
+        console.log("Toggling CodeLens provider");
+        effektCodeLenes.toggleActive();
+    }
+    
 
     /**
      * A hoverprovider to provide hover information on capability scopes.
@@ -321,20 +337,20 @@ export function activate(context: ExtensionContext) {
          * 2. the capabilities sourceRange must be in capability.scopeRange
          */
 
-        let matches: Range[] = capabilitiesInfo.map(ca => {
+        let matches: Range[] = [];
+        capabilitiesInfo.forEach(ca => {
             if(ca != capability && ca.capabilityName == capability.capabilityName && ca.capabilityKind != capability.capabilityKind){
                 try {    
                     if(capability.scopeRange.contains(ca.sourceRange)){
-                        return ca.sourceRange;
+                        matches.push(ca.sourceRange);
                     }   
                 } catch (error) {
                     console.log(error)
                 }
             }
-            return new Range(0,0,0,0)
         });
 
-        editor?.setDecorations(scopeDecorationType, matches);
+        editor?.setDecorations(originDecorationType, matches);
     }
 
     /**
@@ -377,7 +393,8 @@ export function activate(context: ExtensionContext) {
      * TODO: update!
      */
     context.subscriptions.push(commands.registerCommand(highlightScopeCommand, highlightScope));
-    context.subscriptions.push(commands.registerCommand(showCapabilityOriginCommand, showCapabilityOrigin))
+    context.subscriptions.push(commands.registerCommand(showCapabilityOriginCommand, showCapabilityOrigin));
+    context.subscriptions.push(commands.registerCommand(toggleCodeLensesCommand, toggleCodeLenses));
 
 
     context.subscriptions.push(client.start());

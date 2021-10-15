@@ -5,4 +5,6 @@ const stopClientCommand = 'effekt.stopClient';
 const highlightScopeCommand = 'effekt.highlightScope';
 const showCapabilityOriginCommand = 'effekt.showCapabilityOrigin';
 
-export { startClientCommand, stopClientCommand, highlightScopeCommand, showCapabilityOriginCommand };
+const toggleCodeLensesCommand = 'effekt.toggleCodeLenses';
+
+export { startClientCommand, stopClientCommand, highlightScopeCommand, showCapabilityOriginCommand, toggleCodeLensesCommand };
