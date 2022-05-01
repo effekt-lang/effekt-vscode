@@ -2,8 +2,6 @@
 
 VSCode Language Server Client for the Effekt language.
 
-This VSCode extension is based on the example by [Tony Sloane](https://bitbucket.org/inkytonik/minijava-vscode/src/master/).
-
 ## Getting Started
 This extension is not currently published on the extension marketplace so you will have to install it manually in your extensions or run it from VSCode.
 
