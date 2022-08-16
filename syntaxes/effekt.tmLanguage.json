@@ -59,10 +59,10 @@
     },
     "keywords": {
       "patterns": [{
-        "match": "\\b(module|import|def|fun|val|var|effect|type|match|case|record|extern|include)\\b",
+        "match": "\\b(module|import|def|fun|val|var|effect|type|match|case|record|extern|include|box|unbox|in|region|new)\\b",
         "name": "keyword.syntax"
       }, {
-        "match": "\\b(resume|while|try|with|if|else|do|handle)\\b",
+        "match": "\\b(resume|while|try|with|if|else|do|return|)\\b",
         "name": "keyword.control"
       }]
     },
