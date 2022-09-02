@@ -59,15 +59,17 @@
                     "default": true,
                     "description": "Display additional information when hovering over identifier."
                 },
-                "effekt.showTarget": {
-                    "type": "boolean",
-                    "default": false,
-                    "description": "Show the generated JavaScript."
-                },
-                "effekt.showCore": {
-                    "type": "boolean",
-                    "default": false,
-                    "description": "Show the translated Core (System Ξ)."
+                "effekt.showIR": {
+                    "type": "string",
+                    "default": "none",
+                    "enum": ["none", "core", "lifted-core", "machine", "js"],
+                    "enumDescriptions": [
+                        "Disable showing intermediate representation.",
+                        "Show the core intermediate representation after capability-passing transformation.",
+                        "Show the core intermediate representation after lift inference.",
+                        "Show the machine representation.",
+                        "Show the generated JavaScript."
+                    ]
                 }
             }
         },
