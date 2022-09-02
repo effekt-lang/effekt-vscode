@@ -21,7 +21,14 @@ export function activate(context: ExtensionContext) {
 
     let effektCmd = config.get<string>("executable") || defaultEffekt
 
+
     let args: string[] = []
+
+    let effektLib = config.get<string>("lib")
+    if (effektLib) {
+        args.push("--lib");
+        args.push(effektLib)
+    }
 
     // add each workspace folder as an include
     folders.forEach(f => {

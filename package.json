@@ -70,6 +70,19 @@
                         "Show the machine representation.",
                         "Show the generated JavaScript."
                     ]
+                },
+                "effekt.backend": {
+                    "type": "string",
+                    "default": "none",
+                    "enum": ["js", "llvm"],
+                    "enumDescriptions": [
+                        "Use the JS backend.",
+                        "Use the LLVM backend."
+                    ]
+                },
+                "effekt.lib": {
+                    "type": "string",
+                    "description": "Path to the standard library."
                 }
             }
         },
