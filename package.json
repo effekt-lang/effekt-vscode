@@ -71,23 +71,20 @@
                 "effekt.showIR": {
                     "type": "string",
                     "default": "none",
-                    "enum": ["none", "core", "lifted-core", "machine", "js"],
+                    "enum": ["none", "source", "core", "lifted-core", "machine", "js"],
                     "enumDescriptions": [
                         "Disable showing intermediate representation.",
+                        "Show source tree after parsing.",
                         "Show the core intermediate representation after capability-passing transformation.",
                         "Show the core intermediate representation after lift inference.",
                         "Show the machine representation.",
                         "Show the generated JavaScript."
                     ]
                 },
-                "effekt.backend": {
-                    "type": "string",
-                    "default": "none",
-                    "enum": ["js", "llvm"],
-                    "enumDescriptions": [
-                        "Use the JS backend.",
-                        "Use the LLVM backend."
-                    ]
+                "effekt.showTree": {
+                    "type": "boolean",
+                    "default": "false",
+                    "description": "Show tree of IR instead of rendered version (only relevant if 'showIR' is neither 'none' nor 'js'."
                 },
                 "effekt.lib": {
                     "type": "string",
