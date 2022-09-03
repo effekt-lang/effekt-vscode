@@ -36,6 +36,11 @@
             "extensions": [".md"],
             "aliases": ["markdown"],
             "configuration": "./language-configuration.json"
+        }, {
+            "id": "ir",
+            "extensions": [".ir"],
+            "aliases": ["ir", "IR"],
+            "configuration": "./language-configuration.json"
         }],
         "grammars": [{
             "language": "effekt",
@@ -45,6 +50,10 @@
             "language": "markdown",
             "scopeName": "source.markdown",
             "path": "./syntaxes/literateeffekt.tmLanguage.json"
+        },{
+            "language": "ir",
+            "scopeName": "source.ir",
+            "path": "./syntaxes/ir.tmLanguage.json"
         }],
         "configuration": {
             "type": "object",
