@@ -63,6 +63,18 @@
                     "type": "string",
                     "description": "Path to the effekt executable (you need to restart vscode after changing this setting)."
                 },
+                "effekt.backend": {
+                    "type": "string",
+                    "default": "js",
+                    "enum": ["js", "llvm", "chez-monadic", "chez-callcc", "chez-lift"],
+                    "enumDescriptions": [
+                        "Use the JavaScript backend.",
+                        "Use the LLVM backend.",
+                        "Use the Chez Scheme backend (monadic).",
+                        "Use the Chez Scheme backend (call/cc).",
+                        "Use the Chez Scheme backend (lifted)."
+                    ]
+                },
                 "effekt.showExplanations": {
                     "type": "boolean",
                     "default": true,
@@ -71,14 +83,14 @@
                 "effekt.showIR": {
                     "type": "string",
                     "default": "none",
-                    "enum": ["none", "source", "core", "lifted-core", "machine", "js"],
+                    "enum": ["none", "source", "core", "lifted-core", "machine", "target"],
                     "enumDescriptions": [
                         "Disable showing intermediate representation.",
                         "Show source tree after parsing.",
                         "Show the core intermediate representation after capability-passing transformation.",
                         "Show the core intermediate representation after lift inference.",
                         "Show the machine representation.",
-                        "Show the generated JavaScript."
+                        "Show the generated code in the target language."
                     ]
                 },
                 "effekt.showTree": {

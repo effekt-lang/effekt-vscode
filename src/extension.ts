@@ -5,6 +5,7 @@ import { LanguageClient, LanguageClientOptions, ServerOptions } from 'vscode-lan
 import { Monto } from './monto';
 import { platform } from 'os';
 
+
 let client: LanguageClient;
 
 export function activate(context: ExtensionContext) {
@@ -23,6 +24,12 @@ export function activate(context: ExtensionContext) {
 
 
     let args: string[] = []
+
+    let effektBackend = config.get<string>("backend")
+    if (effektBackend) {
+        args.push("--backend");
+        args.push(effektBackend)
+    }
 
     let effektLib = config.get<string>("lib")
     if (effektLib) {
