@@ -66,13 +66,14 @@
                 "effekt.backend": {
                     "type": "string",
                     "default": "js",
-                    "enum": ["js", "llvm", "chez-monadic", "chez-callcc", "chez-lift"],
+                    "enum": ["js", "llvm", "chez-monadic", "chez-callcc", "chez-lift", "ml"],
                     "enumDescriptions": [
                         "Use the JavaScript backend.",
                         "Use the LLVM backend.",
                         "Use the Chez Scheme backend (monadic).",
                         "Use the Chez Scheme backend (call/cc).",
-                        "Use the Chez Scheme backend (lifted)."
+                        "Use the Chez Scheme backend (lifted).",
+                        "Use the MLton backend."
                     ]
                 },
                 "effekt.showExplanations": {
