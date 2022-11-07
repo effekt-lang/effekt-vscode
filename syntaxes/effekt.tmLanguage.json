@@ -21,11 +21,13 @@
     },
     "definitions": {
       "patterns": [{
-          "begin": "\\s*(def)\\s+([a-zA-Z][a-z-A-Z0-9_$]*)\\b",
+          "begin": "\\s*(extern)?\\s*(\\{[^\\}]*\\}|[a-zA-Z][a-z-A-Z0-9_$]*)\\s*(def)\\s+([a-zA-Z][a-z-A-Z0-9_$]*)\\b",
           "end" : "[=\\n]",
           "beginCaptures": {
-            "1": { "name": "keyword.declaration.function" },
-            "2": { "name": "entity.name.function" }
+            "1": { "name": "keyword.declaration.type" },
+            "2": { "name": "entity.name.type" },
+            "3": { "name": "keyword.declaration.function" },
+            "4": { "name": "entity.name.function" }
           },
           "patterns": [{ "include": "#parameters" }]
         }, {
@@ -41,10 +43,11 @@
             "2": { "name": "variable" }
           }
         }, {
-          "match": "\\s*(type|effect)\\s+([a-zA-Z][a-z-A-Z0-9_$]*)\\b",
+          "match": "\\s*(extern)?\\s*(type|effect|interface|resource)\\s+([a-zA-Z][a-z-A-Z0-9_$]*)\\b",
           "captures": {
             "1": { "name": "keyword.declaration.type" },
-            "2": { "name": "entity.name.type" }
+            "2": { "name": "keyword.declaration.type" },
+            "3": { "name": "entity.name.type" }
           }
         }]
     },
@@ -59,7 +62,7 @@
     },
     "keywords": {
       "patterns": [{
-        "match": "\\b(module|import|def|fun|val|var|effect|type|match|case|record|extern|include|box|unbox|in|region|new)\\b",
+        "match": "\\b(module|import|def|fun|val|var|effect|type|match|case|record|extern|include|box|unbox|in|region|new|resource|interface)\\b",
         "name": "keyword.syntax"
       }, {
         "match": "\\b(resume|while|try|with|if|else|do|return|)\\b",
