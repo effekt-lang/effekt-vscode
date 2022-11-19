@@ -6,7 +6,7 @@
         "type": "git",
         "url": "https://github.com/effekt-lang/effekt-vscode.git"
     },
-    "version": "0.1.5",
+    "version": "0.1.6",
     "publisher": "b-studios",
     "engines": {
         "vscode": "^1.30.0"
@@ -80,6 +80,11 @@
                     "type": "boolean",
                     "default": true,
                     "description": "Display additional information when hovering over identifier."
+                },
+                "effekt.showCaptures": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Show additional information about resources used by a function."
                 },
                 "effekt.showIR": {
                     "type": "string",
