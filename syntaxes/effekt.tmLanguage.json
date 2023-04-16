@@ -16,7 +16,12 @@
         {
           "match": "//.*$\n?",
           "name": "comment.line.double-slash.syntax"
-        }
+        },
+				{
+					"begin": "\\s*+(\\/\\*)",
+					"end": "\\*\\/",
+					"name": "comment.multiline.syntax"
+				}
       ]
     },
     "definitions": {
