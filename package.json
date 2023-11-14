@@ -107,6 +107,11 @@
                 "effekt.lib": {
                     "type": "string",
                     "description": "Path to the standard library."
+                },
+                "effekt.debug": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Run the LSP server in debug mode (for development of the VSCode plugin and the Effekt compiler)."
                 }
             }
         },

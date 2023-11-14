@@ -1,9 +1,10 @@
 'use strict';
 
 import { ExtensionContext, workspace, window, Range, DecorationOptions, Location } from 'vscode';
-import { LanguageClient, LanguageClientOptions, ServerOptions, ExecuteCommandRequest } from 'vscode-languageclient';
+import { LanguageClient, LanguageClientOptions, ServerOptions, ExecuteCommandRequest, StreamInfo } from 'vscode-languageclient';
 import { Monto } from './monto';
 import { platform } from 'os';
+import * as net from 'net';
 
 
 let client: LanguageClient;
@@ -45,18 +46,33 @@ export function activate(context: ExtensionContext) {
 
     args.push("--server")
 
-    let serverOptions: ServerOptions = {
-        run: {
-            command: effektCmd,
-            args: args,
-            options: {}
-        },
-        debug: {
-            command: effektCmd,
-            args: args.concat(["--debug"]),
-            options: {}
-        }
-    };
+    let serverOptions: ServerOptions;
+
+    if (config.get<boolean>("debug")) {
+        serverOptions = () => {
+            // Connect to language server via socket
+            let socket: any = net.connect({ port: 5007 });
+            let result: StreamInfo = {
+            writer: socket,
+            reader: socket
+            };
+            return Promise.resolve(result);
+        };
+    } else {
+        serverOptions = {
+            run: {
+                command: effektCmd,
+                args: args,
+                options: {}
+            },
+            debug: {
+                command: effektCmd,
+                args: args,
+                options: {}
+            }
+        };
+    }
+
 
     let clientOptions: LanguageClientOptions = {
         documentSelector: [{
