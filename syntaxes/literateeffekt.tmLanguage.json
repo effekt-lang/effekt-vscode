@@ -11,5 +11,5 @@
     }, {
         "include":  "text.html.markdown"
     }],
-    "scopeName": "source.markdown"
+    "scopeName": "source.literateeffekt"
 }

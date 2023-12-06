@@ -17,7 +17,7 @@
     ],
     "activationEvents": [
         "onLanguage:effekt",
-        "onLanguage:markdown"
+        "onLanguage:literateeffekt"
     ],
     "main": "./out/extension",
     "contributes": {
@@ -48,8 +48,8 @@
             "scopeName": "source.effekt",
             "path": "./syntaxes/effekt.tmLanguage.json"
         },{
-            "language": "markdown",
-            "scopeName": "source.markdown",
+            "language": "literate effekt",
+            "scopeName": "source.literateeffekt",
             "path": "./syntaxes/literateeffekt.tmLanguage.json"
         },{
             "language": "ir",

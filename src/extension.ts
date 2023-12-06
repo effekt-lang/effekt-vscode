@@ -80,7 +80,7 @@ export function activate(context: ExtensionContext) {
             language: 'effekt'
         }, {
             scheme: 'file',
-            language: 'markdown'
+            language: 'literateeffekt'
         }],
         diagnosticCollectionName: "effekt"
     };
