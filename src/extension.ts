@@ -131,8 +131,6 @@ export function activate(context: ExtensionContext) {
 
                 let captureAnnotations: DecorationOptions[] = []
 
-                console.log(result)
-
                 if (result == null) return;
 
                 result.forEach(response => {
