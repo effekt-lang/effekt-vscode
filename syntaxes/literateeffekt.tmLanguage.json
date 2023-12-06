@@ -2,7 +2,7 @@
     "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
     "name": "Literate Effekt",
     "patterns": [{
-        "begin": "```\n",
+        "begin": "```(effekt)?\n",
         "end" : "```\n",
         "name": "markup.fenced_code.block.markdown",
         "patterns": [{
