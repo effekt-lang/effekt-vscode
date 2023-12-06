@@ -33,9 +33,9 @@
             ],
             "configuration": "./language-configuration.json"
         }, {
-            "id": "markdown",
-            "extensions": [".md"],
-            "aliases": ["markdown"],
+            "id": "literate effekt",
+            "extensions": [".effekt.md"],
+            "aliases": ["literate effekt"],
             "configuration": "./language-configuration.json"
         }, {
             "id": "ir",
