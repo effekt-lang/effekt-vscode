@@ -24,7 +24,6 @@
         "languages": [{
             "id": "effekt",
             "extensions": [
-                ".eff",
                 ".effekt"
             ],
             "aliases": [
