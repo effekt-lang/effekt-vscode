@@ -17,14 +17,13 @@
     ],
     "activationEvents": [
         "onLanguage:effekt",
-        "onLanguage:markdown"
+        "onLanguage:literateeffekt"
     ],
     "main": "./out/extension",
     "contributes": {
         "languages": [{
             "id": "effekt",
             "extensions": [
-                ".eff",
                 ".effekt"
             ],
             "aliases": [
@@ -33,9 +32,9 @@
             ],
             "configuration": "./language-configuration.json"
         }, {
-            "id": "markdown",
-            "extensions": [".md"],
-            "aliases": ["markdown"],
+            "id": "literate effekt",
+            "extensions": [".effekt.md"],
+            "aliases": ["literate effekt"],
             "configuration": "./language-configuration.json"
         }, {
             "id": "ir",
@@ -48,8 +47,8 @@
             "scopeName": "source.effekt",
             "path": "./syntaxes/effekt.tmLanguage.json"
         },{
-            "language": "markdown",
-            "scopeName": "source.markdown",
+            "language": "literate effekt",
+            "scopeName": "source.literateeffekt",
             "path": "./syntaxes/literateeffekt.tmLanguage.json"
         },{
             "language": "ir",
