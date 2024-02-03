@@ -9,9 +9,11 @@
 The official Visual Studio Code extension for the [Effekt Programming Language](effekt-lang.org).
 
 ## Getting Started
-This extension is not currently published on the extension marketplace so you will have to install it manually in your extensions or run it from VSCode.
+You can install the extension through the marketplace (via. tab "Extensions").
 
-After installing the extension Visual Studio Code, you need to install the [`effekt` compiler](https://github.com/effekt-lang/effekt#installation) and set the path to the `effekt` binary in the VSCode plugin settings for effekt.
+Currently, the extension does _not_ bundle the [`Effekt` compiler](https://github.com/effekt-lang/effekt#installation), so you need to install it independently.
+
+As a last step, you might need to set the path to the `effekt` binary in the VSCode plugin settings for effekt.
 For Mac OS and Unix users this probably works out of the box after installing `effekt` with npm (that is, once the `effekt` command is in your path). For Windows users, you might need to set the path to `effekt.cmd`.
 
 With this setup the extension should start the server when an Effekt file is opened.
