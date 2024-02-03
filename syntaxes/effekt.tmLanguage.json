@@ -70,7 +70,7 @@
         "match": "\\b(module|import|def|fun|val|var|effect|type|match|case|record|extern|include|box|unbox|in|region|new|resource|interface)\\b",
         "name": "keyword.syntax"
       }, {
-        "match": "\\b(resume|while|try|with|if|else|do|return|)\\b",
+        "match": "\\b(resume|while|try|with|if|else|do|return|is|and)\\b",
         "name": "keyword.control"
       }]
     },
