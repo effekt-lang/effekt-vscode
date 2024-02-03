@@ -7,7 +7,7 @@
         "url": "https://github.com/effekt-lang/effekt-vscode.git"
     },
     "icon": "icon.png",
-    "version": "0.1.9",
+    "version": "0.1.10",
     "publisher": "effekt-lang",
     "engines": {
         "vscode": "^1.30.0"
@@ -129,7 +129,19 @@
                 "mac": "cmd+alt+p",
                 "when": "editorTextFocus && editorLangId == 'effekt'"
             }
-        ]
+        ],
+        "configurationDefaults": {
+            "[effekt]": {
+                "editor.tabSize": 2,
+                "editor.insertSpaces": true,
+                "editor.detectIndentation": false
+            },
+            "[literate effekt]": {
+                "editor.tabSize": 2,
+                "editor.insertSpaces": true,
+                "editor.detectIndentation": false
+            }
+        }
     },
     "scripts": {
         "vscode:prepublish": "npm run compile",
