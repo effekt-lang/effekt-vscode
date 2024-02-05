@@ -67,7 +67,7 @@
     },
     "keywords": {
       "patterns": [{
-        "match": "\\b(module|import|def|fun|val|var|effect|type|match|case|record|extern|include|box|unbox|in|region|new|resource|interface)\\b",
+        "match": "\\b(module|import|def|fun|val|var|effect|type|match|case|record|extern|include|box|unbox|in|region|new|resource|interface|namespace|module|include|export|as)\\b",
         "name": "keyword.syntax"
       }, {
         "match": "\\b(resume|while|try|with|if|else|do|return|is|and)\\b",
