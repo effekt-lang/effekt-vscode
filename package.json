@@ -10,14 +10,10 @@
     "version": "0.1.10",
     "publisher": "effekt-lang",
     "engines": {
-        "vscode": "^1.46.0"
+        "vscode": "^1.86.0"
     },
     "categories": [
         "Other"
-    ],
-    "activationEvents": [
-        "onLanguage:effekt",
-        "onLanguage:literateeffekt"
     ],
     "main": "./out/extension",
     "contributes": {
@@ -145,6 +141,9 @@
         },
         "views": {
             "assistant": [{
+                "id": "binding",
+                "name": "Bindings in Scope"
+            }, {
                 "type": "webview",
                 "id": "helloView",
                 "name": "Code Synthesis",

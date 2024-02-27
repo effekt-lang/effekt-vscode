@@ -1,6 +1,7 @@
 'use strict';
 
 import * as openai from 'openai';
+import {HoleInfo} from './extension';
 
 export function IDEAssistant(apiKey: string | undefined, model: string) {
 
@@ -34,6 +35,13 @@ export function IDEAssistant(apiKey: string | undefined, model: string) {
   const exampleInput1 = `
     def add(n: Int, m: Int) = <>
   `
+  const exampleLocals1 = `
+Expected type at hole: Int
+------
+Available term bindings are:
+n: Int
+m: Int
+------`
   const exampleOutput1 = `n + m`
 
 
@@ -55,26 +63,54 @@ def last[R](dq: Dequeue[R]): Option[R] = dq match {
       if ((fs == 1) && (rs == 0)) { f.headOption }
       else { r.headOption }
 }`
+  const exampleLocals2 = `
+Expected type at hole: Option[R]
+------
+Available term bindings are:
+dq: Dequeue[R]
+emptyQueue: [R]() => Dequeue[R]
+isEmpty: [R](Dequeue[R]) => Boolean
+first: [R](Dequeue[R]) => Option[R]
+size: [R](Dequeue[R]) => Int
+last: [R](Dequeue[R]) => Option[R]
+------`
   const exampleOutput2 = `dq match {
     case Dequeue(f, fs, r, rs) =>
       if ((fs == 0) && (rs == 1)) { r.headOption }
       else { f.headOption }
 }`
 
+
   return {
-    complete: async function(textWithHole: string) {
-      console.log("Trying to complete", textWithHole)
+    complete: async function(textWithHole: string, hole: HoleInfo) {
+
+      let locals = `
+Expected type at hole: ${hole.tpe}
+------
+Available type definitions:
+${hole.types.map(t => t.definition).join("\n")}
+------
+Available term bindings are:
+${hole.terms.map((t) => t.name + ": " + t.tpe).join("\n")}
+------`
       const params: openai.OpenAI.Chat.ChatCompletionCreateParams = {
           messages: [
             { role: 'system', content: prompt },
             { role: 'user', content: exampleInput1 },
+            { role: 'system', content: exampleLocals1 },
             { role: 'assistant', content: exampleOutput1 },
             { role: 'user', content: exampleInput2 },
+            { role: 'system', content: exampleLocals2 },
             { role: 'assistant', content: exampleOutput2 },
-            { role: 'user', content: textWithHole }
+            { role: 'user', content: textWithHole },
+            { role: 'system', content: locals },
           ],
           model: model,
       };
+      console.log(params)
+
+      if (model == "none") return;
+
       const result = await api.chat.completions.create(params)
       const message = result.choices.at(0)?.message.content
       return message

@@ -10,6 +10,11 @@ import { IDEAssistant } from './assistant';
 
 let client: LanguageClient;
 
+export type TermBinding = { name: string; tpe: string }
+export type TypeBinding = { name: string; definition: string }
+export type HoleInfo = { range: Range, tpe: string, terms: TermBinding[], types: TypeBinding[] }
+
+
 export function activate(context: ExtensionContext) {
 
 
@@ -142,6 +147,13 @@ export function activate(context: ExtensionContext) {
     let timeout: NodeJS.Timer;
     let editor = window.activeTextEditor
 
+    function assistantConfig() {
+        const api = config.get<string>("api")
+        const model = config.get<string>("model") || "none"
+        if (!api || model === "none") { return undefined }
+        return { api: api, model: model }
+    }
+
     function scheduleDecorations() {
 		if (timeout) { clearTimeout(timeout) }
 		timeout = setTimeout(updateHoles, 50);
@@ -190,6 +202,63 @@ export function activate(context: ExtensionContext) {
 
     const holeRegex = /<>|<{|}>/g
 
+    let holeInfos: HoleInfo[] = []
+
+    // TODO use events and event emitters to restructure code!
+
+    class TermBindingProvider implements vscode.TreeDataProvider<TermBindingItem> {
+
+        private _onDidChangeTreeData: vscode.EventEmitter<TermBindingItem | undefined> = new vscode.EventEmitter<TermBindingItem | undefined>();
+        readonly onDidChangeTreeData: vscode.Event<TermBindingItem | undefined> = this._onDidChangeTreeData.event;
+
+
+        private termBindings: TermBinding[] = [];
+
+        getTreeItem(element: TermBindingItem): vscode.TreeItem {
+            return element;
+        }
+
+        getChildren(element?: TermBindingItem): Thenable<TermBindingItem[]> {
+            if (element === undefined) {
+                return Promise.resolve(this.termBindings.map(binding => new TermBindingItem(binding.name, binding.tpe)));
+            }
+            return Promise.resolve([]);
+        }
+
+        updateTermBindings(termBindings: TermBinding[]): void {
+            this.termBindings = termBindings;
+            this._onDidChangeTreeData.fire(undefined);
+        }
+    }
+
+    class TermBindingItem extends vscode.TreeItem {
+        constructor(name: string, tpe: string) {
+            super(name, vscode.TreeItemCollapsibleState.None);
+            this.tooltip = `${name}: ${tpe}`;
+            this.description = tpe;
+        }
+    }
+
+    const bindingsProvider = new TermBindingProvider();
+    vscode.window.registerTreeDataProvider('binding', bindingsProvider);
+
+
+    async function getHolesFromServer() {
+        if (!editor) { return; }
+
+        client.sendRequest(ExecuteCommandRequest.type, {
+            command: "holes",
+            arguments: [{ uri: editor.document.uri.toString() }]}).then((result: HoleInfo[]) => {
+
+                console.log(result)
+
+                holeInfos = result || [];
+                let terms = (holeInfos.length == 0) ? [] : holeInfos[0].terms;
+                bindingsProvider.updateTermBindings(terms)
+
+                return findCompletions(holeInfos)
+            }, (err) => console.log(err))
+    }
 
 
     /**
@@ -320,13 +389,14 @@ export function activate(context: ExtensionContext) {
         return holes;
     }
 
-    function findCompletions() {
+    function findCompletions(holes: HoleInfo[]) {
 
         if (!editor) { return; }
-        let holes = findHoles(editor);
         let document = editor.document
         // no holes
-        if (holes.length <= 0) { console.log("no holes"); return; }
+        if (!holes || holes.length <= 0) { console.log("no holes"); return; }
+        // currently only deal with the first hole
+        let hole = holes[0]
 
         const fileContents = editor.document.getText();
 
@@ -334,10 +404,10 @@ export function activate(context: ExtensionContext) {
         if (fileContents.length > 10000) { console.log("too long"); return; }
 
         console.log("completions started");
-        assistant.complete(fileContents).then(res => {
+       return assistant?.complete(fileContents, hole).then(res => {
             proposal = res || "";
             provider.updateProposals()
-            showHoleCompletionAvailable(document, holes[0].range)
+            showHoleCompletionAvailable(document, hole.range)
         })
     }
 
@@ -395,7 +465,7 @@ export function activate(context: ExtensionContext) {
         clearAssistantDiagnostics()
 
         setTimeout(updateCaptures, 50)
-        setTimeout(findCompletions, 0)
+        setTimeout(getHolesFromServer, 0)
     })
 
 	scheduleDecorations();
