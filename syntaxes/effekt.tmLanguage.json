@@ -12,33 +12,30 @@
   ],
   "repository": {
     "comments": {
-      "patterns": [
-        {
-          "begin": "//",
-          "end": "\\n",
-          "beginCaptures": {
-            "0": {
-              "name": "punctuation.definition.comment.effekt"
-            }
-          },
-          "name": "comment.line.double-slash.effekt"
+      "patterns": [{
+        "begin": "//",
+        "end": "\\n",
+        "beginCaptures": {
+          "0": {
+            "name": "punctuation.definition.comment.effekt"
+          }
         },
-				{
-					"begin": "/\\*",
-          "beginCaptures": {
-            "0": {
-              "name": "punctuation.definition.comment.effekt"
-            }
-          },
-          "end": "\\*/",
-          "endCaptures": {
-            "0": {
-              "name": "punctuation.definition.comment.effekt"
-            }
-          },
-          "name": "comment.block.effekt"
-				}
-      ]
+        "name": "comment.line.double-slash.effekt"
+      }, {
+        "begin": "/\\*",
+        "beginCaptures": {
+          "0": {
+            "name": "punctuation.definition.comment.effekt"
+          }
+        },
+        "end": "\\*/",
+        "endCaptures": {
+          "0": {
+            "name": "punctuation.definition.comment.effekt"
+          }
+        },
+        "name": "comment.block.effekt"
+      }]
     },
     "definitions": {
       "patterns": [{
@@ -108,32 +105,27 @@
       }]
     },
     "strings": {
-      "patterns": [
-        {
-          "begin": "\"",
-          "end": "\"",
-          "name": "string.quoted.double.literal",
-          "patterns": [
-            { "include": "#stringTemplates" },
-            {
-              "match": "\\\\.",
-              "name": "constant.character.escape.effekt"
-            }
-          ]
-        },
-        {
-          "begin": "\"\"\"",
-          "end": "\"\"\"",
-          "name": "string.quoted.triple.literal",
-          "patterns": [
-            { "include": "#stringTemplates" },
-            {
-              "match": "\\\\.",
-              "name": "constant.character.escape.effekt"
-            }
-          ]
-        }
-      ]
+      "patterns": [{
+        "begin": "\"",
+        "end": "\"",
+        "name": "string.quoted.double.literal",
+        "patterns": [{
+          "include": "#stringTemplates"
+        }, {
+          "match": "\\\\.",
+          "name": "constant.character.escape.effekt"
+        }]
+      }, {
+        "begin": "\"\"\"",
+        "end": "\"\"\"",
+        "name": "string.quoted.triple.literal",
+        "patterns": [{
+          "include": "#stringTemplates"
+        }, {
+          "match": "\\\\.",
+          "name": "constant.character.escape.effekt"
+        }]
+      }]
     },
     "stringTemplates": {
       "begin": "\\$\\{",
@@ -150,12 +142,10 @@
       ]
     },
     "characters": {
-      "patterns": [
-        {
-          "match": "'(\\\\.|[^'\\\\])'",
-          "name": "string.quoted.single.char.effekt"
-        }
-      ]
+      "patterns": [{
+        "match": "'(\\\\.|[^'\\\\])'",
+        "name": "string.quoted.single.char.effekt"
+      }]
     },
     "numbers": {
       "patterns": [{
