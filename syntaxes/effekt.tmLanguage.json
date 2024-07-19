@@ -168,10 +168,16 @@
       }]
     },
     "numbers": {
-      "patterns": [{
-        "match": "\\b[0-9]+",
-        "name": "constant.numeric"
-      }]
+      "patterns": [
+        {
+          "match": "\\b([0-9]+\\.[0-9]+)\\b",
+          "name": "constant.numeric.float.effekt"
+        },
+        {
+          "match": "\\b([0-9]+)\\b",
+          "name": "constant.numeric.integer.effekt"
+        }
+      ]
     },
     "punctuation": {
       "patterns": [{
