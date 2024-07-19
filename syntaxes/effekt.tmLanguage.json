@@ -9,7 +9,8 @@
     { "include": "#keywords" },
     { "include": "#names" },
     { "include": "#literals" },
-    { "include": "#holes" }
+    { "include": "#holes" },
+    { "include": "#operators" }
   ],
   "repository": {
     "comments": {
@@ -198,6 +199,27 @@
       "name": "meta.hole.effekt",
       "patterns": [{
         "include": "$self"
+      }]
+    },
+    "operators": {
+      "patterns": [{
+        "match": "\\|\\||&&",
+        "name": "keyword.operator.logical.effekt"
+      }, {
+        "match": "==|!=|<=|>=|<|>",
+        "name": "keyword.operator.comparison.effekt"
+      }, {
+        "match": "\\+\\+",
+        "name": "keyword.operator.concatenation.effekt"
+      }, {
+        "match": "\\+\\+|\\+|-|\\*|/",
+        "name": "keyword.operator.arithmetic.effekt"
+      }, {
+        "match": "::",
+        "name": "keyword.operator.namespace.effekt"
+      }, {
+        "match": "=>",
+        "name": "keyword.operator.arrow.effekt"
       }]
     }
   },
