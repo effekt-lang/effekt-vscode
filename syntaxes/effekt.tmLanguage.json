@@ -67,6 +67,12 @@
             "2": { "name": "keyword.declaration.type" },
             "3": { "name": "entity.name.type" }
           }
+        }, {
+          "match": "\\s*(namespace)\\s+([a-zA-Z][a-z-A-Z0-9_$]*)\\b",
+          "captures": {
+            "1": { "name": "keyword.declaration.namespace" },
+            "2": { "name": "entity.name.namespace" }
+          }
         }]
     },
     "parameters": {
