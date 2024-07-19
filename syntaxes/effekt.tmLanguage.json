@@ -14,13 +14,29 @@
     "comments": {
       "patterns": [
         {
-          "match": "//.*$\n?",
-          "name": "comment.line.double-slash.syntax"
+          "begin": "//",
+          "end": "\\n",
+          "beginCaptures": {
+            "0": {
+              "name": "punctuation.definition.comment.effekt"
+            }
+          },
+          "name": "comment.line.double-slash.effekt"
         },
 				{
-					"begin": "\\s*+(\\/\\*)",
-					"end": "\\*\\/",
-					"name": "comment.multiline.syntax"
+					"begin": "/\\*",
+          "beginCaptures": {
+            "0": {
+              "name": "punctuation.definition.comment.effekt"
+            }
+          },
+          "end": "\\*/",
+          "endCaptures": {
+            "0": {
+              "name": "punctuation.definition.comment.effekt"
+            }
+          },
+          "name": "comment.block.effekt"
 				}
       ]
     },
