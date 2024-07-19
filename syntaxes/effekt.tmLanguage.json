@@ -108,11 +108,54 @@
       }]
     },
     "strings": {
-      "patterns": [{
-        "begin": "\"",
-        "end": "\"",
-        "name": "string.quoted.double.literal"
-      }]
+      "patterns": [
+        {
+          "begin": "\"",
+          "end": "\"",
+          "name": "string.quoted.double.literal",
+          "patterns": [
+            { "include": "#stringTemplates" },
+            {
+              "match": "\\\\.",
+              "name": "constant.character.escape.effekt"
+            }
+          ]
+        },
+        {
+          "begin": "\"\"\"",
+          "end": "\"\"\"",
+          "name": "string.quoted.triple.literal",
+          "patterns": [
+            { "include": "#stringTemplates" },
+            {
+              "match": "\\\\.",
+              "name": "constant.character.escape.effekt"
+            }
+          ]
+        }
+      ]
+    },
+    "stringTemplates": {
+      "begin": "\\$\\{",
+      "beginCaptures": {
+        "0": { "name": "punctuation.definition.template-expression.begin.effekt" }
+      },
+      "end": "\\}",
+      "endCaptures": {
+        "0": { "name": "punctuation.definition.template-expression.end.effekt" }
+      },
+      "name": "meta.embedded.line.effekt",
+      "patterns": [
+        { "include": "$self" }
+      ]
+    },
+    "characters": {
+      "patterns": [
+        {
+          "match": "'(\\\\.|[^'\\\\])'",
+          "name": "string.quoted.single.char.effekt"
+        }
+      ]
     },
     "numbers": {
       "patterns": [{
