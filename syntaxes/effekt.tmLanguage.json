@@ -8,9 +8,7 @@
     { "include": "#definitions" },
     { "include": "#keywords" },
     { "include": "#names" },
-    { "include": "#strings" },
-    { "include": "#characters" },
-    { "include": "#numbers" },
+    { "include": "#literals" },
     { "include": "#holes" }
   ],
   "repository": {
@@ -112,11 +110,56 @@
         "name": "keyword.control"
       }]
     },
-    "names": {
+    "literals": {
       "patterns": [{
         "match": "\\b(true|false)\\b",
-        "name": "constant.language"
+        "name": "constant.language.boolean.effekt"
       }, {
+        "match": "\\b([0-9]+\\.[0-9]+)\\b",
+        "name": "constant.numeric.float.effekt"
+      }, {
+        "match": "\\b([0-9]+)\\b",
+        "name": "constant.numeric.integer.effekt"
+      }, {
+        "include": "#characters"
+      }, {
+        "include": "#strings"
+      }]
+    },
+    "characters": {
+      "name": "string.quoted.single.effekt",
+      "begin": "'",
+      "end": "'",
+      "patterns": [{
+        "name": "constant.character.escape.effekt",
+        "match": "\\\\((u[0-9a-fA-F]{4})|.)"
+      }]
+    },
+    "strings": {
+      "patterns": [{
+        "name": "string.quoted.triple.effekt",
+        "begin": "\"\"\"",
+        "end": "\"\"\"",
+        "patterns": [{
+          "name": "constant.character.escape.effekt",
+          "match": "\\\\((u[0-9a-fA-F]{4})|.)"
+        }, {
+          "include": "#stringTemplates"
+        }]
+      }, {
+        "name": "string.quoted.double.effekt",
+        "begin": "\"",
+        "end": "\"",
+        "patterns": [{
+          "name": "constant.character.escape.effekt",
+          "match": "\\\\((u[0-9a-fA-F]{4})|.)"
+        }, {
+          "include": "#stringTemplates"
+        }]
+      }]
+    },
+    "names": {
+      "patterns": [{
         "match": "\\b([a-z][a-zA-Z0-9_]*)\\b[\\s]*[({\\[]",
         "captures": {
           "1": { "name": "entity.name.function" }
@@ -127,29 +170,6 @@
       }, {
         "match": "\\b[A-Z][a-zA-Z0-9_]*\\b",
         "name": "entity.name.type"
-      }]
-    },
-    "strings": {
-      "patterns": [{
-        "begin": "\"\"\"",
-        "end": "\"\"\"",
-        "name": "string.quoted.triple.literal",
-        "patterns": [{
-          "include": "#stringTemplates"
-        }, {
-          "match": "\\\\.",
-          "name": "constant.character.escape.effekt"
-        }]
-      }, {
-        "begin": "\"",
-        "end": "\"",
-        "name": "string.quoted.double.literal",
-        "patterns": [{
-          "include": "#stringTemplates"
-        }, {
-          "match": "\\\\.",
-          "name": "constant.character.escape.effekt"
-        }]
       }]
     },
     "stringTemplates": {
@@ -164,27 +184,6 @@
       "name": "meta.embedded.line.effekt",
       "patterns": [
         { "include": "$self" }
-      ]
-    },
-    "characters": {
-      "patterns": [{
-        "match": "'(\\\\[nrt\\\\']|[^'\\\\])'",
-        "name": "string.quoted.single.char.effekt"
-      }, {
-        "match": "\\\\u[0-9A-Fa-f]{4}",
-        "name": "string.quoted.single.char.effekt"
-      }]
-    },
-    "numbers": {
-      "patterns": [
-        {
-          "match": "\\b([0-9]+\\.[0-9]+)\\b",
-          "name": "constant.numeric.float.effekt"
-        },
-        {
-          "match": "\\b([0-9]+)\\b",
-          "name": "constant.numeric.integer.effekt"
-        }
       ]
     },
     "punctuation": {
