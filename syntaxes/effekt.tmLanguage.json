@@ -194,13 +194,11 @@
       }]
     },
     "holes": {
+      "begin": "<{",
+      "end": "}>",
+      "name": "meta.hole.effekt",
       "patterns": [{
-        "begin": "<{",
-        "end" : "}>",
-        "name": "effekt.hole",
-        "patterns": [{
-          "include": "source.effekt"
-        }]
+        "include": "$self"
       }]
     }
   },
