@@ -123,9 +123,9 @@
     },
     "strings": {
       "patterns": [{
-        "begin": "\"",
-        "end": "\"",
-        "name": "string.quoted.double.literal",
+        "begin": "\"\"\"",
+        "end": "\"\"\"",
+        "name": "string.quoted.triple.literal",
         "patterns": [{
           "include": "#stringTemplates"
         }, {
@@ -133,9 +133,9 @@
           "name": "constant.character.escape.effekt"
         }]
       }, {
-        "begin": "\"\"\"",
-        "end": "\"\"\"",
-        "name": "string.quoted.triple.literal",
+        "begin": "\"",
+        "end": "\"",
+        "name": "string.quoted.double.literal",
         "patterns": [{
           "include": "#stringTemplates"
         }, {
