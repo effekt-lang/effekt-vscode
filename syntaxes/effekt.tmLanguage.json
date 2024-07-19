@@ -102,11 +102,20 @@
     },
     "keywords": {
       "patterns": [{
-        "match": "\\b(module|import|def|fun|val|var|effect|type|match|case|record|extern|include|box|unbox|in|region|new|resource|interface|namespace|module|include|export|as)\\b",
+        "match": "\\b(module|import|def|fun|val|var|effect|type|record|extern|include|box|unbox|in|region|new|resource|interface|namespace|module|include|export|as)\\b",
         "name": "keyword.syntax.effekt"
       }, {
-        "match": "\\b(resume|while|try|with|if|else|do|return|is|and)\\b",
-        "name": "keyword.control.effekt"
+        "match": "\\b(resume|return)\\b",
+        "name": "keyword.control.flow.jump.effekt"
+      }, {
+        "match": "\\b(do|try|with)\\b",
+        "name": "keyword.control.flow.effects.effekt"
+      }, {
+        "match": "\\b(while|match|case|if|else)\\b",
+        "name": "keyword.control.flow.effekt"
+      }, {
+        "match": "\\b(is|and)\\b",
+        "name": "keyword.operator.effekt"
       }]
     },
     "literals": {
