@@ -43,7 +43,7 @@
           "end" : "[=\\n]",
           "beginCaptures": {
             "1": { "name": "keyword.declaration.type" },
-            "2": { "name": "entity.name.type" },
+            "2": { "name": "variable.other.capability.effekt" },
             "3": { "name": "keyword.declaration.function" },
             "4": { "name": "entity.name.function" }
           },
