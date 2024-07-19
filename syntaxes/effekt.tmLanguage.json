@@ -9,6 +9,7 @@
     { "include": "#keywords" },
     { "include": "#names" },
     { "include": "#strings" },
+    { "include": "#characters" },
     { "include": "#numbers" },
     { "include": "#holes" }
   ],
@@ -159,7 +160,10 @@
     },
     "characters": {
       "patterns": [{
-        "match": "'(\\\\.|[^'\\\\])'",
+        "match": "'(\\\\[nrt\\\\']|[^'\\\\])'",
+        "name": "string.quoted.single.char.effekt"
+      }, {
+        "match": "\\\\u[0-9A-Fa-f]{4}",
         "name": "string.quoted.single.char.effekt"
       }]
     },
