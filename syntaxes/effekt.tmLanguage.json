@@ -18,17 +18,13 @@
         "begin": "//",
         "end": "\\n",
         "beginCaptures": {
-          "0": {
-            "name": "punctuation.definition.comment.effekt"
-          }
+          "0": { "name": "punctuation.definition.comment.effekt" }
         },
         "name": "comment.line.double-slash.effekt"
       }, {
         "begin": "/\\*",
         "beginCaptures": {
-          "0": {
-            "name": "punctuation.definition.comment.effekt"
-          }
+          "0": { "name": "punctuation.definition.comment.effekt" }
         },
         "end": "\\*/",
         "endCaptures": {
