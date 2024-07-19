@@ -38,13 +38,21 @@
     },
     "definitions": {
       "patterns": [{
-          "begin": "\\s*(extern)?\\s*(\\{[^\\}]*\\}|[a-zA-Z][a-z-A-Z0-9_$]*)\\s*(def)\\s+([a-zA-Z][a-z-A-Z0-9_$]*)\\b",
-          "end" : "[=\\n]",
-          "beginCaptures": {
-            "1": { "name": "keyword.declaration.type" },
-            "2": { "patterns": [{ "include": "#capabilities" }] },
-            "3": { "name": "keyword.declaration.function" },
-            "4": { "name": "entity.name.function" }
+          "begin": "\\s*(extern)\\s+((?:(?:\\{[^\\}]*\\}|[a-zA-Z][a-z-A-Z0-9_$]*)\\s+)?)\\s*(def)\\s+([a-zA-Z][a-z-A-Z0-9_$]*)\\b",
+          "end": "[=\\n]",
+          "captures": {
+              "1": { "name": "keyword.declaration.type" },
+              "2": { "patterns": [{ "include": "#capabilities" }] },
+              "3": { "name": "keyword.declaration.function.extern" },
+              "4": { "name": "entity.name.function" }
+            },
+          "patterns": [{ "include": "#parameters" }]
+        }, {
+          "begin": "\\s*(def)\\s+([a-zA-Z][a-z-A-Z0-9_$]*)\\b",
+          "end": "[=\\n]",
+          "captures": {
+            "1": { "name": "keyword.declaration.function" },
+            "2": { "name": "entity.name.function" }
           },
           "patterns": [{ "include": "#parameters" }]
         }, {
