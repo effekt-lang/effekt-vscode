@@ -7,6 +7,7 @@
     { "include": "#comments" },
     { "include": "#definitions" },
     { "include": "#keywords" },
+    { "include": "#boxed_types" },
     { "include": "#names" },
     { "include": "#literals" },
     { "include": "#holes" },
@@ -87,8 +88,23 @@
           }
         }]
     },
+    "boxed_types": {
+      "comment": "Used for boxed types like 'at {}', 'at {io}', 'at {io, global}', etc.",
+      "patterns": [{
+        "begin": "\\b(at)\\s*\\{",
+        "beginCaptures": {
+          "1": { "name": "keyword.syntax.at.effekt" }
+        },
+        "end": "\\}",
+        "patterns": [{
+          "include": "#capabilities"
+        }]
+      }]
+    },
     "parameters": {
       "patterns": [{
+        "include": "#boxed_types"
+      }, {
         "match": "\\b([a-z][a-zA-Z0-9_$]*)(?:)",
         "name": "variable.parameter"
       }, {
