@@ -165,8 +165,9 @@
       "begin": "'",
       "end": "'",
       "patterns": [{
-        "name": "constant.character.escape.effekt",
-        "match": "\\\\((u[0-9a-fA-F]{4})|.)"
+        "include": "#escapes"
+      }, {
+        "include": "#invalidEscapes"
       }]
     },
     "strings": {
@@ -174,10 +175,8 @@
         "name": "string.quoted.triple.effekt",
         "begin": "\"\"\"",
         "end": "\"\"\"",
+        "comment": "Important: only single-line strings can have escapes!",
         "patterns": [{
-          "name": "constant.character.escape.effekt",
-          "match": "\\\\((u[0-9a-fA-F]{4})|.)"
-        }, {
           "include": "#stringTemplates"
         }]
       }, {
@@ -185,12 +184,22 @@
         "begin": "\"",
         "end": "\"",
         "patterns": [{
-          "name": "constant.character.escape.effekt",
-          "match": "\\\\((u[0-9a-fA-F]{4})|.)"
+          "include": "#escapes"
+        }, {
+          "include": "#invalidEscapes"
         }, {
           "include": "#stringTemplates"
         }]
       }]
+    },
+    "escapes": {
+      "match": "\\\\([btnfr\\\\\"']|u[0-9A-Fa-f]{4})",
+      "name": "constant.character.escape.effekt"
+    },
+    "invalidEscapes": {
+      "match": "\\\\.",
+      "name": "invalid.illegal.unknown-escape.effekt",
+      "comment": "Represents any possible escape, therefore should always be used _after_ #escapes!"
     },
     "names": {
       "patterns": [{
