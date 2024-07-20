@@ -59,11 +59,19 @@
             "2": { "name": "variable" }
           }
         }, {
-          "match": "\\s*(var)\\s+([a-zA-Z][a-z-A-Z0-9_$]*)\\b",
-          "captures": {
+          "begin": "\\s*(var)\\s+([a-zA-Z][a-z-A-Z0-9_$]*)\\b",
+          "beginCaptures": {
             "1": { "name": "keyword.declaration.var" },
             "2": { "name": "variable" }
-          }
+          },
+          "end": "[=\\n]",
+          "patterns": [{
+            "match": "\\s+(in)\\s+([a-zA-Z][a-z-A-Z0-9_$]*)\\b",
+            "captures": {
+              "1": { "name": "keyword.syntax.in.effekt" },
+              "2": { "name": "entity.name.region.effekt" }
+            }
+          }]
         }, {
           "match": "\\s*(extern)?\\s*(type|effect|interface|resource)\\s+([a-zA-Z][a-z-A-Z0-9_$]*)\\b",
           "captures": {
@@ -102,7 +110,7 @@
     },
     "keywords": {
       "patterns": [{
-        "match": "\\b(module|import|def|fun|val|var|effect|type|record|extern|include|box|unbox|in|region|new|resource|interface|namespace|module|include|export|as)\\b",
+        "match": "\\b(module|import|def|fun|val|var|effect|type|record|extern|include|box|unbox|region|new|resource|interface|namespace|module|include|export|as)\\b",
         "name": "keyword.syntax.effekt"
       }, {
         "match": "\\b(resume|return)\\b",
