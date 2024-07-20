@@ -72,6 +72,8 @@
               "1": { "name": "keyword.syntax.in.effekt" },
               "2": { "name": "entity.name.region.effekt" }
             }
+          }, {
+            "include": "#parameters"
           }]
         }, {
           "match": "\\s*(extern)?\\s*(type|effect|interface|resource)\\s+([a-zA-Z][a-z-A-Z0-9_$]*)\\b",
