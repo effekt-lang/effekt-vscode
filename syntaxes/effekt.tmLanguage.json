@@ -36,7 +36,7 @@
     "definitions": {
       "patterns": [{
           "begin": "\\s*(extern)\\s+((?:(?:\\{[^\\}]*\\}|[a-zA-Z][a-z-A-Z0-9_$]*)\\s+)?)\\s*(def)\\s+([a-zA-Z][a-z-A-Z0-9_$]*)\\b",
-          "end": "(?=\\=|\\n)",
+          "end": "(?:(?=\\n)|(?=\\b(?:(?!=>)[^=]>\\b)|(?:(?!>)\\=)))",
           "captures": {
             "1": { "name": "keyword.declaration.type" },
             "2": { "patterns": [{ "include": "#capabilities" }] },
@@ -46,7 +46,7 @@
           "patterns": [{ "include": "#parameters" }]
         }, {
           "begin": "\\s*(def)\\s+([a-zA-Z][a-z-A-Z0-9_$]*)\\b",
-          "end": "(?=\\=|\\n)",
+          "end": "(?:(?=\\n)|(?=\\b(?:(?!=>)[^=]>\\b)|(?:(?!>)\\=)))",
           "captures": {
             "1": { "name": "keyword.declaration.function" },
             "2": { "name": "entity.name.function" }
@@ -64,7 +64,7 @@
             "1": { "name": "keyword.declaration.var" },
             "2": { "name": "variable" }
           },
-          "end": "(?=\\=|\\n)",
+          "end": "(?:(?=\\n)|(?=\\b(?:(?!=>)[^=]>\\b)|(?:(?!>)\\=)))",
           "patterns": [{
             "match": "\\s+(in)\\s+([a-zA-Z][a-z-A-Z0-9_$]*)\\b",
             "captures": {
