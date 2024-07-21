@@ -8,8 +8,8 @@
     { "include": "#definitions" },
     { "include": "#keywords" },
     { "include": "#boxed_types" },
-    { "include": "#names" },
     { "include": "#literals" },
+    { "include": "#names" },
     { "include": "#holes" },
     { "include": "#operators" }
   ],
