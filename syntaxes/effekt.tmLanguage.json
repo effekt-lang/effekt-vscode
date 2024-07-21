@@ -70,7 +70,7 @@
           "patterns": [{
             "match": "\\s+(in)\\s+([a-zA-Z][a-z-A-Z0-9_$]*)\\b",
             "captures": {
-              "1": { "name": "keyword.syntax.in.effekt" },
+              "1": { "name": "keyword.other.in.effekt" },
               "2": { "name": "entity.name.region.effekt" }
             }
           }, {
@@ -98,7 +98,7 @@
         }, {
           "match": "\\s*(import)\\s+((?:[a-zA-Z][a-zA-Z0-9_]*(?:/[a-zA-Z][a-zA-Z0-9_]*)*))\\b",
           "captures": {
-            "1": { "name": "keyword.syntax.import.effekt" },
+            "1": { "name": "keyword.other.import.effekt" },
             "2": { "name": "entity.name.module.import.effekt" }
           }
         }]
@@ -142,7 +142,7 @@
     "keywords": {
       "patterns": [{
         "match": "\\b(module|import|def|fun|val|var|effect|type|record|include|box|unbox|region|new|resource|interface|namespace|module|include|export|as)\\b",
-        "name": "keyword.syntax.effekt"
+        "name": "keyword.other.effekt"
       }, {
         "match": "\\b(resume|return)\\b",
         "name": "keyword.control.jump.effekt"
@@ -284,7 +284,7 @@
       "patterns": [{
         "match": "\\b(region)\\s+([a-zA-Z][a-zA-Z0-9_]*)\\b",
         "captures": {
-          "1": { "name": "keyword.syntax.region.effekt" },
+          "1": { "name": "keyword.other.region.effekt" },
           "2": { "name": "entity.name.region.effekt" }
         }
       }]
