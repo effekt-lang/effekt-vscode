@@ -90,10 +90,16 @@
             "2": { "name": "entity.name.namespace.effekt" }
           }
         }, {
-          "match": "\\s*(module)\\s+([a-zA-Z][a-z-A-Z0-9_$]*)\\b",
+          "match": "\\s*(module)\\s+((?:[a-zA-Z][a-zA-Z0-9_]*(?:/[a-zA-Z][a-zA-Z0-9_]*)*))\\b",
           "captures": {
             "1": { "name": "keyword.declaration.module.effekt" },
             "2": { "name": "entity.name.module.effekt" }
+          }
+        }, {
+          "match": "\\s*(import)\\s+((?:[a-zA-Z][a-zA-Z0-9_]*(?:/[a-zA-Z][a-zA-Z0-9_]*)*))\\b",
+          "captures": {
+            "1": { "name": "keyword.syntax.import.effekt" },
+            "2": { "name": "entity.name.module.import.effekt" }
           }
         }]
     },
