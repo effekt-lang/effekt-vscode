@@ -155,7 +155,7 @@
     },
     "keywords": {
       "patterns": [{
-        "match": "\\b(module|import|def|fun|val|var|effect|type|record|include|box|unbox|region|new|resource|interface|namespace|module|include|export|as)\\b",
+        "match": "\\b(module|import|def|fun|val|var|effect|type|record|box|unbox|region|new|resource|interface|namespace|module|include|export|as)\\b",
         "name": "keyword.other.effekt"
       }, {
         "match": "\\b(resume|return)\\b",
