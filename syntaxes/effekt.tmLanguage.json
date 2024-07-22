@@ -71,8 +71,7 @@
             "match": "\\s+(in)\\s+([a-zA-Z][a-z-A-Z0-9_$]*)\\b",
             "captures": {
               "1": { "name": "keyword.other.in.effekt" },
-              "2": { "name": "entity.name.region.effekt" }
-            }
+              "2": { "name": "variable.other.capability.effekt entity.name.region.effekt" }            }
           }, {
             "include": "#parameters"
           }]
@@ -131,6 +130,9 @@
       "patterns": [{
         "match": "\\b(pure)\\b",
         "name": "keyword.other.capability.pure.effekt"
+      }, {
+        "match": "\\b(io|global)\\b",
+        "name": "support.constant.effekt variable.other.capability.effekt"
       }, {
         "match": "\\b([a-z][a-zA-Z0-9_]*)\\b",
         "name": "variable.other.capability.effekt"
@@ -285,7 +287,7 @@
         "match": "\\b(region)\\s+([a-zA-Z][a-zA-Z0-9_]*)\\b",
         "captures": {
           "1": { "name": "keyword.other.region.effekt" },
-          "2": { "name": "entity.name.region.effekt" }
+          "2": { "name": "variable.other.capability.effekt entity.name.region.effekt" }
         }
       }]
     }
