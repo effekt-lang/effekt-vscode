@@ -155,20 +155,17 @@
     },
     "keywords": {
       "patterns": [{
-        "match": "\\b(module|import|def|fun|val|var|effect|type|record|box|unbox|region|new|resource|interface|namespace|module|include|export|as)\\b",
+        "match": "\\b(module|import|def|fun|val|var|effect|type|record|box|unbox|region|new|resource|interface|namespace|module|include|export)\\b",
         "name": "keyword.other.effekt"
       }, {
-        "match": "\\b(resume|return)\\b",
+        "match": "\\b(return)\\b",
         "name": "keyword.control.jump.effekt"
       }, {
-        "match": "\\b(do|try|with)\\b",
+        "match": "\\b(do|resume|try|with)\\b",
         "name": "keyword.control.effect.effekt"
       }, {
-        "match": "\\b(while|match|case|if|else)\\b",
+        "match": "\\b(while|match|case|if|else|is|and)\\b",
         "name": "keyword.control.flow.effekt"
-      }, {
-        "match": "\\b(is|and)\\b",
-        "name": "keyword.operator.effekt"
       }, {
         "match": "\\b(extern)\\b",
         "name": "storage.modifier.extern.effekt"
