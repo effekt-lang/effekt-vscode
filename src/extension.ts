@@ -1,15 +1,124 @@
 'use strict';
 
-import { ExtensionContext, workspace, window, Range, DecorationOptions, Location } from 'vscode';
+import { ExtensionContext, workspace, window, Range, DecorationOptions, Location, ProgressLocation } from 'vscode';
 import { LanguageClient, LanguageClientOptions, ServerOptions, ExecuteCommandRequest, StreamInfo } from 'vscode-languageclient';
 import { Monto } from './monto';
 import { platform } from 'os';
 import * as net from 'net';
-
+import * as cp from 'child_process';
+import * as https from 'https';
+import * as semver from 'semver';
 
 let client: LanguageClient;
 
-export function activate(context: ExtensionContext) {
+async function execCommand(command: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+        cp.exec(command, (error, stdout, stderr) => {
+            if (error) {
+                reject(error);
+            } else {
+                resolve(stdout.trim());
+            }
+        });
+    });
+}
+
+async function getLatestNpmVersion(packageName: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+        https.get(`https://registry.npmjs.org/${packageName}/latest`, (res) => {
+            let data = '';
+            res.on('data', (chunk) => data += chunk);
+            res.on('end', () => {
+                try {
+                    const json = JSON.parse(data);
+                    resolve(json.version);
+                } catch (error) {
+                    reject(new Error('Failed to parse npm registry response'));
+                }
+            });
+        }).on('error', reject);
+    });
+}
+
+async function checkAndInstallEffekt(): Promise<string> {
+    const checkCommand = process.platform === 'win32' ? 'where' : 'which';
+    
+    try {
+        // Check if Effekt is installed
+        await execCommand(`${checkCommand} effekt`);
+        const currentVersion = await execCommand('effekt --version');
+        
+        // Check for updates
+        const latestVersion = await getLatestNpmVersion('effekt');
+        const newVersionAvailable = semver.gt(latestVersion, currentVersion);
+
+        if (newVersionAvailable) {
+            const update = await window.showInformationMessage(
+                `A new version of Effekt is available (${latestVersion}). Would you like to update?`,
+                'Yes', 'No'
+            );
+            
+            if (update === 'Yes') {
+                await window.withProgress({
+                    location: ProgressLocation.Notification,
+                    title: "Updating Effekt",
+                    cancellable: false
+                }, async (progress) => {
+                    try {
+                        await execCommand('npm install -g effekt@latest');
+                        window.showInformationMessage(`Effekt has been updated to version ${latestVersion}.`);
+                        return latestVersion;
+                    } catch (error) {
+                        window.showErrorMessage('Failed to update Effekt. Please try updating manually.');
+                        return currentVersion;
+                    }
+                });
+            }
+        }
+        
+        return currentVersion;
+    } catch (error) {
+        // Effekt not found, check for Node and npm
+        try {
+            await execCommand(`${checkCommand} node`);
+            await execCommand(`${checkCommand} npm`);
+        } catch (error) {
+            window.showErrorMessage('Node.js and npm are required to install Effekt. Please install them first.');
+            return '';
+        }
+
+        // Offer to install Effekt
+        const latestVersion = await getLatestNpmVersion('effekt');
+        const install = await window.showInformationMessage(
+            `Effekt ${latestVersion} is available. Would you like to install it via npm?`,
+            'Yes', 'No'
+        );
+
+        if (install === 'Yes') {
+            return await window.withProgress({
+                location: ProgressLocation.Notification,
+                title: "Installing Effekt via npm",
+                cancellable: false
+            }, async (progress) => {
+                try {
+                    await execCommand('npm install -g effekt');
+                    window.showInformationMessage(`Effekt ${latestVersion} has been installed successfully.`);
+                    return latestVersion;
+                } catch (error) {
+                    window.showErrorMessage('Failed to install Effekt. Please try installing it manually.');
+                    return '';
+                }
+            });
+        }
+    }
+    return '';
+}
+
+export async function activate(context: ExtensionContext) {
+    const effektVersion = await checkAndInstallEffekt();
+    if (!effektVersion) {
+        window.showWarningMessage('Effekt is not installed. LSP features may not work correctly.');
+    }
 
     let config = workspace.getConfiguration("effekt");
 
