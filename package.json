@@ -151,6 +151,11 @@
                 "category": "Effekt",
                 "command": "effekt.selectLinkedEditors",
                 "title": "Focus Product Editors"
+            },
+            {
+                "category": "Effekt",
+                "command": "effekt.checkForUpdates",
+                "title": "Effekt: Check for Updates"
             }
         ],
         "keybindings": [
@@ -182,13 +187,14 @@
         "test": "npm run compile && node ./node_modules/vscode/bin/test"
     },
     "dependencies": {
+        "semver": "^7.6.3",
         "vscode-languageclient": "^5.2.1"
     },
     "devDependencies": {
-        "typescript": "^2.6.1",
-        "vscode": "^1.1.37",
-        "tslint": "^5.8.0",
+        "@types/mocha": "^2.2.42",
         "@types/node": "^7.0.43",
-        "@types/mocha": "^2.2.42"
+        "tslint": "^5.8.0",
+        "typescript": "^2.6.1",
+        "vscode": "^1.1.37"
     }
 }
