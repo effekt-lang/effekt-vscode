@@ -1,7 +1,7 @@
 'use strict';
 
 import { ExtensionContext, workspace, window, Range, DecorationOptions, Location } from 'vscode';
-import { LanguageClient, LanguageClientOptions, ServerOptions, ExecuteCommandRequest, StreamInfo } from 'vscode-languageclient';
+import { LanguageClient, LanguageClientOptions, ServerOptions, ExecuteCommandRequest, StreamInfo } from 'vscode-languageclient/node';
 import { Monto } from './monto';
 import { platform } from 'os';
 import * as net from 'net';
@@ -109,7 +109,7 @@ export function activate(context: ExtensionContext) {
     const captureDecoration = window.createTextEditorDecorationType({})
 
     // based on https://github.com/microsoft/vscode-extension-samples/blob/master/decorator-sample/src/extension.ts
-    let timeout: NodeJS.Timer;
+    let timeout: NodeJS.Timeout;
     let editor = window.activeTextEditor
 
     function scheduleDecorations() {
@@ -202,7 +202,7 @@ export function activate(context: ExtensionContext) {
 
 	scheduleDecorations();
 
-    context.subscriptions.push(client.start());
+    client.start();
 }
 
 export function deactivate(): Thenable<void> | undefined {

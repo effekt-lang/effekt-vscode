@@ -1,6 +1,6 @@
 import { commands, ExtensionContext, EventEmitter, Range, Selection, TextDocumentContentProvider, TextEditor, TextEditorRevealType, TextEditorSelectionChangeEvent, Uri, ViewColumn, workspace, window } from 'vscode';
 import { NotificationType } from 'vscode-jsonrpc';
-import { LanguageClient, DidChangeConfigurationNotification } from 'vscode-languageclient';
+import { LanguageClient, DidChangeConfigurationNotification } from 'vscode-languageclient/node';
 
 export namespace Monto {
 
@@ -28,7 +28,7 @@ export namespace Monto {
     }
 
     namespace PublishProduct {
-        export const type = new NotificationType<Product, void>(
+        export const type = new NotificationType<Product>(
             "monto/publishProduct"
         );
     }
@@ -143,7 +143,7 @@ export namespace Monto {
 
         client.clientOptions.initializationOptions = workspace.getConfiguration(name);
 
-        client.onReady().then(_ => {
+        client.start().then(_ => {
             client.onNotification(PublishProduct.type, product => {
                 saveProduct(product);
                 showProduct(product);
