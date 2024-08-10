@@ -54,7 +54,7 @@ export class EffektManager {
      * @param packageName The name of the npm package.
      * @returns A promise that resolves with the latest version string.
      */
-    private async getLatestNpmVersion(packageName: string): Promise<string> {
+    private async getLatestNPMVersion(packageName: string): Promise<string> {
         return new Promise<string>((resolve, reject) => {
             const url = new URL(`https://registry.npmjs.org/${packageName}/latest`);
             https.get(url, (res) => {
@@ -109,7 +109,7 @@ export class EffektManager {
         try {
             const effektPath = await this.getEffektExecutable();
             const currentVersion = await this.execCommand(`"${effektPath}" --version`);
-            const latestVersion = await this.getLatestNpmVersion(this.effektNPMPackage);
+            const latestVersion = await this.getLatestNPMVersion(this.effektNPMPackage);
 
             if (semver.gt(latestVersion, semver.clean(currentVersion) || '')) {
                 return this.promptForAction(latestVersion, 'update');
@@ -119,7 +119,8 @@ export class EffektManager {
             return currentVersion;
         } catch (error) {
             if (error instanceof Error && error.message.includes('Effekt executable not found')) {
-                return this.promptForAction(await this.getLatestNpmVersion(this.effektNPMPackage), 'install');
+                const latestVersion = await this.getLatestNPMVersion(this.effektNPMPackage)
+                return this.promptForAction(latestVersion, 'install');
             } else {
                 this.showErrorWithLogs(`Failed to check Effekt: ${error}`);
                 return '';
@@ -265,7 +266,7 @@ export class EffektManager {
      * Gets the command arguments for starting the Effekt server.
      * @returns An array of command arguments.
      */
-    public getEffektCommand(): string[] {
+    public getEffektArgs(): string[] {
         const args: string[] = [];
         const effektBackend = this.config.get<string>("backend");
         const effektLib = this.config.get<string>("lib");

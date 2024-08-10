@@ -48,7 +48,7 @@ export async function activate(context: vscode.ExtensionContext) {
         };
     } else {
         const effektExecutable = await effektManager.getEffektExecutable();
-        const args = effektManager.getEffektCommand();
+        const args = effektManager.getEffektArgs();
         serverOptions = {
             run: { command: effektExecutable, args },
             debug: { command: effektExecutable, args }
