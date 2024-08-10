@@ -241,8 +241,10 @@ export class EffektManager {
     public async checkAndInstallEffekt(): Promise<string> {
         try {
             const effektPath = await this.getEffektExecutable();
-            const currentVersion = await this.execCommand(`"${effektPath}" --version`);
-            this.effektVersion = semver.clean(currentVersion, true)
+            if (!this.effektVersion) {
+                const currentVersion = await this.execCommand(`"${effektPath.path}" --version`);
+                this.effektVersion = semver.clean(currentVersion, true)
+            }
 
             const latestVersion = await this.getLatestNPMVersion(this.effektNPMPackage);
 
@@ -252,7 +254,7 @@ export class EffektManager {
             }
 
             this.updateStatusBar();
-            return currentVersion;
+            return this.effektVersion || '';
         } catch (error) {
             if (error instanceof Error && error.message.includes('Effekt executable not found')) {
                 const latestVersion = await this.getLatestNPMVersion(this.effektNPMPackage)
