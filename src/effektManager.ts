@@ -111,7 +111,8 @@ export class EffektManager {
             const currentVersion = await this.execCommand(`"${effektPath}" --version`);
             const latestVersion = await this.getLatestNPMVersion(this.effektNPMPackage);
 
-            if (semver.gt(latestVersion, semver.clean(currentVersion) || '')) {
+            // check if the latest version strictly newer than the current version
+            if (semver.gt(latestVersion, semver.clean(currentVersion, true) || '', true)) {
                 return this.promptForAction(latestVersion, 'update');
             }
 
