@@ -3,6 +3,20 @@ import * as cp from 'child_process';
 import * as https from 'https';
 import * as semver from 'semver';
 import { URL } from 'url';
+import * as path from 'path';
+import * as fs from 'fs';
+
+interface InstallationResult {
+    success: boolean;
+    executable?: string;
+    message: string;
+    version?: string;
+}
+
+interface EffektExecutableInfo {
+    path: string;
+    version: string;
+}
 
 /**
  * Manages Effekt installation, updates, and status within VS Code.
@@ -12,8 +26,10 @@ export class EffektManager {
     private config: vscode.WorkspaceConfiguration;
     private serverStatus: 'starting' | 'running' | 'stopped' | 'error' = 'stopped';
     private outputChannel: vscode.OutputChannel;
-    private effektNPMPackage: string = '@effekt-lang/effekt';
     private effektVersion: string | null = null;
+
+    private readonly effektNPMPackage: string = '@effekt-lang/effekt';
+    private readonly possibleEffektExecutables = ['effekt', 'effekt.sh', 'effekt.cmd'];
 
     constructor() {
         this.statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
@@ -78,29 +94,144 @@ export class EffektManager {
 
     /**
      * Locates the Effekt executable.
-     * @returns A promise that resolves with the path to the Effekt executable.
      */
-    public async getEffektExecutable(): Promise<string> {
+    public async getEffektExecutable(): Promise<EffektExecutableInfo> {
         const customPath = this.config.get<string>("executable");
         if (customPath) {
             try {
-                await this.execCommand(`"${customPath}" --version`);
-                return customPath;
+                const version = await this.execCommand(`"${customPath}" --version`);
+                return { path: customPath, version };
             } catch (error) {
                 this.showErrorWithLogs(`Custom Effekt executable not working: ${customPath}. ${error}`);
             }
         }
 
-        for (const name of ['effekt', 'effekt.sh', 'effekt.cmd']) {
+        for (const name of this.possibleEffektExecutables) {
             try {
-                await this.execCommand(`${name} --version`);
-                return name;
+                const version = await this.execCommand(`${name} --version`);
+                return { path: name, version };
             } catch {
                 // Try next option
             }
         }
 
         throw new Error('Effekt executable not found');
+    }
+
+    /**
+     * Installs or updates Effekt.
+     * @param version The version to install or update to.
+     * @param action The action being performed ('install' or 'update').
+     * @returns A promise that resolves with the installed/updated version or an empty string.
+     */
+    private async installOrUpdateEffekt(version: string, action: 'install' | 'update'): Promise<string> {
+        if (!(await this.checkNodeAndNpm())) {
+            this.logMessage('INFO', 'Node / npm are not installed.');
+            return '';
+        }
+
+        return vscode.window.withProgress({
+            location: vscode.ProgressLocation.Notification,
+            title: `${action === 'update' ? 'Updating' : 'Installing'} Effekt`,
+            cancellable: false
+        }, async (progress) => {
+            try {
+                progress.report({ increment: 0, message: 'Preparing...' });
+                await this.runNpmInstall();
+                progress.report({ increment: 50, message: 'Verifying installation...' });
+
+                const verificationResult = await this.verifyEffektInstallation();
+                progress.report({ increment: 100, message: 'Completed' });
+
+                this.handleInstallationResult(verificationResult, action);
+                return verificationResult.success ? verificationResult.version || '' : '';
+            } catch (error) {
+                this.showErrorWithLogs(`Failed to ${action} Effekt: ${error}`);
+                this.updateStatusBar();
+                return '';
+            }
+        });
+    }
+
+    private async runNpmInstall(): Promise<void> {
+        const npmInstallCommand = `npm install -g ${this.effektNPMPackage}@latest`;
+        const npmOutput = await this.execCommand(npmInstallCommand);
+        this.logMessage('INFO', `Ran '${npmInstallCommand}'; stdout: ${npmOutput}`);
+    }
+
+    private async verifyEffektInstallation(): Promise<InstallationResult> {
+        try {
+            const { path: execPath, version } = await this.getEffektExecutable();
+            return { 
+                success: true, 
+                executable: execPath, 
+                message: execPath.includes(path.sep) 
+                    ? `Effekt found at ${execPath}, but not in PATH.`
+                    : "Effekt found in PATH.",
+                version
+            };
+        } catch (error) {
+            // If getEffektExecutable fails, try to locate in global npm directory
+            const npmRoot = await this.execCommand('npm root -g');
+
+            for (const execName of this.possibleEffektExecutables) {
+                const fullPath = path.join(npmRoot, execName);
+                if (await this.fileExists(fullPath)) {
+                    try {
+                        const version = await this.execCommand(`"${fullPath}" --version`);
+                        return { 
+                            success: true, 
+                            executable: fullPath, 
+                            message: `Effekt found at ${fullPath}, but not in PATH.`,
+                            version
+                        };
+                    } catch {
+                        // Executable exists but doesn't work, continue to next
+                    }
+                }
+            }
+
+            return { 
+                success: false, 
+                message: "Effekt was installed but couldn't be located or executed. Please check your installation." 
+            };
+        }
+    }
+
+    private async fileExists(filePath: string): Promise<boolean> {
+        try {
+            await fs.promises.access(filePath, fs.constants.F_OK);
+            return true;
+        } catch {
+            return false;
+        }
+    }
+
+    private handleInstallationResult(result: InstallationResult, action: 'install' | 'update'): void {
+        if (result.success && result.version) {
+            const baseMessage = `Effekt has been ${action === 'update' ? 'updated' : 'installed'} to version ${result.version}.`;
+            
+            if (result.executable && !result.executable.includes(path.sep)) {
+                // Effekt is in PATH
+                vscode.window.showInformationMessage(baseMessage);
+                this.logMessage('INFO', baseMessage);
+            } else {
+                // Effekt is not in PATH
+                const fullMessage = `${baseMessage}\n${result.message}\nConsider adding it to your PATH for easier access.`;
+                vscode.window.showWarningMessage(fullMessage, 'View Logs')
+                    .then(selection => {
+                        if (selection === 'View Logs') {
+                            this.outputChannel.show();
+                        }
+                    });
+                this.logMessage('INFO', fullMessage);
+            }
+            this.effektVersion = result.version;
+        } else {
+            this.showErrorWithLogs(result.message);
+        }
+        
+        this.updateStatusBar();
     }
 
     /**
@@ -172,45 +303,10 @@ export class EffektManager {
         } catch (error) {
             this.showErrorWithLogs(
                 "Node.js and npm are required to install Effekt automatically. " +
-                "Please install Node.js (which includes npm) from https://nodejs.org, then restart VSCode."
+                "Please install Node.js (which includes npm), then restart VSCode."
             );
             return false;
         }
-    }
-
-    /**
-     * Installs or updates Effekt.
-     * @param version The version to install or update to.
-     * @param action The action being performed ('install' or 'update').
-     * @returns A promise that resolves with the installed/updated version or an empty string.
-     */
-    private async installOrUpdateEffekt(version: string, action: 'install' | 'update'): Promise<string> {
-        // We can only install or update Effekt if node&npm are installed!
-        if (!(await this.checkNodeAndNpm())) {
-            return '';
-        }
- 
-        return vscode.window.withProgress({
-            location: vscode.ProgressLocation.Notification,
-            title: `${action === 'update' ? 'Updating' : 'Installing'} Effekt`,
-            cancellable: false
-        }, async (progress) => {
-            try {
-                progress.report({ increment: 0, message: 'Preparing...' });
-                await this.execCommand(`npm install -g ${this.effektNPMPackage}@latest`);
-                progress.report({ increment: 100, message: 'Completed' });
-                
-                const message = `Effekt has been ${action}d to version ${version}.`;
-                vscode.window.showInformationMessage(message);
-                this.logMessage('INFO', message);
-                this.updateStatusBar();
-                return version;
-            } catch (error) {
-                this.showErrorWithLogs(`Failed to ${action} Effekt: ${error}`);
-                this.updateStatusBar();
-                return '';
-            }
-        });
     }
 
     /**
