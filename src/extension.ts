@@ -13,11 +13,11 @@ let effektManager: EffektManager;
 function registerCommands(context: vscode.ExtensionContext) {
     context.subscriptions.push(
         vscode.commands.registerCommand('effekt.checkForUpdates', async () => {
-            await effektManager.checkAndInstallEffekt();
+            await effektManager?.checkAndInstallEffekt();
         }),
         vscode.commands.registerCommand('effekt.restartServer', async () => {
-            await client.stop();
-            client.start();
+            await client?.stop();
+            client?.start();
         })
     );
 }
