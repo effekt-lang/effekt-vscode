@@ -17,6 +17,7 @@ export class EffektManager {
     constructor() {
         this.statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
         this.statusBarItem.text = 'Ξ Effekt';
+        this.statusBarItem.command = 'effekt.checkForUpdates';
         this.statusBarItem.show();
         this.config = vscode.workspace.getConfiguration("effekt");
         this.outputChannel = vscode.window.createOutputChannel("Effekt Version Manager");
@@ -257,7 +258,7 @@ export class EffektManager {
 
         const config = statusConfig[this.serverStatus];
         this.statusBarItem.text = `Ξ Effekt ${config.icon}`;
-        this.statusBarItem.tooltip = config.tooltip;
+        this.statusBarItem.tooltip = `${config.tooltip}\n\nClick to check for updates`;
         this.statusBarItem.color = config.color ? new vscode.ThemeColor(config.color) : undefined;
         this.statusBarItem.backgroundColor = config.bgColor ? new vscode.ThemeColor(config.bgColor) : undefined;
         this.statusBarItem.show();
