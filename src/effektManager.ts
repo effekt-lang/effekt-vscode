@@ -111,7 +111,7 @@ export class EffektManager {
             const currentVersion = await this.execCommand(`"${effektPath}" --version`);
             const latestVersion = await this.getLatestNpmVersion(this.effektNPMPackage);
 
-            if (semver.gt(latestVersion, currentVersion)) {
+            if (semver.gt(latestVersion, semver.clean(currentVersion) || '')) {
                 return this.promptForAction(latestVersion, 'update');
             }
 
@@ -147,12 +147,43 @@ export class EffektManager {
     }
 
     /**
+     * Checks if Node.js and npm are installed and meet the minimum version requirements.
+     * @returns A promise that resolves with a boolean indicating if the requirements are met.
+     */
+    private async checkNodeAndNpm(): Promise<boolean> {
+        try {
+            const nodeVersion = await this.execCommand('node --version');
+            await this.execCommand('npm --version'); // Note: if needed, we could also check npm version.
+
+            const minNodeVersion = 'v12.0.0'; // Minimum supported Node.js version
+
+            if (semver.lt(semver.clean(nodeVersion) || '', minNodeVersion)) {
+                this.showErrorWithLogs(`Node.js version ${minNodeVersion} or higher is required. You have ${nodeVersion}.`);
+                return false;
+            }
+
+            return true;
+        } catch (error) {
+            this.showErrorWithLogs(
+                "Node.js and npm are required to install Effekt automatically. " +
+                "Please install Node.js (which includes npm) from https://nodejs.org, then restart VSCode."
+            );
+            return false;
+        }
+    }
+
+    /**
      * Installs or updates Effekt.
      * @param version The version to install or update to.
      * @param action The action being performed ('install' or 'update').
      * @returns A promise that resolves with the installed/updated version or an empty string.
      */
     private async installOrUpdateEffekt(version: string, action: 'install' | 'update'): Promise<string> {
+        // We can only install or update Effekt if node&npm are installed!
+        if (!(await this.checkNodeAndNpm())) {
+            return '';
+        }
+ 
         return vscode.window.withProgress({
             location: vscode.ProgressLocation.Notification,
             title: `${action === 'update' ? 'Updating' : 'Installing'} Effekt`,
@@ -218,7 +249,7 @@ export class EffektManager {
         const statusConfig = {
             'starting': { icon: "$(loading~spin) ", tooltip: "Effekt server is starting...", color: undefined, bgColor: undefined },
             'running': { icon: "$(check) ", tooltip: "Effekt server is running.", color: undefined, bgColor: undefined },
-            'stopped': { icon: "$(debug-stop) ", tooltip: "Effekt server is stopped.", color: "statusBarItem.warningForeground", bgColor: "statusBarItem.warningBackground" },
+            'stopped': { icon: "$(stop-circle) ", tooltip: "Effekt server is stopped.", color: "statusBarItem.warningForeground", bgColor: "statusBarItem.warningBackground" },
             'error': { icon: "$(error) ", tooltip: "Effekt server encountered an error.", color: "statusBarItem.errorForeground", bgColor: "statusBarItem.errorBackground" }
         };
 
