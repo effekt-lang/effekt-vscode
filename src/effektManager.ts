@@ -8,12 +8,15 @@ export class EffektManager {
     private statusBarItem: vscode.StatusBarItem;
     private config: vscode.WorkspaceConfiguration;
     private serverStatus: 'starting' | 'running' | 'stopped' | 'error' = 'stopped';
+    private outputChannel: vscode.OutputChannel;
+    private effektNPMPackage: string = '@effekt-lang/effekt'
 
     constructor() {
         this.statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
         this.statusBarItem.text = 'Ξ Effekt';
         this.statusBarItem.show();
         this.config = vscode.workspace.getConfiguration("effekt");
+        this.outputChannel = vscode.window.createOutputChannel("Effekt Version Manager");
         this.updateStatusBar();
     }
 
@@ -21,13 +24,19 @@ export class EffektManager {
         return new Promise<string>((resolve, reject) => {
             cp.exec(command, (error, stdout, stderr) => {
                 if (error) {
-                    reject(new Error(`Failed to execute command: ${command}. Error: ${error.message}`));
+                    const errorMessage = `Failed to execute command: ${command}. Error: ${error.message}`;
+                    this.logError(errorMessage);
+                    reject(new Error(errorMessage));
                 } else {
                     resolve(stdout.trim());
                 }
             });
         });
     }    
+
+    private logError(message: string) {
+        this.outputChannel.appendLine(`[${new Date().toISOString()}] ERROR: ${message}`);
+    }
 
     private async getLatestNpmVersion(packageName: string): Promise<string> {
         return new Promise<string>((resolve, reject) => {
@@ -39,11 +48,17 @@ export class EffektManager {
                     try {
                         const json = JSON.parse(data);
                         resolve(json.version);
-                    } catch {
-                        reject(new Error('Failed to parse npm registry response'));
+                    } catch (error) {
+                        const errorMessage = `Failed to parse npm registry response: ${error}`;
+                        this.logError(errorMessage);
+                        reject(new Error(errorMessage));
                     }
                 });
-            }).on('error', reject);
+            }).on('error', (error) => {
+                const errorMessage = `Failed to fetch latest version from npm: ${error}`;
+                this.logError(errorMessage);
+                reject(new Error(errorMessage));
+            });
         });
     }
 
@@ -53,8 +68,15 @@ export class EffektManager {
             try {
                 await this.execCommand(`"${customPath}" --version`);
                 return customPath;
-            } catch {
-                vscode.window.showWarningMessage(`Custom Effekt executable not found or not working: ${customPath}`);
+            } catch (error) {
+                const errorMessage = `Custom Effekt executable not found or not working: ${customPath}. Error: ${error}`;
+                this.logError(errorMessage);
+                vscode.window.showWarningMessage(errorMessage, 'View Logs')
+                    .then(selection => {
+                        if (selection === 'View Logs') {
+                            this.outputChannel.show();
+                        }
+                    });
             }
         }
 
@@ -68,7 +90,9 @@ export class EffektManager {
             }
         }
 
-        throw new Error('Effekt executable not found');
+        const errorMessage = 'Effekt executable not found';
+        this.logError(errorMessage);
+        throw new Error(errorMessage);
     }
 
     public async checkAndInstallEffekt(): Promise<string> {
@@ -90,11 +114,13 @@ export class EffektManager {
 
             this.updateStatusBar();
             return currentVersion;
-        } catch {
+        } catch (error) {
+            this.logError(`Failed to check or install Effekt: ${error}`);
             return this.offerInstallEffekt();
         }
     }
 
+    // TODO: refactor, merge with offerInstallEffekt
     private async updateEffekt(version: string): Promise<string> {
         return vscode.window.withProgress({
             location: vscode.ProgressLocation.Notification,
@@ -102,12 +128,19 @@ export class EffektManager {
             cancellable: false
         }, async () => {
             try {
-                await this.execCommand('npm install -g effekt@latest');
+                await this.execCommand(`npm install -g ${this.effektNPMPackage}@latest`);
                 vscode.window.showInformationMessage(`Effekt has been updated to version ${version}.`);
                 this.updateStatusBar();
                 return version;
-            } catch {
-                vscode.window.showErrorMessage('Failed to update Effekt. Please try updating manually.');
+            } catch (error) {
+                const errorMessage = `Failed to update Effekt: ${error}`;
+                this.logError(errorMessage);
+                vscode.window.showErrorMessage(errorMessage, 'View Logs')
+                    .then(selection => {
+                        if (selection === 'View Logs') {
+                            this.outputChannel.show();
+                        }
+                    });
                 this.updateStatusBar();
                 return '';
             }
@@ -118,13 +151,20 @@ export class EffektManager {
         try {
             await this.execCommand('node --version');
             await this.execCommand('npm --version');
-        } catch {
-            vscode.window.showErrorMessage('Node.js and npm are required to install Effekt. Please install them first.');
+        } catch (error) {
+            const errorMessage = `Node.js and npm are required to install Effekt. Please install them first. Error: ${error}`;
+            this.logError(errorMessage);
+            vscode.window.showErrorMessage(errorMessage, 'View Logs')
+                .then(selection => {
+                    if (selection === 'View Logs') {
+                        this.outputChannel.show();
+                    }
+                });
             this.updateStatusBar();
             return '';
         }
 
-        const latestVersion = await this.getLatestNpmVersion('effekt');
+        const latestVersion = await this.getLatestNpmVersion(this.effektNPMPackage);
         const install = await vscode.window.showInformationMessage(
             `Effekt ${latestVersion} is available. Would you like to install it?`,
             'Yes', 'No'
@@ -137,12 +177,19 @@ export class EffektManager {
                 cancellable: false
             }, async () => {
                 try {
-                    await this.execCommand('npm install -g effekt');
+                    await this.execCommand(`npm install -g ${this.effektNPMPackage}@latest`);
                     vscode.window.showInformationMessage(`Effekt ${latestVersion} has been installed successfully.`);
                     this.updateStatusBar();
                     return latestVersion;
-                } catch {
-                    vscode.window.showErrorMessage('Failed to install Effekt. Please try installing it manually.');
+                } catch (error) {
+                    const errorMessage = `Failed to install Effekt: ${error}`;
+                    this.logError(errorMessage);
+                    vscode.window.showErrorMessage(errorMessage, 'View Logs')
+                        .then(selection => {
+                            if (selection === 'View Logs') {
+                                this.outputChannel.show();
+                            }
+                        });
                     this.updateStatusBar();
                     return '';
                 }
