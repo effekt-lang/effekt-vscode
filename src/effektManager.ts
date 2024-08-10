@@ -13,6 +13,7 @@ export class EffektManager {
     private serverStatus: 'starting' | 'running' | 'stopped' | 'error' = 'stopped';
     private outputChannel: vscode.OutputChannel;
     private effektNPMPackage: string = '@effekt-lang/effekt';
+    private effektVersion: string | null = null;
 
     constructor() {
         this.statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
@@ -110,10 +111,12 @@ export class EffektManager {
         try {
             const effektPath = await this.getEffektExecutable();
             const currentVersion = await this.execCommand(`"${effektPath}" --version`);
+            this.effektVersion = semver.clean(currentVersion, true)
+
             const latestVersion = await this.getLatestNPMVersion(this.effektNPMPackage);
 
             // check if the latest version strictly newer than the current version
-            if (semver.gt(latestVersion, semver.clean(currentVersion, true) || '', true)) {
+            if (semver.gt(latestVersion, this.effektVersion || '', true)) {
                 return this.promptForAction(latestVersion, 'update');
             }
 
@@ -258,7 +261,15 @@ export class EffektManager {
 
         const config = statusConfig[this.serverStatus];
         this.statusBarItem.text = `Ξ Effekt ${config.icon}`;
-        this.statusBarItem.tooltip = `${config.tooltip}\n\nClick to check for updates`;
+        this.statusBarItem.tooltip = new vscode.MarkdownString(`${config.tooltip}\n\n`
+            + `_Click to check for updates_\n\n`
+            + `---\n`
+            + `**Effekt Information:**\n`
+            + `- Version: ${this.effektVersion || '<unknown>'}\n`
+            + `- Status: ${this.serverStatus}\n`
+            + `- Backend: ${this.config.get<string>("backend") || '<unknown>'}`);
+        this.statusBarItem.tooltip.isTrusted = true;
+
         this.statusBarItem.color = config.color ? new vscode.ThemeColor(config.color) : undefined;
         this.statusBarItem.backgroundColor = config.bgColor ? new vscode.ThemeColor(config.bgColor) : undefined;
         this.statusBarItem.show();
