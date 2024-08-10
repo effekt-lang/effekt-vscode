@@ -156,6 +156,11 @@
                 "category": "Effekt",
                 "command": "effekt.checkForUpdates",
                 "title": "Check for Effekt Updates"
+            },
+            {
+                "category": "Effekt",
+                "command": "effekt.restartServer",
+                "title": "Restart LSP Server"
             }
         ],
         "keybindings": [

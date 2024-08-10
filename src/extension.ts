@@ -10,18 +10,27 @@ import * as net from 'net';
 let client: LanguageClient;
 let effektManager: EffektManager;
 
+function registerCommands(context: vscode.ExtensionContext) {
+    context.subscriptions.push(
+        vscode.commands.registerCommand('effekt.checkForUpdates', async () => {
+            await effektManager.checkAndInstallEffekt();
+        }),
+        vscode.commands.registerCommand('effekt.restartServer', async () => {
+            await client.stop();
+            client.start();
+        })
+    );
+}
+
 export async function activate(context: vscode.ExtensionContext) {
     effektManager = new EffektManager();
+
     const effektVersion = await effektManager.checkAndInstallEffekt();
     if (!effektVersion) {
         vscode.window.showWarningMessage('Effekt is not installed. LSP features may not work correctly.');
     }
 
-    // Register the command to check for updates
-    let disposable = vscode.commands.registerCommand('effekt.checkForUpdates', async () => {
-        await effektManager.checkAndInstallEffekt();
-    });
-    context.subscriptions.push(disposable);
+    registerCommands(context);
 
     const config = vscode.workspace.getConfiguration("effekt");
 
