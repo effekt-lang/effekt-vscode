@@ -19,7 +19,7 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: ${{ env.NODE_VERSION }}
-  
+
     - run: npm install -g typescript
     - run: npm install -g vsce
     - run: npm install
