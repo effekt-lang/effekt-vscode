@@ -89,7 +89,7 @@ export async function activate(context: vscode.ExtensionContext) {
     const captureDecoration = vscode.window.createTextEditorDecorationType({})
 
     // based on https://github.com/microsoft/vscode-extension-samples/blob/master/decorator-sample/src/extension.ts
-    let timeout: NodeJS.Timer;
+    let timeout: NodeJS.Timeout;
     let editor = vscode.window.activeTextEditor
 
     function scheduleDecorations() {

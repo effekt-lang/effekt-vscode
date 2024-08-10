@@ -155,7 +155,7 @@
             {
                 "category": "Effekt",
                 "command": "effekt.checkForUpdates",
-                "title": "Effekt: Check for Updates"
+                "title": "Check for Effekt Updates"
             }
         ],
         "keybindings": [
@@ -180,21 +180,23 @@
         }
     },
     "scripts": {
-        "vscode:prepublish": "npm run compile",
-        "compile": "tsc -p ./",
-        "watch": "tsc -watch -p ./",
-        "postinstall": "node ./node_modules/vscode/bin/install",
-        "test": "npm run compile && node ./node_modules/vscode/bin/test"
-    },
+		"vscode:prepublish": "npm run compile",
+		"compile": "tsc -b",
+		"watch": "tsc -b -w",
+		"lint": "eslint ./client/src ./server/src --ext .ts,.tsx"
+	},
     "dependencies": {
         "semver": "^7.6.3",
         "vscode-languageclient": "^5.2.1"
     },
-    "devDependencies": {
-        "@types/mocha": "^2.2.42",
-        "@types/node": "^7.0.43",
-        "tslint": "^5.8.0",
-        "typescript": "^2.6.1",
-        "vscode": "^1.1.37"
-    }
+	"devDependencies": {
+		"@types/vscode": "^1.30.0",
+		"@types/mocha": "^10.0.6",
+		"@types/node": "^18.14.6",
+		"@typescript-eslint/eslint-plugin": "^7.1.0",
+		"@typescript-eslint/parser": "^7.1.0",
+		"eslint": "^8.57.0",
+		"mocha": "^10.3.0",
+		"typescript": "^5.3.3"
+	}
 }
