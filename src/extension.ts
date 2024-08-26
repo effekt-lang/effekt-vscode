@@ -13,7 +13,7 @@ let effektManager: EffektManager;
 function registerCommands(context: vscode.ExtensionContext) {
     context.subscriptions.push(
         vscode.commands.registerCommand('effekt.checkForUpdates', async () => {
-            await effektManager?.checkAndInstallEffekt();
+            await effektManager?.checkForUpdatesAndInstall();
         }),
         vscode.commands.registerCommand('effekt.restartServer', async () => {
             await client?.stop();
@@ -25,7 +25,7 @@ function registerCommands(context: vscode.ExtensionContext) {
 export async function activate(context: vscode.ExtensionContext) {
     effektManager = new EffektManager();
 
-    const effektVersion = await effektManager.checkAndInstallEffekt();
+    const effektVersion = await effektManager.checkForUpdatesAndInstall();
     if (!effektVersion) {
         vscode.window.showWarningMessage('Effekt is not installed. LSP features may not work correctly.');
     }
@@ -47,7 +47,7 @@ export async function activate(context: vscode.ExtensionContext) {
             return Promise.resolve(result);
         };
     } else {
-        const effektExecutable = await effektManager.getEffektExecutable();
+        const effektExecutable = await effektManager.locateEffektExecutable();
         const args = effektManager.getEffektArgs();
         serverOptions = {
             run: { command: effektExecutable.path, args },

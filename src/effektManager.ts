@@ -93,9 +93,9 @@ export class EffektManager {
     }
 
     /**
-     * Locates the Effekt executable.
+     * Locates the Effekt executable: tries to look into user given path first, then tries 'possibleEffektExecutables' in PATH.
      */
-    public async getEffektExecutable(): Promise<EffektExecutableInfo> {
+    public async locateEffektExecutable(): Promise<EffektExecutableInfo> {
         const customPath = this.config.get<string>("executable");
         if (customPath) {
             try {
@@ -161,7 +161,7 @@ export class EffektManager {
 
     private async verifyEffektInstallation(): Promise<InstallationResult> {
         try {
-            const { path: execPath, version } = await this.getEffektExecutable();
+            const { path: execPath, version } = await this.locateEffektExecutable();
             return { 
                 success: true, 
                 executable: execPath, 
@@ -238,9 +238,9 @@ export class EffektManager {
      * Checks for Effekt updates and offers to install/update if necessary.
      * @returns A promise that resolves with the current Effekt version.
      */
-    public async checkAndInstallEffekt(): Promise<string> {
+    public async checkForUpdatesAndInstall(): Promise<string> {
         try {
-            const effektPath = await this.getEffektExecutable();
+            const effektPath = await this.locateEffektExecutable();
             if (!this.effektVersion) {
                 const currentVersion = await this.execCommand(`"${effektPath.path}" --version`);
                 this.effektVersion = currentVersion
