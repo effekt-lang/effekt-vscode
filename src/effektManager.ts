@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as cp from 'child_process';
 import * as https from 'https';
-import * as semver from 'semver';
+import { compare as compareVersion } from 'compare-versions';
 import { URL } from 'url';
 import * as path from 'path';
 import * as fs from 'fs';
@@ -243,13 +243,13 @@ export class EffektManager {
             const effektPath = await this.getEffektExecutable();
             if (!this.effektVersion) {
                 const currentVersion = await this.execCommand(`"${effektPath.path}" --version`);
-                this.effektVersion = semver.clean(currentVersion, true)
+                this.effektVersion = currentVersion
             }
 
             const latestVersion = await this.getLatestNPMVersion(this.effektNPMPackage);
 
             // check if the latest version strictly newer than the current version
-            if (semver.gt(latestVersion, this.effektVersion || '', true)) {
+            if (compareVersion(latestVersion, this.effektVersion || '', '>')) {
                 return this.promptForAction(latestVersion, 'update');
             }
 
@@ -296,7 +296,7 @@ export class EffektManager {
 
             const minNodeVersion = 'v12.0.0'; // Minimum supported Node.js version
 
-            if (semver.lt(semver.clean(nodeVersion) || '', minNodeVersion)) {
+            if (compareVersion(nodeVersion, minNodeVersion, '<')) {
                 this.showErrorWithLogs(`Node.js version ${minNodeVersion} or higher is required. You have ${nodeVersion}.`);
                 return false;
             }
