@@ -42,6 +42,23 @@ export class EffektManager {
     }
 
     /**
+     * Get the Effekt version of the (assumed) Effekt binary in the `path` parameter.
+     * Doesn't handle any errors, the *caller* is expected to do so.
+     *
+     * @returns a version number like '0.2.2' or '0.25.2.13' or '0.99.99+nightly.rev.abcdef', etc.
+     */
+    private async fetchEffektVersion(path: string): Promise<string> {
+        /// Helper function to remove a generic prefix from a string
+        const removePrefix = (value: string, prefix: string) =>
+            value.startsWith(prefix) ? value.slice(prefix.length) : value;
+
+        const versionOutput = await this.execCommand(`"${path}" --version`);
+        // TODO: Handle outputs that don't start with the correct prefix?
+        const version = removePrefix(versionOutput.trim(), "Effekt "); // NOTE: the space is important here
+        return version;
+    }
+
+    /**
      * Executes a shell command and returns the output.
      * @param command The command to execute.
      * @returns A promise that resolves with the command output.
@@ -96,20 +113,20 @@ export class EffektManager {
      * Locates the Effekt executable: tries to look into user given path first, then tries 'possibleEffektExecutables' in PATH.
      */
     public async locateEffektExecutable(): Promise<EffektExecutableInfo> {
-        const customPath = this.config.get<string>("executable");
-        if (customPath) {
+        const customEffektPath = this.config.get<string>("executable");
+        if (customEffektPath) {
             try {
-                const version = await this.execCommand(`"${customPath}" --version`);
-                return { path: customPath, version };
+                const version = await this.fetchEffektVersion(customEffektPath);
+                return { path: customEffektPath, version };
             } catch (error) {
-                this.showErrorWithLogs(`Custom Effekt executable not working: ${customPath}. ${error}`);
+                this.showErrorWithLogs(`Custom Effekt executable not working: ${customEffektPath}. ${error}`);
             }
         }
 
-        for (const name of this.possibleEffektExecutables) {
+        for (const effektPath of this.possibleEffektExecutables) {
             try {
-                const version = await this.execCommand(`${name} --version`);
-                return { path: name, version };
+                const version = await this.fetchEffektVersion(effektPath);
+                return { path: effektPath, version };
             } catch {
                 // Try next option
             }
@@ -178,7 +195,7 @@ export class EffektManager {
                 const fullPath = path.join(npmRoot, execName);
                 if (await this.fileExists(fullPath)) {
                     try {
-                        const version = await this.execCommand(`"${fullPath}" --version`);
+                        const version = await this.fetchEffektVersion(fullPath);
                         return { 
                             success: true, 
                             executable: fullPath, 
@@ -242,7 +259,7 @@ export class EffektManager {
         try {
             const effektPath = await this.locateEffektExecutable();
             if (!this.effektVersion) {
-                const currentVersion = await this.execCommand(`"${effektPath.path}" --version`);
+                const currentVersion = await this.fetchEffektVersion(effektPath.path);
                 this.effektVersion = currentVersion
             }
 
