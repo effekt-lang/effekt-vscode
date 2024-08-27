@@ -10,12 +10,12 @@ interface InstallationResult {
     success: boolean;
     executable?: string;
     message: string;
-    version?: string;
+    version?: string | null;
 }
 
 interface EffektExecutableInfo {
     path: string;
-    version: string;
+    version: string | null;
 }
 
 /**
@@ -47,12 +47,16 @@ export class EffektManager {
      *
      * @returns a version number like '0.2.2' or '0.25.2.13' or '0.99.99+nightly.rev.abcdef', etc.
      */
-    private async fetchEffektVersion(path: string): Promise<string> {
+    private async fetchEffektVersion(path: string): Promise<string | null> {
         /// Helper function to remove a generic prefix from a string
         const removePrefix = (value: string, prefix: string) =>
             value.startsWith(prefix) ? value.slice(prefix.length) : value;
 
         const versionOutput = await this.execCommand(`"${path}" --version`);
+        if (versionOutput.trim() === '') {
+            return null;
+        }
+
         // TODO: Handle outputs that don't start with the correct prefix?
         const version = removePrefix(versionOutput.trim(), "Effekt "); // NOTE: the space is important here
         return version;
@@ -266,7 +270,7 @@ export class EffektManager {
             const latestVersion = await this.getLatestNPMVersion(this.effektNPMPackage);
 
             // check if the latest version strictly newer than the current version
-            if (compareVersion(latestVersion, this.effektVersion || '', '>')) {
+            if (!this.effektVersion || compareVersion(latestVersion, this.effektVersion, '>')) {
                 return this.promptForAction(latestVersion, 'update');
             }
 
