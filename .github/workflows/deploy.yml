@@ -6,7 +6,7 @@ on:
       - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
 
 env:
-  NODE_VERSION: '12.x'
+  NODE_VERSION: '18.x'
 
 jobs:
   build-vscode:
@@ -14,18 +14,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
+
     - name: Set up NodeJS ${{ env.NODE_VERSION }}
       uses: actions/setup-node@v4
       with:
         node-version: ${{ env.NODE_VERSION }}
+  
     - run: npm install -g typescript
     - run: npm install -g vsce
     - run: npm install
+
     - name: Package VSCode extension into .vsix file
       run: vsce package --out effekt.vsix
 
     - name: Upload vsix file
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: effekt-vscode
         path: effekt.vsix
@@ -36,17 +39,17 @@ jobs:
     needs: [build-vscode]
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Download VSCode artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: effekt-vscode
           path: distribution/
 
       - name: Create Release
         id: create_release
-        uses: actions/create-release@latest
+        uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -84,7 +87,7 @@ jobs:
         run: npm install -g vsce
 
       - name: Download VSCode artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: effekt-vscode
           path: ./
