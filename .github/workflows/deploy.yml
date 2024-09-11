@@ -1,28 +1,34 @@
-# This is a copy-and-past version of ci.yml but additionally creating a release
-name: Release Artifacts
+name: Release Artifacts and Deploy
 
 on:
   push:
     tags:
       - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
+
+env:
+  NODE_VERSION: '18.x'
+
 jobs:
   build-vscode:
     name: Build the VSCode extension
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: Install Node.js
-      uses: actions/setup-node@v1
+    - uses: actions/checkout@v4
+
+    - name: Set up NodeJS ${{ env.NODE_VERSION }}
+      uses: actions/setup-node@v4
       with:
-        node-version: 20.x
+        node-version: ${{ env.NODE_VERSION }}
+  
     - run: npm install -g typescript
     - run: npm install -g vsce
     - run: npm install
+
     - name: Package VSCode extension into .vsix file
       run: vsce package --out effekt.vsix
 
     - name: Upload vsix file
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v4
       with:
         name: effekt-vscode
         path: effekt.vsix
@@ -33,25 +39,25 @@ jobs:
     needs: [build-vscode]
     steps:
       - name: Checkout code
-        uses: actions/checkout@master
+        uses: actions/checkout@v4
 
       - name: Download VSCode artifact
-        uses: actions/download-artifact@v1
+        uses: actions/download-artifact@v4
         with:
           name: effekt-vscode
           path: distribution/
 
       - name: Create Release
         id: create_release
-        uses: actions/create-release@latest
+        uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          release_name: Prerelease ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
           tag_name: ${{ github.ref }}
           body: Automatic release for ${{ github.ref }}
           draft: false
-          prerelease: true
+          prerelease: false
 
       - name: Upload vsix file
         id: upload_vsix
@@ -63,3 +69,30 @@ jobs:
           asset_path: ./distribution/effekt.vsix
           asset_name: effekt-vscode-extension.vsix
           asset_content_type: application/zip
+
+  deploy:
+    name: Deploy to VSCode Marketplace
+    runs-on: ubuntu-latest
+    needs: [release]
+    steps:
+      - name: Set up NodeJS ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install vsce
+        run: npm install -g vsce
+
+      - name: Download VSCode artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: effekt-vscode
+          path: ./
+
+      - name: Publish to VSCode Marketplace
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+        run: |
+          # -i: Specifies the path to the .vsix file to publish
+          # $(ls *.vsix): Finds the .vsix file in the current directory
+          vsce publish -i $(ls *.vsix)
