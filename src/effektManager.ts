@@ -50,12 +50,34 @@ export class EffektManager {
     private async fetchEffektVersion(path: string): Promise<string> {
         /// Helper function to remove a generic prefix from a string
         const removePrefix = (value: string, prefix: string) =>
-            value.startsWith(prefix) ? value.slice(prefix.length) : value;
+            value.startsWith(prefix) ? value.slice(prefix.length) : null;
 
-        const versionOutput = await this.execCommand(`"${path}" --version`);
-        // TODO: Handle outputs that don't start with the correct prefix?
-        const version = removePrefix(versionOutput.trim(), "Effekt "); // NOTE: the space is important here
-        return version;
+        try {
+            // First, try `effekt --version`:
+            const versionOutput = await this.execCommand(`"${path}" --version`);
+
+            const version = removePrefix(versionOutput.trim(), "Effekt "); // NOTE: the space is important here
+            if (!version) {
+                throw new Error(`Output of '${path} --version' is not in the correct format 'Effekt 0.1.2'; got '${versionOutput}' instead.`)
+            }
+            return version;
+        } catch (versionError) {
+            // Otherwise try `effekt --help`:
+            try {
+                const helpOutput = await this.execCommand(`"${path}" --help`);
+
+                // Check if the output contains the word "Effekt" anywhere
+                if (/\bEffekt\b/i.test(helpOutput)) {
+                    return "0.2.2"; // XXX: Hardcoded, 0.2.2 is the last version of Effekt without `--version`.
+                }
+            } catch (helpError) {
+                // If both `--version` and `--help` fail, throw an error
+                throw new Error(`Failed to determine Effekt version: ${versionError}\nHelp command also failed: ${helpError}`);
+            }
+        }
+
+        // If we reach this point, it means --help succeeded but didn't contain "Effekt"
+        throw new Error("Unable to determine Effekt version");
     }
 
     /**
@@ -117,6 +139,7 @@ export class EffektManager {
         if (customEffektPath) {
             try {
                 const version = await this.fetchEffektVersion(customEffektPath);
+                this.logMessage('INFO', `Located executable at custom path ${customEffektPath} with version ${version}`);
                 return { path: customEffektPath, version };
             } catch (error) {
                 this.showErrorWithLogs(`Custom Effekt executable not working: ${customEffektPath}. ${error}`);
@@ -126,6 +149,7 @@ export class EffektManager {
         for (const effektPath of this.possibleEffektExecutables) {
             try {
                 const version = await this.fetchEffektVersion(effektPath);
+                this.logMessage('INFO', `Located executable at path ${effektPath} with version ${version}`);
                 return { path: effektPath, version };
             } catch {
                 // Try next option
