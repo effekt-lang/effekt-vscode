@@ -142,6 +142,10 @@ export class EffektManager {
      * @returns A promise that resolves with the installed/updated version or an empty string.
      */
     private async installOrUpdateEffekt(version: string, action: 'install' | 'update'): Promise<string> {
+        if (!(await this.checkJava())) {
+            this.logMessage('INFO', 'Java is not installed.');
+            return '';
+        }
         if (!(await this.checkNodeAndNpm())) {
             this.logMessage('INFO', 'Node / npm are not installed.');
             return '';
@@ -318,6 +322,8 @@ export class EffektManager {
                 return false;
             }
 
+            this.logMessage("INFO", `Found Node.js version ${nodeVersion}`);
+
             return true;
         } catch (error) {
             this.showErrorWithLogs(
@@ -325,6 +331,74 @@ export class EffektManager {
                 "Please install Node.js (which includes npm), then restart VSCode."
             );
             return false;
+        }
+    }
+
+   /**
+     * Checks if Java is installed and meets the minimum version requirement.
+     * @returns A promise that resolves with a boolean indicating if the requirements are met.
+     */
+    private async checkJava(): Promise<boolean> {
+        try {
+            const javaVersion = await this.getJavaVersion();
+            const minJavaVersion = '11.0.0'; // Minimum supported Java version
+
+            if (compareVersion(javaVersion, minJavaVersion, '<')) {
+                this.showErrorWithLogs(`Java version ${minJavaVersion} or higher is required. You have ${javaVersion}.`);
+                return false;
+            }
+
+            this.logMessage("INFO", `Found Java version ${javaVersion}`);
+
+            return true;
+        } catch (error) {
+            this.showErrorWithLogs(
+                "Java (JRE) is required to run Effekt. " +
+                "Please install Java, then restart VSCode."
+            );
+            return false;
+        }
+    }
+
+    /**
+     * Extracts the Java version from the output of 'java -version' command.
+     * @returns A promise that resolves with the Java version string.
+     */
+    private async getJavaVersion(): Promise<string> {
+        try {
+            const output = await this.execCommand('java -version');
+
+            // Regular expressions to match different Java version formats
+            const versionRegexes = [
+                /version "((\d+\.\d+\.\d+).*?)"/, // Standard format: "11.0.2" or "1.8.0_292"
+                /version "((\d+).*?)"/, // OpenJDK format on some systems: "11" or "11-internal"
+                /(\d+\.\d+\.\d+)/,  // Fallback for version without quotes
+            ];
+
+            let version = '';
+            for (const regex of versionRegexes) {
+                const match = output.match(regex);
+                if (match) {
+                    version = match[2] || match[1]; // Prefer the version number without extra info
+                    break;
+                }
+            }
+
+            if (!version) {
+                throw new Error('Unable to extract Java version from output');
+            }
+
+            // Handle special cases like "1.8.0_292" for Java 8
+            if (version.startsWith('1.')) {
+                version = version.split('.')[1];
+            }
+
+            // Remove any additional info after the version number
+            version = version.split('-')[0].split('_')[0];
+
+            return version;
+        } catch (error) {
+            throw new Error(`Failed to execute 'java -version': ${error}`);
         }
     }
 
