@@ -21,40 +21,57 @@
     ],
     "main": "./out/extension",
     "contributes": {
-        "languages": [{
-            "id": "effekt",
-            "extensions": [
-                ".effekt"
-            ],
-            "aliases": [
-                "Effekt",
-                "effekt"
-            ],
-            "configuration": "./language-configuration.json"
-        }, {
-            "id": "literate effekt",
-            "extensions": [".effekt.md"],
-            "aliases": ["literate effekt"],
-            "configuration": "./language-configuration.json"
-        }, {
-            "id": "ir",
-            "extensions": [".ir"],
-            "aliases": ["ir", "IR"],
-            "configuration": "./language-configuration.json"
-        }],
-        "grammars": [{
-            "language": "effekt",
-            "scopeName": "source.effekt",
-            "path": "./syntaxes/effekt.tmLanguage.json"
-        },{
-            "language": "literate effekt",
-            "scopeName": "source.literateeffekt",
-            "path": "./syntaxes/literateeffekt.tmLanguage.json"
-        },{
-            "language": "ir",
-            "scopeName": "source.ir",
-            "path": "./syntaxes/ir.tmLanguage.json"
-        }],
+        "languages": [
+            {
+                "id": "effekt",
+                "extensions": [
+                    ".effekt"
+                ],
+                "aliases": [
+                    "Effekt",
+                    "effekt"
+                ],
+                "configuration": "./language-configuration.json"
+            },
+            {
+                "id": "literate effekt",
+                "extensions": [
+                    ".effekt.md"
+                ],
+                "aliases": [
+                    "literate effekt"
+                ],
+                "configuration": "./language-configuration.json"
+            },
+            {
+                "id": "ir",
+                "extensions": [
+                    ".ir"
+                ],
+                "aliases": [
+                    "ir",
+                    "IR"
+                ],
+                "configuration": "./language-configuration.json"
+            }
+        ],
+        "grammars": [
+            {
+                "language": "effekt",
+                "scopeName": "source.effekt",
+                "path": "./syntaxes/effekt.tmLanguage.json"
+            },
+            {
+                "language": "literate effekt",
+                "scopeName": "source.literateeffekt",
+                "path": "./syntaxes/literateeffekt.tmLanguage.json"
+            },
+            {
+                "language": "ir",
+                "scopeName": "source.ir",
+                "path": "./syntaxes/ir.tmLanguage.json"
+            }
+        ],
         "configuration": {
             "type": "object",
             "title": "Effekt",
@@ -66,7 +83,14 @@
                 "effekt.backend": {
                     "type": "string",
                     "default": "js",
-                    "enum": ["js", "llvm", "chez-monadic", "chez-callcc", "chez-lift", "ml"],
+                    "enum": [
+                        "js",
+                        "llvm",
+                        "chez-monadic",
+                        "chez-callcc",
+                        "chez-lift",
+                        "ml"
+                    ],
                     "enumDescriptions": [
                         "Use the JavaScript backend.",
                         "Use the LLVM backend.",
@@ -89,7 +113,14 @@
                 "effekt.showIR": {
                     "type": "string",
                     "default": "none",
-                    "enum": ["none", "source", "core", "lifted-core", "machine", "target"],
+                    "enum": [
+                        "none",
+                        "source",
+                        "core",
+                        "lifted-core",
+                        "machine",
+                        "target"
+                    ],
                     "enumDescriptions": [
                         "Disable showing intermediate representation.",
                         "Show source tree after parsing.",
