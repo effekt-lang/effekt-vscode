@@ -88,7 +88,7 @@ export class EffektManager {
      */
     private async execCommand(command: string, resolveWithStderr?: boolean): Promise<string> {
         return new Promise<string>((resolve, reject) => {
-            cp.exec(command, (error, stdout, stderr) => {
+            cp.exec(command, { encoding: 'utf8', maxBuffer: 1024 * 1024 }, (error, stdout, stderr) => {
                 if (error) {
                     reject(error);
                 } else {
