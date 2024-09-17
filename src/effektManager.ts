@@ -83,15 +83,17 @@ export class EffektManager {
     /**
      * Executes a shell command and returns the output.
      * @param command The command to execute.
+     * @param resolveWithStderr If true, the promise is resolved with combined stdout and stderr.
      * @returns A promise that resolves with the command output.
      */
-    private async execCommand(command: string): Promise<string> {
+    private async execCommand(command: string, resolveWithStderr?: boolean): Promise<string> {
         return new Promise<string>((resolve, reject) => {
             cp.exec(command, (error, stdout, stderr) => {
                 if (error) {
                     reject(error);
                 } else {
-                    resolve(stdout.trim());
+                    const output = stdout.trim() + (resolveWithStderr ? stderr.trim() : '')
+                    resolve(output);
                 }
             });
         });
@@ -390,7 +392,9 @@ export class EffektManager {
      */
     private async getJavaVersion(): Promise<string> {
         try {
-            const output = await this.execCommand('java -version');
+            const output = await this.execCommand('java -version', true);
+
+            this.logMessage('INFO', `Got ${output} from 'java -version'`)
 
             // Regular expressions to match different Java version formats
             const versionRegexes = [
