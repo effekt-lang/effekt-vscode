@@ -2,18 +2,24 @@ name: Continuous Integration
 
 on: [push]
 
+env:
+  NODE_VERSION: '18.x'
+
 jobs:
   build-vscode:
     name: Build the VSCode extension
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: Install Node.js
-      uses: actions/setup-node@v1
+    - uses: actions/checkout@v4
+
+    - name: Set up NodeJS ${{ env.NODE_VERSION }}
+      uses: actions/setup-node@v4
       with:
-        node-version: 18.x
+        node-version: ${{ env.NODE_VERSION }}
+
     - run: npm install -g typescript
     - run: npm install -g vsce
     - run: npm install
+
     - name: Package VSCode extension into .vsix file
       run: vsce package
