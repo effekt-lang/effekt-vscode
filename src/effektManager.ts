@@ -327,7 +327,7 @@ export class EffektManager {
             return this.installOrUpdateEffekt(version, action);
         }
         this.updateStatusBar();
-        return '';
+        return this.effektVersion || '';
     }
 
     /**
@@ -376,6 +376,8 @@ export class EffektManager {
 
             return true;
         } catch (error) {
+            this.logMessage("ERROR", `When checking Java version got: ${error}`)
+
             this.showErrorWithLogs(
                 "Java (JRE) is required to run Effekt. " +
                 "Please install Java, then restart VSCode."
