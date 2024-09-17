@@ -97,7 +97,7 @@ export class EffektManager {
                 }
             });
         });
-    }    
+    }
 
     /**
      * Logs a message to the output channel.
@@ -209,9 +209,9 @@ export class EffektManager {
     private async verifyEffektInstallation(): Promise<InstallationResult> {
         try {
             const { path: execPath, version } = await this.locateEffektExecutable();
-            return { 
-                success: true, 
-                executable: execPath, 
+            return {
+                success: true,
+                executable: execPath,
                 message: `Effekt found successfully in ${execPath}.`,
                 version
             };
@@ -224,9 +224,9 @@ export class EffektManager {
                 if (await this.fileExists(fullPath)) {
                     try {
                         const version = await this.fetchEffektVersion(fullPath);
-                        return { 
-                            success: true, 
-                            executable: fullPath, 
+                        return {
+                            success: true,
+                            executable: fullPath,
                             message: `Effekt found at ${fullPath}, but not in PATH.`,
                             version
                         };
@@ -236,9 +236,9 @@ export class EffektManager {
                 }
             }
 
-            return { 
-                success: false, 
-                message: "Effekt was installed but couldn't be located or executed. Please check your installation." 
+            return {
+                success: false,
+                message: "Effekt was installed but couldn't be located or executed. Please check your installation."
             };
         }
     }
@@ -255,7 +255,7 @@ export class EffektManager {
     private handleInstallationResult(result: InstallationResult, action: 'install' | 'update'): void {
         if (result.success && result.version) {
             const baseMessage = `Effekt has been ${action === 'update' ? 'updated' : 'installed'} to version ${result.version}.`;
-            
+
             if (result.executable && !result.executable.includes(path.sep)) {
                 // Effekt is in PATH
                 vscode.window.showInformationMessage(baseMessage);
@@ -275,7 +275,7 @@ export class EffektManager {
         } else {
             this.showErrorWithLogs(result.message);
         }
-        
+
         this.updateStatusBar();
     }
 
@@ -318,7 +318,7 @@ export class EffektManager {
      * @returns A promise that resolves with the installed/updated version or an empty string.
      */
     private async promptForAction(version: string, action: 'install' | 'update'): Promise<string> {
-        const message = action === 'update' 
+        const message = action === 'update'
             ? `A new version of Effekt is available (${version}). Would you like to update?`
             : `Effekt ${version} is available. Would you like to install it?`;
 
@@ -358,10 +358,10 @@ export class EffektManager {
         }
     }
 
-   /**
-     * Checks if Java is installed and meets the minimum version requirement.
-     * @returns A promise that resolves with a boolean indicating if the requirements are met.
-     */
+    /**
+      * Checks if Java is installed and meets the minimum version requirement.
+      * @returns A promise that resolves with a boolean indicating if the requirements are met.
+      */
     private async checkJava(): Promise<boolean> {
         try {
             const javaVersion = await this.getJavaVersion();
