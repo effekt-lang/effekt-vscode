@@ -212,13 +212,11 @@ export class EffektManager {
             return { 
                 success: true, 
                 executable: execPath, 
-                message: execPath.includes(path.sep) 
-                    ? `Effekt found at ${execPath}, but not in PATH.`
-                    : "Effekt found in PATH.",
+                message: `Effekt found successfully in ${execPath}.`,
                 version
             };
         } catch (error) {
-            // If getEffektExecutable fails, try to locate in global npm directory
+            // If locateEffektExecutable fails, try to locate in global npm directory
             const npmRoot = await this.execCommand('npm root -g');
 
             for (const execName of this.possibleEffektExecutables) {
