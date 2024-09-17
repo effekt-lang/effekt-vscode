@@ -201,8 +201,17 @@ export class EffektManager {
     }
 
     private async runNpmInstall(): Promise<void> {
+        // 1) Check if the npm root is managed by Nix in order to produce a better error
+        const npmRoot = await this.execCommand('npm root -g');
+        if (npmRoot.startsWith("/nix/store")) {
+            this.logMessage('ERROR', 'NPM root is in the read-only Nix store. Installation is not possible.')
+            throw new Error('Detected Nix environment: NPM global modules are stored in a read-only directory managed by Nix. Installation cannot proceed.');
+        }
+
+        // 2) Actually run `npm install -g ...`
         const npmInstallCommand = `npm install -g ${this.effektNPMPackage}@latest`;
         const npmOutput = await this.execCommand(npmInstallCommand);
+
         this.logMessage('INFO', `Ran '${npmInstallCommand}'; stdout: ${npmOutput}`);
     }
 
