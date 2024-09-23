@@ -348,7 +348,7 @@ export class EffektManager {
             const nodeVersion = await this.execCommand('node --version');
             await this.execCommand('npm --version'); // Note: if needed, we could also check npm version.
 
-            const minNodeVersion = 'v12.0.0'; // Minimum supported Node.js version
+            const minNodeVersion = 'v16.0.0'; // Minimum supported Node.js version
 
             if (compareVersion(nodeVersion, minNodeVersion, '<')) {
                 this.showErrorWithLogs(`Node.js version ${minNodeVersion} or higher is required. You have ${nodeVersion}.`);
