@@ -29,7 +29,10 @@ export class EffektManager {
     private effektVersion: string | null = null;
 
     private readonly effektNPMPackage: string = '@effekt-lang/effekt';
-    private readonly possibleEffektExecutables = ['effekt', 'effekt.sh', 'effekt.cmd'];
+    private readonly possibleEffektExecutables =
+        process.platform === 'win32'
+            ? ['effekt.cmd', 'effekt', 'effekt.sh']  // On Windows, try 'effekt.cmd' first.
+            : ['effekt', 'effekt.sh', 'effekt.cmd'];
 
     constructor() {
         this.statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
