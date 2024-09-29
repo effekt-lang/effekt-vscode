@@ -1,7 +1,7 @@
 'use strict';
 
 import * as vscode from 'vscode';
-import { LanguageClient, LanguageClientOptions, ServerOptions, ExecuteCommandRequest, StreamInfo } from 'vscode-languageclient';
+import { LanguageClient, LanguageClientOptions, ServerOptions, ExecuteCommandRequest, StreamInfo, ExecutableOptions } from 'vscode-languageclient';
 import { EffektManager } from './effektManager';
 import { Monto } from './monto';
 
@@ -49,9 +49,18 @@ export async function activate(context: vscode.ExtensionContext) {
     } else {
         const effektExecutable = await effektManager.locateEffektExecutable();
         const args = effektManager.getEffektArgs();
+
+        /* > Node.js will now error with EINVAL if a .bat or .cmd file is passed to child_process.spawn and child_process.spawnSync without the shell option set.
+         * > If the input to spawn/spawnSync is sanitized, users can now pass { shell: true } as an option to prevent the occurrence of EINVALs errors.
+         *
+         * https://nodejs.org/en/blog/vulnerability/april-2024-security-releases-2
+         */
+        const isWindows = process.platform === 'win32';
+        const execOptions: ExecutableOptions = { shell: isWindows };
+
         serverOptions = {
-            run: { command: effektExecutable.path, args },
-            debug: { command: effektExecutable.path, args }
+            run: { command: effektExecutable.path, args, options: execOptions },
+            debug: { command: effektExecutable.path, args, options: execOptions }
         };
     }
 
