@@ -151,6 +151,16 @@
                 "category": "Effekt",
                 "command": "effekt.selectLinkedEditors",
                 "title": "Focus Product Editors"
+            },
+            {
+                "category": "Effekt",
+                "command": "effekt.checkForUpdates",
+                "title": "Check for Effekt Updates"
+            },
+            {
+                "category": "Effekt",
+                "command": "effekt.restartServer",
+                "title": "Restart LSP Server"
             }
         ],
         "keybindings": [
@@ -176,19 +186,22 @@
     },
     "scripts": {
         "vscode:prepublish": "npm run compile",
-        "compile": "tsc -p ./",
-        "watch": "tsc -watch -p ./",
-        "postinstall": "node ./node_modules/vscode/bin/install",
-        "test": "npm run compile && node ./node_modules/vscode/bin/test"
+        "compile": "tsc -b",
+        "watch": "tsc -b -w",
+        "lint": "eslint ./client/src ./server/src --ext .ts,.tsx"
     },
     "dependencies": {
+        "compare-versions": "^6.1.1",
         "vscode-languageclient": "^5.2.1"
     },
     "devDependencies": {
-        "typescript": "^2.6.1",
-        "vscode": "^1.1.37",
-        "tslint": "^5.8.0",
-        "@types/node": "^7.0.43",
-        "@types/mocha": "^2.2.42"
+        "@types/mocha": "^10.0.6",
+        "@types/node": "^18.14.6",
+        "@types/vscode": "^1.30.0",
+        "@typescript-eslint/eslint-plugin": "^7.1.0",
+        "@typescript-eslint/parser": "^7.1.0",
+        "eslint": "^8.57.0",
+        "mocha": "^10.3.0",
+        "typescript": "^5.3.3"
     }
 }

@@ -1,50 +1,38 @@
 'use strict';
 
-import { ExtensionContext, workspace, window, Range, DecorationOptions, Location } from 'vscode';
-import { LanguageClient, LanguageClientOptions, ServerOptions, ExecuteCommandRequest, StreamInfo } from 'vscode-languageclient';
+import * as vscode from 'vscode';
+import { LanguageClient, LanguageClientOptions, ServerOptions, ExecuteCommandRequest, StreamInfo, ExecutableOptions } from 'vscode-languageclient';
+import { EffektManager } from './effektManager';
 import { Monto } from './monto';
-import { platform } from 'os';
+
 import * as net from 'net';
 
-
 let client: LanguageClient;
+let effektManager: EffektManager;
 
-export function activate(context: ExtensionContext) {
+function registerCommands(context: vscode.ExtensionContext) {
+    context.subscriptions.push(
+        vscode.commands.registerCommand('effekt.checkForUpdates', async () => {
+            await effektManager?.checkForUpdatesAndInstall();
+        }),
+        vscode.commands.registerCommand('effekt.restartServer', async () => {
+            await client?.stop();
+            client?.start();
+        })
+    );
+}
 
-    let config = workspace.getConfiguration("effekt");
+export async function activate(context: vscode.ExtensionContext) {
+    effektManager = new EffektManager();
 
-    let folders = workspace.workspaceFolders || []
-
-    let defaultEffekt = "effekt";
-    let os = platform();
-
-    if (os == 'win32') { defaultEffekt = "effekt.cmd" }
-    else if (os == 'linux' || os == 'freebsd' || os == 'openbsd') { defaultEffekt = "effekt.sh" }
-
-    let effektCmd = config.get<string>("executable") || defaultEffekt
-
-
-    let args: string[] = []
-
-    let effektBackend = config.get<string>("backend")
-    if (effektBackend) {
-        args.push("--backend");
-        args.push(effektBackend)
+    const effektVersion = await effektManager.checkForUpdatesAndInstall();
+    if (!effektVersion) {
+        vscode.window.showWarningMessage('Effekt is not installed. LSP features may not work correctly.');
     }
 
-    let effektLib = config.get<string>("lib")
-    if (effektLib) {
-        args.push("--lib");
-        args.push(effektLib)
-    }
+    registerCommands(context);
 
-    // add each workspace folder as an include
-    folders.forEach(f => {
-        args.push("--includes");
-        args.push(f.uri.fsPath);
-    })
-
-    args.push("--server")
+    const config = vscode.workspace.getConfiguration("effekt");
 
     let serverOptions: ServerOptions;
 
@@ -53,35 +41,34 @@ export function activate(context: ExtensionContext) {
             // Connect to language server via socket
             let socket: any = net.connect({ port: 5007 });
             let result: StreamInfo = {
-            writer: socket,
-            reader: socket
+                writer: socket,
+                reader: socket
             };
             return Promise.resolve(result);
         };
     } else {
+        const effektExecutable = await effektManager.locateEffektExecutable();
+        const args = effektManager.getEffektArgs();
+
+        /* > Node.js will now error with EINVAL if a .bat or .cmd file is passed to child_process.spawn and child_process.spawnSync without the shell option set.
+         * > If the input to spawn/spawnSync is sanitized, users can now pass { shell: true } as an option to prevent the occurrence of EINVALs errors.
+         *
+         * https://nodejs.org/en/blog/vulnerability/april-2024-security-releases-2
+         */
+        const isWindows = process.platform === 'win32';
+        const execOptions: ExecutableOptions = { shell: isWindows };
+
         serverOptions = {
-            run: {
-                command: effektCmd,
-                args: args,
-                options: {}
-            },
-            debug: {
-                command: effektCmd,
-                args: args,
-                options: {}
-            }
+            run: { command: effektExecutable.path, args, options: execOptions },
+            debug: { command: effektExecutable.path, args, options: execOptions }
         };
     }
 
-
     let clientOptions: LanguageClientOptions = {
-        documentSelector: [{
-            scheme: 'file',
-            language: 'effekt'
-        }, {
-            scheme: 'file',
-            language: 'literateeffekt'
-        }],
+        documentSelector: [
+            { scheme: 'file', language: 'effekt' },
+            { scheme: 'file', language: 'literateeffekt' }
+        ],
         diagnosticCollectionName: "effekt"
     };
 
@@ -92,13 +79,24 @@ export function activate(context: ExtensionContext) {
         clientOptions
     );
 
+    // Update server status
+    client.onDidChangeState(event => {
+        if (event.newState === 1) {
+            effektManager.updateServerStatus('starting');
+        } else if (event.newState === 2) {
+            effektManager.updateServerStatus('running');
+        } else if (event.newState === 3) {
+            effektManager.updateServerStatus('stopped');
+        }
+    });
+
     Monto.setup("effekt", context, client);
 
     // Decorate holes
     // ---
     // It would be nice if there was a way to reuse the scopes of the tmLanguage file
 
-    const holeDelimiterDecoration = window.createTextEditorDecorationType({
+    const holeDelimiterDecoration = vscode.window.createTextEditorDecorationType({
         opacity: '0.5',
         borderRadius: '4pt',
         light: { backgroundColor: "rgba(0,0,0,0.05)" },
@@ -106,11 +104,11 @@ export function activate(context: ExtensionContext) {
     })
 
     // the decorations themselves don't have styles. Only the added before-elements.
-    const captureDecoration = window.createTextEditorDecorationType({})
+    const captureDecoration = vscode.window.createTextEditorDecorationType({})
 
     // based on https://github.com/microsoft/vscode-extension-samples/blob/master/decorator-sample/src/extension.ts
-    let timeout: NodeJS.Timer;
-    let editor = window.activeTextEditor
+    let timeout: NodeJS.Timeout;
+    let editor = vscode.window.activeTextEditor
 
     function scheduleDecorations() {
 		if (timeout) { clearTimeout(timeout) }
@@ -126,10 +124,10 @@ export function activate(context: ExtensionContext) {
         client.sendRequest(ExecuteCommandRequest.type, { command: "inferredCaptures", arguments: [{
             uri: editor.document.uri.toString()
         }]}).then(
-            (result : [{ location: Location, captureText: string }]) => {
+            (result : [{ location: vscode.Location, captureText: string }]) => {
                 if (!editor) { return; }
 
-                let captureAnnotations: DecorationOptions[] = []
+                let captureAnnotations: vscode.DecorationOptions[] = []
 
                 if (result == null) return;
 
@@ -169,13 +167,13 @@ export function activate(context: ExtensionContext) {
         const text = editor.document.getText()
         const positionAt = editor.document.positionAt
 
-        let holeDelimiters: DecorationOptions[] = []
+        let holeDelimiters: vscode.DecorationOptions[] = []
         let match;
 
         function addDelimiter(from: number, to: number) {
             const begin = positionAt(from)
             const end = positionAt(to)
-            holeDelimiters.push({ range: new Range(begin, end) })
+            holeDelimiters.push({ range: new vscode.Range(begin, end) })
         }
 
         while (match = holeRegex.exec(text)) {
@@ -185,18 +183,18 @@ export function activate(context: ExtensionContext) {
         editor.setDecorations(holeDelimiterDecoration, holeDelimiters)
     }
 
-    window.onDidChangeActiveTextEditor(ed => {
+    vscode.window.onDidChangeActiveTextEditor(ed => {
 		editor = ed;
 		scheduleDecorations();
 	}, null, context.subscriptions);
 
-	workspace.onDidChangeTextDocument(event => {
+	vscode.workspace.onDidChangeTextDocument(event => {
 		if (editor && event.document === editor.document) {
 			scheduleDecorations();
 		}
     }, null, context.subscriptions);
 
-    workspace.onDidSaveTextDocument(ev => {
+    vscode.workspace.onDidSaveTextDocument(ev => {
         setTimeout(updateCaptures, 50)
     })
 
@@ -206,8 +204,9 @@ export function activate(context: ExtensionContext) {
 }
 
 export function deactivate(): Thenable<void> | undefined {
-	if (!client) {
-		return undefined;
-	}
-	return client.stop();
+    if (!client) {
+        return undefined;
+    }
+    effektManager.updateServerStatus('stopped');
+    return client.stop();
 }
