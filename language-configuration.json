@@ -11,7 +11,7 @@
     "autoClosingPairs": [
         ["{", "}"],
         ["[", "]"],
-        ["(", ")"],
+        ["(", ")"]
     ],
     "surroundingPairs": [
         ["{", "}"],
@@ -20,7 +20,23 @@
         ["<{", "}>"]
     ],
     "folding": {
-        "offSide": false,
+        "offSide": false
     },
-    "wordPattern": "([a-zA-Z][a-zA-Z0-9_]*)"
+    "wordPattern": "([a-zA-Z][a-zA-Z0-9_]*)",
+    "onEnterRules": [
+        {
+            "beforeText": "^\\s*//[^/].*$",
+            "action": {
+                "appendText": "// ",
+				"indent": "none"
+            }
+        },
+        {
+            "beforeText": "^\\s*///.*$",
+            "action": {
+                "appendText": "/// ",
+				"indent": "none"
+            }
+        }
+    ]
 }
