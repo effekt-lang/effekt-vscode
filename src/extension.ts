@@ -67,7 +67,7 @@ export async function activate(context: vscode.ExtensionContext) {
     let clientOptions: LanguageClientOptions = {
         documentSelector: [
             { scheme: 'file', language: 'effekt' },
-            { scheme: 'file', language: 'literateeffekt' }
+            { scheme: 'file', language: 'literate effekt' }
         ],
         diagnosticCollectionName: "effekt"
     };
