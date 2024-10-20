@@ -40,11 +40,21 @@ async function getEffektRepl() {
 }
 
 async function runEffektFile(uri: vscode.Uri) {
-    const repl = await getEffektRepl();
-    const relativePath = path.parse(vscode.workspace.asRelativePath(uri));
+    // Save the document if it has unsaved changes
+    const document = await vscode.workspace.openTextDocument(uri);
+    if (document.isDirty) {
+        await document.save();
+    }
 
-    const modulePrefix = relativePath.dir.split(path.delimiter).join('/')
-    const module = `${modulePrefix}${modulePrefix ? '/' : ''}${relativePath.name}`
+    const repl = await getEffektRepl();
+
+    const relativePath = vscode.workspace.asRelativePath(uri);
+    const parsedPath = path.parse(relativePath);
+
+    // Remove .effekt or .effekt.md extension
+    const moduleName = parsedPath.base.replace(/\.effekt(\.md)?$/, '');
+
+    const module = path.join(parsedPath.dir, moduleName).split(path.sep).join('/');
 
     repl.sendText(':reset')
     repl.sendText(`import ${module}`);
