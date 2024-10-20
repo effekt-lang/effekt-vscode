@@ -10,7 +10,7 @@ import * as path from 'path';
 
 let client: LanguageClient;
 let effektManager: EffektManager;
-const runnerTerminals: Map<string, vscode.Terminal> = new Map();
+let effektRepl: vscode.Terminal | null = null;
 
 function registerCommands(context: vscode.ExtensionContext) {
     context.subscriptions.push(
@@ -22,40 +22,34 @@ function registerCommands(context: vscode.ExtensionContext) {
             client?.start();
         }),
         vscode.commands.registerCommand('effekt.runFile', runEffektFile),
-        vscode.commands.registerCommand('effekt.stopRunning', stopRunningEffekt),
-        vscode.commands.registerCommand('effekt.clearTerminal', clearEffektTerminal)
     );
 }
 
+async function getEffektRepl() {
+    if (effektRepl === null || effektRepl.exitStatus !== undefined) {
+        const effektExecutable = await effektManager.locateEffektExecutable();
+        effektRepl = vscode.window.createTerminal({
+            name: 'Effekt REPL',
+            shellPath: effektExecutable.path,
+            shellArgs: effektManager.getEffektArgs(/* server = */ false),
+            isTransient: true, // Don't persist across VSCode restarts
+        });
+        effektRepl.show();
+    }
+    return effektRepl;
+}
+
 async function runEffektFile(uri: vscode.Uri) {
-    const effektExecutable = await effektManager.locateEffektExecutable();
-    const args = [ uri.fsPath, ...effektManager.getEffektArgs(/* server = */ false) ];
+    const repl = await getEffektRepl();
+    const relativePath = path.parse(vscode.workspace.asRelativePath(uri));
 
-    const terminalName = `Effekt: ${path.basename(uri.fsPath)}`;
-    let terminal = runnerTerminals.get(uri.fsPath)
+    const modulePrefix = relativePath.dir.split(path.delimiter).join('/')
+    const module = `${modulePrefix}${modulePrefix ? '/' : ''}${relativePath.name}`
 
-    if (!terminal || terminal.exitStatus !== undefined) {
-        terminal = vscode.window.createTerminal(terminalName);
-        runnerTerminals.set(uri.fsPath, terminal)
-    }
-
-    terminal.show();
-    terminal.sendText("clear");
-    terminal.sendText(`"${effektExecutable.path}" ${args.join(' ')}`);
-}
-
-async function stopRunningEffekt(uri: vscode.Uri) {
-    const terminal = runnerTerminals.get(uri.fsPath);
-    if (terminal) {
-        terminal.sendText('\x03'); // Send Ctrl+C to stop the running process
-    }
-}
-
-async function clearEffektTerminal(uri: vscode.Uri) {
-    const terminal = runnerTerminals.get(uri.fsPath);
-    if (terminal) {
-        terminal.sendText('clear');
-    }
+    repl.sendText(':reset')
+    repl.sendText(`import ${module}`);
+    repl.sendText('main()');
+    repl.show();
 }
 
 class EffektRunCodeLensProvider implements vscode.CodeLensProvider {
@@ -72,18 +66,6 @@ class EffektRunCodeLensProvider implements vscode.CodeLensProvider {
             codeLenses.push(new vscode.CodeLens(range, {
                 title: '$(play) Run',
                 command: 'effekt.runFile',
-                arguments: [document.uri]
-            }));
-
-            codeLenses.push(new vscode.CodeLens(range, {
-                title: '$(debug-stop) Stop',
-                command: 'effekt.stopRunning',
-                arguments: [document.uri]
-            }));
-
-            codeLenses.push(new vscode.CodeLens(range, {
-                title: '$(clear-all) Clear',
-                command: 'effekt.clearTerminal',
                 arguments: [document.uri]
             }));
         }
@@ -114,14 +96,11 @@ export async function activate(context: vscode.ExtensionContext) {
         )
     );
 
-    // Clean up terminals when closed
+    // Clean up REPL when closed
     context.subscriptions.push(
         vscode.window.onDidCloseTerminal(terminal => {
-            for (const [uri, t] of runnerTerminals.entries()) {
-                if (t === terminal) {
-                    runnerTerminals.delete(uri);
-                    break;
-                }
+            if (terminal === effektRepl) {
+                effektRepl = null;
             }
         })
     );
