@@ -6,9 +6,11 @@ import { EffektManager } from './effektManager';
 import { Monto } from './monto';
 
 import * as net from 'net';
+import * as path from 'path';
 
 let client: LanguageClient;
 let effektManager: EffektManager;
+const runnerTerminals: Map<string, vscode.Terminal> = new Map();
 
 function registerCommands(context: vscode.ExtensionContext) {
     context.subscriptions.push(
@@ -18,8 +20,76 @@ function registerCommands(context: vscode.ExtensionContext) {
         vscode.commands.registerCommand('effekt.restartServer', async () => {
             await client?.stop();
             client?.start();
-        })
+        }),
+        vscode.commands.registerCommand('effekt.runFile', runEffektFile),
+        vscode.commands.registerCommand('effekt.stopRunning', stopRunningEffekt),
+        vscode.commands.registerCommand('effekt.clearTerminal', clearEffektTerminal)
     );
+}
+
+async function runEffektFile(uri: vscode.Uri) {
+    const effektExecutable = await effektManager.locateEffektExecutable();
+    const args = [ uri.fsPath, ...effektManager.getEffektArgs(/* server = */ false) ];
+
+    const terminalName = `Effekt: ${path.basename(uri.fsPath)}`;
+    let terminal = runnerTerminals.get(uri.fsPath)
+
+    if (!terminal || terminal.exitStatus !== undefined) {
+        terminal = vscode.window.createTerminal(terminalName);
+        runnerTerminals.set(uri.fsPath, terminal)
+    }
+
+    terminal.show();
+    terminal.sendText("clear");
+    terminal.sendText(`"${effektExecutable.path}" ${args.join(' ')}`);
+}
+
+async function stopRunningEffekt(uri: vscode.Uri) {
+    const terminal = runnerTerminals.get(uri.fsPath);
+    if (terminal) {
+        terminal.sendText('\x03'); // Send Ctrl+C to stop the running process
+    }
+}
+
+async function clearEffektTerminal(uri: vscode.Uri) {
+    const terminal = runnerTerminals.get(uri.fsPath);
+    if (terminal) {
+        terminal.sendText('clear');
+    }
+}
+
+class EffektRunCodeLensProvider implements vscode.CodeLensProvider {
+    public provideCodeLenses(document: vscode.TextDocument): vscode.CodeLens[] {
+        const codeLenses: vscode.CodeLens[] = [];
+        const text = document.getText();
+        const mainFunctionRegex = /^def\s+main\s*\(\s*\)/gm;
+        let match: RegExpExecArray | null;
+
+        while ((match = mainFunctionRegex.exec(text)) !== null) {
+            const line = document.lineAt(document.positionAt(match.index).line);
+            const range = new vscode.Range(line.range.start, line.range.end);
+            
+            codeLenses.push(new vscode.CodeLens(range, {
+                title: '$(play) Run',
+                command: 'effekt.runFile',
+                arguments: [document.uri]
+            }));
+
+            codeLenses.push(new vscode.CodeLens(range, {
+                title: '$(debug-stop) Stop',
+                command: 'effekt.stopRunning',
+                arguments: [document.uri]
+            }));
+
+            codeLenses.push(new vscode.CodeLens(range, {
+                title: '$(clear-all) Clear',
+                command: 'effekt.clearTerminal',
+                arguments: [document.uri]
+            }));
+        }
+
+        return codeLenses;
+    }
 }
 
 export async function activate(context: vscode.ExtensionContext) {
@@ -31,6 +101,26 @@ export async function activate(context: vscode.ExtensionContext) {
     }
 
     registerCommands(context);
+
+    // Register the CodeLens provider
+    context.subscriptions.push(
+        vscode.languages.registerCodeLensProvider(
+            { language: 'effekt', scheme: 'file' },
+            new EffektRunCodeLensProvider()
+        )
+    );
+
+    // Clean up terminals when closed
+    context.subscriptions.push(
+        vscode.window.onDidCloseTerminal(terminal => {
+            for (const [uri, t] of runnerTerminals.entries()) {
+                if (t === terminal) {
+                    runnerTerminals.delete(uri);
+                    break;
+                }
+            }
+        })
+    );
 
     const config = vscode.workspace.getConfiguration("effekt");
 
