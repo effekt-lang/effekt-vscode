@@ -107,6 +107,10 @@ export async function activate(context: vscode.ExtensionContext) {
         vscode.languages.registerCodeLensProvider(
             { language: 'effekt', scheme: 'file' },
             new EffektRunCodeLensProvider()
+        ),
+        vscode.languages.registerCodeLensProvider(
+            { language: 'literate effekt', scheme: 'file' },
+            new EffektRunCodeLensProvider()
         )
     );
 
