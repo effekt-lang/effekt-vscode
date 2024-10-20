@@ -31,7 +31,7 @@ async function getEffektRepl() {
         effektRepl = vscode.window.createTerminal({
             name: 'Effekt REPL',
             shellPath: effektExecutable.path,
-            shellArgs: effektManager.getEffektArgs(/* server = */ false),
+            shellArgs: effektManager.getEffektArgs(),
             isTransient: true, // Don't persist across VSCode restarts
         });
         effektRepl.show();
@@ -131,7 +131,7 @@ export async function activate(context: vscode.ExtensionContext) {
         };
     } else {
         const effektExecutable = await effektManager.locateEffektExecutable();
-        const args = effektManager.getEffektArgs();
+        const args = ["--server", ...effektManager.getEffektArgs()];
 
         /* > Node.js will now error with EINVAL if a .bat or .cmd file is passed to child_process.spawn and child_process.spawnSync without the shell option set.
          * > If the input to spawn/spawnSync is sanitized, users can now pass { shell: true } as an option to prevent the occurrence of EINVALs errors.
