@@ -9,6 +9,7 @@ import * as net from 'net';
 
 let client: LanguageClient;
 let effektManager: EffektManager;
+let effektRunnerTerminal: vscode.Terminal | null = null;
 
 function registerCommands(context: vscode.ExtensionContext) {
     context.subscriptions.push(
@@ -18,8 +19,59 @@ function registerCommands(context: vscode.ExtensionContext) {
         vscode.commands.registerCommand('effekt.restartServer', async () => {
             await client?.stop();
             client?.start();
-        })
+        }),
+        vscode.commands.registerCommand('effekt.runFile', runEffektFile),
     );
+}
+
+async function getEffektTerminal() {
+    if (effektRunnerTerminal === null || effektRunnerTerminal.exitStatus !== undefined) {
+        effektRunnerTerminal = vscode.window.createTerminal({
+            name: 'Effekt Runner',
+            isTransient: true, // Don't persist across VSCode restarts
+        });
+        effektRunnerTerminal.hide();
+    }
+    return effektRunnerTerminal;
+}
+
+async function runEffektFile(uri: vscode.Uri) {
+    // Save the document if it has unsaved changes
+    const document = await vscode.workspace.openTextDocument(uri);
+    if (document.isDirty) {
+        await document.save();
+    }
+
+    const terminal = await getEffektTerminal();
+
+    const effektExecutable = await effektManager.locateEffektExecutable();
+    const args = [ uri.fsPath, ...effektManager.getEffektArgs() ];
+
+    terminal.sendText("clear");
+    terminal.sendText(`"${effektExecutable.path}" ${args.join(' ')}`);
+    terminal.show();
+}
+
+class EffektRunCodeLensProvider implements vscode.CodeLensProvider {
+    public provideCodeLenses(document: vscode.TextDocument): vscode.CodeLens[] {
+        const codeLenses: vscode.CodeLens[] = [];
+        const text = document.getText();
+        const mainFunctionRegex = /^def\s+main\s*\(\s*\)/gm;
+        let match: RegExpExecArray | null;
+
+        while ((match = mainFunctionRegex.exec(text)) !== null) {
+            const line = document.lineAt(document.positionAt(match.index).line);
+            const range = new vscode.Range(line.range.start, line.range.end);
+            
+            codeLenses.push(new vscode.CodeLens(range, {
+                title: '$(play) Run',
+                command: 'effekt.runFile',
+                arguments: [document.uri]
+            }));
+        }
+
+        return codeLenses;
+    }
 }
 
 export async function activate(context: vscode.ExtensionContext) {
@@ -31,6 +83,27 @@ export async function activate(context: vscode.ExtensionContext) {
     }
 
     registerCommands(context);
+
+    // Register the CodeLens provider
+    context.subscriptions.push(
+        vscode.languages.registerCodeLensProvider(
+            { language: 'effekt', scheme: 'file' },
+            new EffektRunCodeLensProvider()
+        ),
+        vscode.languages.registerCodeLensProvider(
+            { language: 'literate effekt', scheme: 'file' },
+            new EffektRunCodeLensProvider()
+        )
+    );
+
+    // Clean up REPL when closed
+    context.subscriptions.push(
+        vscode.window.onDidCloseTerminal(terminal => {
+            if (terminal === effektRunnerTerminal) {
+                effektRunnerTerminal = null;
+            }
+        })
+    );
 
     const config = vscode.workspace.getConfiguration("effekt");
 
@@ -48,7 +121,7 @@ export async function activate(context: vscode.ExtensionContext) {
         };
     } else {
         const effektExecutable = await effektManager.locateEffektExecutable();
-        const args = effektManager.getEffektArgs();
+        const args = ["--server", ...effektManager.getEffektArgs()];
 
         /* > Node.js will now error with EINVAL if a .bat or .cmd file is passed to child_process.spawn and child_process.spawnSync without the shell option set.
          * > If the input to spawn/spawnSync is sanitized, users can now pass { shell: true } as an option to prevent the occurrence of EINVALs errors.
@@ -204,6 +277,7 @@ export async function activate(context: vscode.ExtensionContext) {
 }
 
 export function deactivate(): Thenable<void> | undefined {
+    if (effektRunnerTerminal) effektRunnerTerminal.dispose()
     if (!client) {
         return undefined;
     }

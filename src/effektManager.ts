@@ -505,7 +505,7 @@ export class EffektManager {
     }
 
     /**
-     * Gets the command arguments for starting the Effekt server.
+     * Gets the command arguments for starting Effekt.
      * @returns An array of command arguments.
      */
     public getEffektArgs(): string[] {
@@ -519,7 +519,6 @@ export class EffektManager {
         const folders = vscode.workspace.workspaceFolders || [];
         folders.forEach(folder => args.push("--includes", folder.uri.fsPath));
 
-        args.push("--server");
         return args;
     }
 }
