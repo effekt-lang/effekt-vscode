@@ -6,11 +6,10 @@ import { EffektManager } from './effektManager';
 import { Monto } from './monto';
 
 import * as net from 'net';
-import * as path from 'path';
 
 let client: LanguageClient;
 let effektManager: EffektManager;
-let effektRepl: vscode.Terminal | null = null;
+let effektRunnerTerminal: vscode.Terminal | null = null;
 
 function registerCommands(context: vscode.ExtensionContext) {
     context.subscriptions.push(
@@ -25,18 +24,15 @@ function registerCommands(context: vscode.ExtensionContext) {
     );
 }
 
-async function getEffektRepl() {
-    if (effektRepl === null || effektRepl.exitStatus !== undefined) {
-        const effektExecutable = await effektManager.locateEffektExecutable();
-        effektRepl = vscode.window.createTerminal({
-            name: 'Effekt REPL',
-            shellPath: effektExecutable.path,
-            shellArgs: effektManager.getEffektArgs(),
+async function getEffektTerminal() {
+    if (effektRunnerTerminal === null || effektRunnerTerminal.exitStatus !== undefined) {
+        effektRunnerTerminal = vscode.window.createTerminal({
+            name: 'Effekt Runner',
             isTransient: true, // Don't persist across VSCode restarts
         });
-        effektRepl.show();
+        effektRunnerTerminal.hide();
     }
-    return effektRepl;
+    return effektRunnerTerminal;
 }
 
 async function runEffektFile(uri: vscode.Uri) {
@@ -46,20 +42,14 @@ async function runEffektFile(uri: vscode.Uri) {
         await document.save();
     }
 
-    const repl = await getEffektRepl();
+    const terminal = await getEffektTerminal();
 
-    const relativePath = vscode.workspace.asRelativePath(uri);
-    const parsedPath = path.parse(relativePath);
+    const effektExecutable = await effektManager.locateEffektExecutable();
+    const args = [ uri.fsPath, ...effektManager.getEffektArgs() ];
 
-    // Remove .effekt or .effekt.md extension
-    const moduleName = parsedPath.base.replace(/\.effekt(\.md)?$/, '');
-
-    const module = path.join(parsedPath.dir, moduleName).split(path.sep).join('/');
-
-    repl.sendText(':reset')
-    repl.sendText(`import ${module}`);
-    repl.sendText('main()');
-    repl.show();
+    terminal.sendText("clear");
+    terminal.sendText(`"${effektExecutable.path}" ${args.join(' ')}`);
+    terminal.show();
 }
 
 class EffektRunCodeLensProvider implements vscode.CodeLensProvider {
@@ -109,8 +99,8 @@ export async function activate(context: vscode.ExtensionContext) {
     // Clean up REPL when closed
     context.subscriptions.push(
         vscode.window.onDidCloseTerminal(terminal => {
-            if (terminal === effektRepl) {
-                effektRepl = null;
+            if (terminal === effektRunnerTerminal) {
+                effektRunnerTerminal = null;
             }
         })
     );
@@ -287,6 +277,7 @@ export async function activate(context: vscode.ExtensionContext) {
 }
 
 export function deactivate(): Thenable<void> | undefined {
+    if (effektRunnerTerminal) effektRunnerTerminal.dispose()
     if (!client) {
         return undefined;
     }
