@@ -48,7 +48,7 @@ async function runEffektFile(uri: vscode.Uri) {
     const args = [ uri.fsPath, ...effektManager.getEffektArgs() ];
 
     terminal.sendText("clear");
-    terminal.sendText(`"${effektExecutable.path}" ${args.join(' ')}`);
+    terminal.sendText(`${effektExecutable.path} ${args.join(' ')}`);
     terminal.show();
 }
 
