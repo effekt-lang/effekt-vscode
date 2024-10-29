@@ -182,7 +182,18 @@
                 "editor.insertSpaces": true,
                 "editor.detectIndentation": false
             }
-        }
+        },
+        "notebooks": [
+            {
+                "type": "effekt-notebook",
+                "displayName": "My Effekt Notebook",
+                "selector": [
+                    {
+                        "filenamePattern": "*.effektbook"
+                    }
+                ]
+            }
+        ]
     },
     "scripts": {
         "vscode:prepublish": "npm run compile",
