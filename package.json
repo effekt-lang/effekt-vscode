@@ -182,7 +182,18 @@
                 "editor.insertSpaces": true,
                 "editor.detectIndentation": false
             }
-        }
+        },
+        "notebooks": [
+            {
+                "type": "effekt-notebook",
+                "displayName": "My Effekt Notebook",
+                "selector": [
+                    {
+                        "filenamePattern": "*.effektbook"
+                    }
+                ]
+            }
+        ]
     },
     "scripts": {
         "vscode:prepublish": "npm run compile",
@@ -197,7 +208,7 @@
     "devDependencies": {
         "@types/mocha": "^10.0.6",
         "@types/node": "^18.14.6",
-        "@types/vscode": "^1.30.0",
+        "@types/vscode": "^1.94.0",
         "@typescript-eslint/eslint-plugin": "^7.1.0",
         "@typescript-eslint/parser": "^7.1.0",
         "eslint": "^8.57.0",
