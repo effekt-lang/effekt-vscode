@@ -118,7 +118,9 @@ class EffektCapturesProvider implements vscode.InlayHintsProvider {
                     log("... URI correct => creating a hint!")
                     const position = response.location.range.start;
                     const hint = new vscode.InlayHint(position, response.captureText, vscode.InlayHintKind.Type);
-                    hint.tooltip = undefined; // NOTE: We could add a tooltip here if we wanted one.
+
+                    // This tooltip is useful when there are a lot of captures.
+                    hint.tooltip = new vscode.MarkdownString(`Captures: ${response.captureText}`);
                     hint.paddingRight = true;
                     hint.paddingLeft = false;
                     inlayHintCache[document.uri.toString()].push(hint);
