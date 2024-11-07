@@ -117,7 +117,12 @@ class EffektCapturesProvider implements vscode.InlayHintsProvider {
                 if (response.location.uri.toString() === document.uri.toString()) {
                     log("... URI correct => creating a hint!")
                     const position = response.location.range.start;
-                    const hint = new vscode.InlayHint(position, response.captureText, vscode.InlayHintKind.Type);
+
+                    // Truncate long captures ourselves.
+                    // TODO: Does this make sense? Shouldn't we at least show the first one?
+                    // TODO: Can the backend send them in a list so that we can have a somewhat stable (alphabetic?) order?
+                    const hintText = response.captureText.length > 24 ? "{…}" : response.captureText;
+                    const hint = new vscode.InlayHint(position, hintText, vscode.InlayHintKind.Type);
 
                     // This tooltip is useful when there are a lot of captures.
                     hint.tooltip = new vscode.MarkdownString(`Captures: \`${response.captureText}\``);
