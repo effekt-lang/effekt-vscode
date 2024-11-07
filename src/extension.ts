@@ -87,11 +87,16 @@ let debugOutputChannel = vscode.window.createOutputChannel("Effekt DEBUG");
 function log(message: string) {
     debugOutputChannel.appendLine(message);
 }
+
+interface InlayHintCache {
+    [uri: string]: vscode.InlayHint[];
+}
+
+const inlayHintCache: InlayHintCache = {};
+
 class EffektCapturesProvider implements vscode.InlayHintsProvider {
     public async provideInlayHints(document: vscode.TextDocument, range: vscode.Range): Promise<vscode.InlayHint[]> {
         log("Inlay hints requested for: " + document.uri.toString() + " & range: " + JSON.stringify(range));
-
-        const hints: vscode.InlayHint[] = [];
 
         try {
             const result = await client.sendRequest(ExecuteCommandRequest.type, {
@@ -103,9 +108,10 @@ class EffektCapturesProvider implements vscode.InlayHintsProvider {
 
             if (!result) {
                 log("No results returned.");
-                return hints;
+                return inlayHintCache[document.uri.toString()];
             }
 
+            inlayHintCache[document.uri.toString()] = [];
             for (const response of result) {
                 log("processing a single response: " + JSON.stringify(response))
                 if (response.location.uri.toString() === document.uri.toString()) {
@@ -115,16 +121,17 @@ class EffektCapturesProvider implements vscode.InlayHintsProvider {
                     hint.tooltip = undefined; // NOTE: We could add a tooltip here if we wanted one.
                     hint.paddingRight = true;
                     hint.paddingLeft = false;
-                    hints.push(hint);
+                    inlayHintCache[document.uri.toString()].push(hint);
                 }
             }
 
         } catch (error) {
             log("Error during inlay hints request: " + JSON.stringify(error));
             vscode.window.showErrorMessage("An error occurred while fetching inlay hints.");
+            inlayHintCache[document.uri.toString()] = [];
         }
 
-        return hints;
+        return inlayHintCache[document.uri.toString()];
     }
 }
 
