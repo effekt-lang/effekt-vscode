@@ -74,6 +74,51 @@ class EffektRunCodeLensProvider implements vscode.CodeLensProvider {
     }
 }
 
+let outputChannel = vscode.window.createOutputChannel("Effekt DEBUG");
+
+function log(message: string) {
+    outputChannel.appendLine(message);
+}
+class EffektCapturesProvider implements vscode.InlayHintsProvider {
+    public async provideInlayHints(document: vscode.TextDocument, range: vscode.Range): Promise<vscode.InlayHint[]> {
+        log("Inlay hints requested for: " + document.uri.toString() + " & range: " + JSON.stringify(range));
+
+        const hints: vscode.InlayHint[] = [];
+    
+        try {
+            const result = await client.sendRequest(ExecuteCommandRequest.type, {
+                command: "inferredCaptures",
+                arguments: [{ uri: document.uri.toString() }]
+            }) as { location: vscode.Location, captureText: string }[];
+    
+            log("Inlay hints result: " + JSON.stringify(result));
+    
+            if (!result) {
+                log("No results returned.");
+                return hints;
+            }
+    
+            for (const response of result) {
+                log("processing a single response: " + JSON.stringify(response))
+                if (response.location.uri.toString() === document.uri.toString()) {
+                    log("... URI correct!")
+                    const position = response.location.range.start;
+                    const hint = new vscode.InlayHint(position, response.captureText, vscode.InlayHintKind.Type);
+                    hint.paddingRight = true;
+                    hint.paddingLeft = false;
+                    hints.push(hint);
+                }
+            }
+    
+        } catch (error) {
+            log("Error during inlay hints request: " + JSON.stringify(error));
+            vscode.window.showErrorMessage("An error occurred while fetching inlay hints.");
+        }
+    
+        return hints;
+    }
+}
+
 export async function activate(context: vscode.ExtensionContext) {
     effektManager = new EffektManager();
 
@@ -83,6 +128,8 @@ export async function activate(context: vscode.ExtensionContext) {
     }
 
     registerCommands(context);
+
+    const config = vscode.workspace.getConfiguration("effekt");
 
     // Register the CodeLens provider
     context.subscriptions.push(
@@ -96,6 +143,21 @@ export async function activate(context: vscode.ExtensionContext) {
         )
     );
 
+    // Conditionally register the Captures provider
+    //if (config.get<boolean>("showCaptures")) {
+        context.subscriptions.push(
+            vscode.languages.registerInlayHintsProvider(
+                { language: 'effekt', scheme: 'file' },
+                new EffektCapturesProvider()
+            ),
+            vscode.languages.registerInlayHintsProvider(
+                { language: 'literate effekt', scheme: 'file' },
+                new EffektCapturesProvider()
+            )
+        );
+    //}
+
+
     // Clean up REPL when closed
     context.subscriptions.push(
         vscode.window.onDidCloseTerminal(terminal => {
@@ -104,8 +166,6 @@ export async function activate(context: vscode.ExtensionContext) {
             }
         })
     );
-
-    const config = vscode.workspace.getConfiguration("effekt");
 
     let serverOptions: ServerOptions;
 
@@ -177,7 +237,7 @@ export async function activate(context: vscode.ExtensionContext) {
     })
 
     // the decorations themselves don't have styles. Only the added before-elements.
-    const captureDecoration = vscode.window.createTextEditorDecorationType({})
+    // const captureDecoration = vscode.window.createTextEditorDecorationType({})
 
     // based on https://github.com/microsoft/vscode-extension-samples/blob/master/decorator-sample/src/extension.ts
     let timeout: NodeJS.Timeout;
@@ -188,7 +248,7 @@ export async function activate(context: vscode.ExtensionContext) {
 		timeout = setTimeout(updateHoles, 50);
     }
 
-    function updateCaptures() {
+    /*function updateCaptures() {
 
         if (!editor) { return; }
 
@@ -227,7 +287,7 @@ export async function activate(context: vscode.ExtensionContext) {
                 return editor.setDecorations(captureDecoration, captureAnnotations)
             }
         );
-    }
+    }*/
 
     const holeRegex = /<>|<{|}>/g
 
@@ -267,9 +327,9 @@ export async function activate(context: vscode.ExtensionContext) {
 		}
     }, null, context.subscriptions);
 
-    vscode.workspace.onDidSaveTextDocument(ev => {
-        setTimeout(updateCaptures, 50)
-    })
+    //vscode.workspace.onDidSaveTextDocument(ev => {
+    //    setTimeout(updateCaptures, 50)
+    //})
 
 	scheduleDecorations();
 
