@@ -83,10 +83,9 @@ class EffektRunCodeLensProvider implements vscode.CodeLensProvider {
     }
 }
 
-let outputChannel = vscode.window.createOutputChannel("Effekt DEBUG");
-
+let debugOutputChannel = vscode.window.createOutputChannel("Effekt DEBUG");
 function log(message: string) {
-    outputChannel.appendLine(message);
+    debugOutputChannel.appendLine(message);
 }
 class EffektCapturesProvider implements vscode.InlayHintsProvider {
     public async provideInlayHints(document: vscode.TextDocument, range: vscode.Range): Promise<vscode.InlayHint[]> {
@@ -110,9 +109,10 @@ class EffektCapturesProvider implements vscode.InlayHintsProvider {
             for (const response of result) {
                 log("processing a single response: " + JSON.stringify(response))
                 if (response.location.uri.toString() === document.uri.toString()) {
-                    log("... URI correct!")
+                    log("... URI correct => creating a hint!")
                     const position = response.location.range.start;
                     const hint = new vscode.InlayHint(position, response.captureText, vscode.InlayHintKind.Type);
+                    hint.tooltip = undefined; // NOTE: We could add a tooltip here if we wanted one.
                     hint.paddingRight = true;
                     hint.paddingLeft = false;
                     hints.push(hint);
@@ -258,48 +258,7 @@ export async function activate(context: vscode.ExtensionContext) {
         timeout = setTimeout(updateHoles, 50);
     }
 
-    /*function updateCaptures() {
-        if (!editor) { return; }
-
-        if (!config.get<boolean>("showCaptures")) { return; }
-
-        client.sendRequest(ExecuteCommandRequest.type, { command: "inferredCaptures", arguments: [{
-            uri: editor.document.uri.toString()
-        }]}).then(
-            (result : [{ location: vscode.Location, captureText: string }]) => {
-                if (!editor) { return; }
-
-                let captureAnnotations: vscode.DecorationOptions[] = [];
-
-                if (result == null) return;
-
-                result.forEach(response => {
-                    if (!editor) { return; }
-                    const loc = response.location;
-                    if (loc.uri != editor.document.uri) return;
-
-                    captureAnnotations.push({
-                        range: loc.range,
-                        renderOptions: {
-                            before: {
-                                contentText: response.captureText,
-                                backgroundColor: "rgba(170,210,255,0.3)",
-                                color: "rgba(50,50,50,0.5)",
-                                fontStyle: "italic",
-                                margin: "0 0.5em 0 0.5em"
-                            }
-                        }
-                    });
-                });
-
-                if (!editor) { return; }
-                return editor.setDecorations(captureDecoration, captureAnnotations);
-            }
-        );
-    }*/
-
-    const holeRegex = /<>|<{|}>/g;
-
+    const holeRegex = /<>|<{|}>/g
     /**
      * TODO clean this up -- ideally move it to the language server
      */
