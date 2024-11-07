@@ -74,6 +74,65 @@ class EffektRunCodeLensProvider implements vscode.CodeLensProvider {
     }
 }
 
+let debugOutputChannel = vscode.window.createOutputChannel("Effekt DEBUG");
+function log(message: string) {
+    debugOutputChannel.appendLine(message);
+}
+
+interface InlayHintCache {
+    [uri: string]: vscode.InlayHint[];
+}
+
+const inlayHintCache: InlayHintCache = {};
+
+class EffektCapturesProvider implements vscode.InlayHintsProvider {
+    public async provideInlayHints(document: vscode.TextDocument, range: vscode.Range): Promise<vscode.InlayHint[]> {
+        log("Inlay hints requested for: " + document.uri.toString() + " & range: " + JSON.stringify(range));
+    
+        try {
+            const result = await client.sendRequest(ExecuteCommandRequest.type, {
+                command: "inferredCaptures",
+                arguments: [{ uri: document.uri.toString() }]
+            }) as { location: vscode.Location, captureText: string }[];
+    
+            log("Inlay hints result: " + JSON.stringify(result));
+    
+            if (!result) {
+                log("No results returned.");
+                return inlayHintCache[document.uri.toString()];
+            }
+    
+            inlayHintCache[document.uri.toString()] = [];
+            for (const response of result) {
+                log("processing a single response: " + JSON.stringify(response))
+                if (response.location.uri.toString() === document.uri.toString()) {
+                    log("... URI correct => creating a hint!")
+                    const position = response.location.range.start;
+
+                    // Truncate long captures ourselves.
+                    // TODO: Does this make sense? Shouldn't we at least show the first one?
+                    // TODO: Can the backend send them in a list so that we can have a somewhat stable (alphabetic?) order?
+                    const hintText = response.captureText.length > 30 ? "{…}" : response.captureText;
+                    const hint = new vscode.InlayHint(position, hintText, vscode.InlayHintKind.Type);
+
+                    // This tooltip is useful when there are a lot of captures.
+                    hint.tooltip = new vscode.MarkdownString(`Captures: \`${response.captureText}\``);
+                    hint.paddingRight = true;
+                    hint.paddingLeft = false;
+                    inlayHintCache[document.uri.toString()].push(hint);
+                }
+            }
+    
+        } catch (error) {
+            log("Error during inlay hints request: " + JSON.stringify(error));
+            vscode.window.showErrorMessage("An error occurred while fetching inlay hints.");
+            inlayHintCache[document.uri.toString()] = [];
+        }
+    
+        return inlayHintCache[document.uri.toString()];
+    }
+}
+
 export async function activate(context: vscode.ExtensionContext) {
     effektManager = new EffektManager();
 
@@ -83,6 +142,8 @@ export async function activate(context: vscode.ExtensionContext) {
     }
 
     registerCommands(context);
+
+    const config = vscode.workspace.getConfiguration("effekt");
 
     // Register the CodeLens provider
     context.subscriptions.push(
@@ -96,6 +157,21 @@ export async function activate(context: vscode.ExtensionContext) {
         )
     );
 
+    // Conditionally register the Captures provider
+    //if (config.get<boolean>("showCaptures")) {
+        context.subscriptions.push(
+            vscode.languages.registerInlayHintsProvider(
+                { language: 'effekt', scheme: 'file' },
+                new EffektCapturesProvider()
+            ),
+            vscode.languages.registerInlayHintsProvider(
+                { language: 'literate effekt', scheme: 'file' },
+                new EffektCapturesProvider()
+            )
+        );
+    //}
+
+
     // Clean up REPL when closed
     context.subscriptions.push(
         vscode.window.onDidCloseTerminal(terminal => {
@@ -104,8 +180,6 @@ export async function activate(context: vscode.ExtensionContext) {
             }
         })
     );
-
-    const config = vscode.workspace.getConfiguration("effekt");
 
     let serverOptions: ServerOptions;
 
@@ -177,7 +251,7 @@ export async function activate(context: vscode.ExtensionContext) {
     })
 
     // the decorations themselves don't have styles. Only the added before-elements.
-    const captureDecoration = vscode.window.createTextEditorDecorationType({})
+    // const captureDecoration = vscode.window.createTextEditorDecorationType({})
 
     // based on https://github.com/microsoft/vscode-extension-samples/blob/master/decorator-sample/src/extension.ts
     let timeout: NodeJS.Timeout;
@@ -186,47 +260,6 @@ export async function activate(context: vscode.ExtensionContext) {
     function scheduleDecorations() {
 		if (timeout) { clearTimeout(timeout) }
 		timeout = setTimeout(updateHoles, 50);
-    }
-
-    function updateCaptures() {
-
-        if (!editor) { return; }
-
-        if (!config.get<boolean>("showCaptures")) { return; }
-
-        client.sendRequest(ExecuteCommandRequest.type, { command: "inferredCaptures", arguments: [{
-            uri: editor.document.uri.toString()
-        }]}).then(
-            (result : [{ location: vscode.Location, captureText: string }]) => {
-                if (!editor) { return; }
-
-                let captureAnnotations: vscode.DecorationOptions[] = []
-
-                if (result == null) return;
-
-                result.forEach(response => {
-                    if (!editor) { return; }
-                    const loc = response.location
-                    if (loc.uri != editor.document.uri) return;
-
-                    captureAnnotations.push({
-                        range:  loc.range,
-                        renderOptions: {
-                            before: {
-                            contentText: response.captureText,
-                            backgroundColor: "rgba(170,210,255,0.3)",
-                            color: "rgba(50,50,50,0.5)",
-                            fontStyle: "italic",
-                            margin: "0 0.5em 0 0.5em"
-                            }
-                        }
-                    })
-                })
-
-                if (!editor) { return; }
-                return editor.setDecorations(captureDecoration, captureAnnotations)
-            }
-        );
     }
 
     const holeRegex = /<>|<{|}>/g
@@ -266,10 +299,6 @@ export async function activate(context: vscode.ExtensionContext) {
 			scheduleDecorations();
 		}
     }, null, context.subscriptions);
-
-    vscode.workspace.onDidSaveTextDocument(ev => {
-        setTimeout(updateCaptures, 50)
-    })
 
 	scheduleDecorations();
 
