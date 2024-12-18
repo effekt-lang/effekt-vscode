@@ -1,11 +1,13 @@
 'use strict';
 
 import * as vscode from 'vscode';
-import { LanguageClient, LanguageClientOptions, ServerOptions, ExecuteCommandRequest, StreamInfo, ExecutableOptions } from 'vscode-languageclient';
+import { LanguageClient, LanguageClientOptions, ServerOptions, ExecuteCommandRequest, StreamInfo, ExecutableOptions, RenameRequest } from 'vscode-languageclient';
 import { EffektManager } from './effektManager';
 import { Monto } from './monto';
 
 import * as net from 'net';
+import { NotebookSerializer } from './notebookSerializer';
+import { Controller } from './notebookController';
 
 let client: LanguageClient;
 let effektManager: EffektManager;
@@ -274,6 +276,12 @@ export async function activate(context: vscode.ExtensionContext) {
 	scheduleDecorations();
 
     context.subscriptions.push(client.start());
+
+    // Notebook
+    context.subscriptions.push(
+        vscode.workspace.registerNotebookSerializer('effekt-notebook', new NotebookSerializer()),
+        new Controller(client),
+    );
 }
 
 export function deactivate(): Thenable<void> | undefined {
