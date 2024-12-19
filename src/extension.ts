@@ -1,7 +1,14 @@
 'use strict';
 
 import * as vscode from 'vscode';
-import { LanguageClient, LanguageClientOptions, ServerOptions, ExecuteCommandRequest, StreamInfo, ExecutableOptions } from 'vscode-languageclient';
+import {
+    LanguageClient,
+    LanguageClientOptions,
+    ServerOptions,
+    ExecuteCommandRequest,
+    StreamInfo,
+    State as ClientState
+} from 'vscode-languageclient/node';
 import { EffektManager } from './effektManager';
 import { Monto } from './monto';
 
@@ -17,8 +24,10 @@ function registerCommands(context: vscode.ExtensionContext) {
             await effektManager?.checkForUpdatesAndInstall();
         }),
         vscode.commands.registerCommand('effekt.restartServer', async () => {
-            await client?.stop();
-            client?.start();
+            if (client) {
+                await client.stop();
+                client.start();
+            }
         }),
         vscode.commands.registerCommand('effekt.runFile', runEffektFile),
     );
@@ -62,7 +71,7 @@ class EffektRunCodeLensProvider implements vscode.CodeLensProvider {
         while ((match = mainFunctionRegex.exec(text)) !== null) {
             const line = document.lineAt(document.positionAt(match.index).line);
             const range = new vscode.Range(line.range.start, line.range.end);
-            
+
             codeLenses.push(new vscode.CodeLens(range, {
                 title: '$(play) Run',
                 command: 'effekt.runFile',
@@ -112,8 +121,8 @@ export async function activate(context: vscode.ExtensionContext) {
     if (config.get<boolean>("debug")) {
         serverOptions = () => {
             // Connect to language server via socket
-            let socket: any = net.connect({ port: 5007 });
-            let result: StreamInfo = {
+            const socket = net.connect({ port: 5007 });
+            const result: StreamInfo = {
                 writer: socket,
                 reader: socket
             };
@@ -129,7 +138,7 @@ export async function activate(context: vscode.ExtensionContext) {
          * https://nodejs.org/en/blog/vulnerability/april-2024-security-releases-2
          */
         const isWindows = process.platform === 'win32';
-        const execOptions: ExecutableOptions = { shell: isWindows };
+        const execOptions = { shell: isWindows };
 
         serverOptions = {
             run: { command: effektExecutable.path, args, options: execOptions },
@@ -154,11 +163,11 @@ export async function activate(context: vscode.ExtensionContext) {
 
     // Update server status
     client.onDidChangeState(event => {
-        if (event.newState === 1) {
+        if (event.newState === ClientState.Starting) {
             effektManager.updateServerStatus('starting');
-        } else if (event.newState === 2) {
+        } else if (event.newState === ClientState.Running) {
             effektManager.updateServerStatus('running');
-        } else if (event.newState === 3) {
+        } else if (event.newState === ClientState.Stopped) {
             effektManager.updateServerStatus('stopped');
         }
     });
@@ -173,23 +182,22 @@ export async function activate(context: vscode.ExtensionContext) {
         opacity: '0.5',
         borderRadius: '4pt',
         light: { backgroundColor: "rgba(0,0,0,0.05)" },
-		dark: { backgroundColor: "rgba(255,255,255,0.05)" }
-    })
+        dark: { backgroundColor: "rgba(255,255,255,0.05)" }
+    });
 
     // the decorations themselves don't have styles. Only the added before-elements.
-    const captureDecoration = vscode.window.createTextEditorDecorationType({})
+    const captureDecoration = vscode.window.createTextEditorDecorationType({});
 
     // based on https://github.com/microsoft/vscode-extension-samples/blob/master/decorator-sample/src/extension.ts
     let timeout: NodeJS.Timeout;
-    let editor = vscode.window.activeTextEditor
+    let editor = vscode.window.activeTextEditor;
 
     function scheduleDecorations() {
-		if (timeout) { clearTimeout(timeout) }
-		timeout = setTimeout(updateHoles, 50);
+        if (timeout) { clearTimeout(timeout); }
+        timeout = setTimeout(updateHoles, 50);
     }
 
     function updateCaptures() {
-
         if (!editor) { return; }
 
         if (!config.get<boolean>("showCaptures")) { return; }
@@ -200,36 +208,36 @@ export async function activate(context: vscode.ExtensionContext) {
             (result : [{ location: vscode.Location, captureText: string }]) => {
                 if (!editor) { return; }
 
-                let captureAnnotations: vscode.DecorationOptions[] = []
+                let captureAnnotations: vscode.DecorationOptions[] = [];
 
                 if (result == null) return;
 
                 result.forEach(response => {
                     if (!editor) { return; }
-                    const loc = response.location
+                    const loc = response.location;
                     if (loc.uri != editor.document.uri) return;
 
                     captureAnnotations.push({
-                        range:  loc.range,
+                        range: loc.range,
                         renderOptions: {
                             before: {
-                            contentText: response.captureText,
-                            backgroundColor: "rgba(170,210,255,0.3)",
-                            color: "rgba(50,50,50,0.5)",
-                            fontStyle: "italic",
-                            margin: "0 0.5em 0 0.5em"
+                                contentText: response.captureText,
+                                backgroundColor: "rgba(170,210,255,0.3)",
+                                color: "rgba(50,50,50,0.5)",
+                                fontStyle: "italic",
+                                margin: "0 0.5em 0 0.5em"
                             }
                         }
-                    })
-                })
+                    });
+                });
 
                 if (!editor) { return; }
-                return editor.setDecorations(captureDecoration, captureAnnotations)
+                return editor.setDecorations(captureDecoration, captureAnnotations);
             }
         );
     }
 
-    const holeRegex = /<>|<{|}>/g
+    const holeRegex = /<>|<{|}>/g;
 
     /**
      * TODO clean this up -- ideally move it to the language server
@@ -237,47 +245,48 @@ export async function activate(context: vscode.ExtensionContext) {
     function updateHoles() {
         if (!editor) { return; }
 
-        const text = editor.document.getText()
-        const positionAt = editor.document.positionAt
+        const text = editor.document.getText();
+        const positionAt = editor.document.positionAt;
 
-        let holeDelimiters: vscode.DecorationOptions[] = []
+        let holeDelimiters: vscode.DecorationOptions[] = [];
         let match;
 
         function addDelimiter(from: number, to: number) {
-            const begin = positionAt(from)
-            const end = positionAt(to)
-            holeDelimiters.push({ range: new vscode.Range(begin, end) })
+            const begin = positionAt(from);
+            const end = positionAt(to);
+            holeDelimiters.push({ range: new vscode.Range(begin, end) });
         }
 
         while (match = holeRegex.exec(text)) {
-            addDelimiter(match.index, match.index + 2)
+            addDelimiter(match.index, match.index + 2);
         }
 
-        editor.setDecorations(holeDelimiterDecoration, holeDelimiters)
+        editor.setDecorations(holeDelimiterDecoration, holeDelimiters);
     }
 
     vscode.window.onDidChangeActiveTextEditor(ed => {
-		editor = ed;
-		scheduleDecorations();
-	}, null, context.subscriptions);
+        editor = ed;
+        scheduleDecorations();
+    }, null, context.subscriptions);
 
-	vscode.workspace.onDidChangeTextDocument(event => {
-		if (editor && event.document === editor.document) {
-			scheduleDecorations();
-		}
+    vscode.workspace.onDidChangeTextDocument(event => {
+        if (editor && event.document === editor.document) {
+            scheduleDecorations();
+        }
     }, null, context.subscriptions);
 
     vscode.workspace.onDidSaveTextDocument(ev => {
-        setTimeout(updateCaptures, 50)
-    })
+        setTimeout(updateCaptures, 50);
+    });
 
-	scheduleDecorations();
+    scheduleDecorations();
 
-    context.subscriptions.push(client.start());
+    await client.start();
+    context.subscriptions.push(client);
 }
 
 export function deactivate(): Thenable<void> | undefined {
-    if (effektRunnerTerminal) effektRunnerTerminal.dispose()
+    if (effektRunnerTerminal) effektRunnerTerminal.dispose();
     if (!client) {
         return undefined;
     }

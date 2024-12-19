@@ -1,6 +1,6 @@
 import { commands, ExtensionContext, EventEmitter, Range, Selection, TextDocumentContentProvider, TextEditor, TextEditorRevealType, TextEditorSelectionChangeEvent, Uri, ViewColumn, workspace, window } from 'vscode';
-import { NotificationType } from 'vscode-jsonrpc';
-import { LanguageClient, DidChangeConfigurationNotification } from 'vscode-languageclient';
+import { NotificationType } from 'vscode-languageclient/node';
+import { LanguageClient } from 'vscode-languageclient/node';
 
 export namespace Monto {
 
@@ -24,13 +24,12 @@ export namespace Monto {
     }
 
     export interface OffsetRange {
-        start: number; end: number;
+        start: number;
+        end: number;
     }
 
     namespace PublishProduct {
-        export const type = new NotificationType<Product, void>(
-            "monto/publishProduct"
-        );
+        export const type = new NotificationType<Product>('monto/publishProduct');
     }
 
     // Map Monto uri strings to latest version of their products
@@ -128,9 +127,9 @@ export namespace Monto {
         });
 
         workspace.onDidChangeConfiguration(event => {
-            // if (event.affectsConfiguration(name)) {
-                sendConfigurationToServer(client, name);
-            // }
+            client.sendNotification('workspace/didChangeConfiguration', {
+                settings: workspace.getConfiguration(name)
+            });
         });
 
         context.subscriptions.push(
@@ -141,21 +140,13 @@ export namespace Monto {
 
         context.subscriptions.push(workspace.registerTextDocumentContentProvider(montoScheme, montoProvider));
 
-        client.clientOptions.initializationOptions = workspace.getConfiguration(name);
-
-        client.onReady().then(_ => {
-            client.onNotification(PublishProduct.type, product => {
+        // Initialize client and setup notifications
+        client.start().then(() => {
+            client.onNotification(PublishProduct.type, (product: Product) => {
                 saveProduct(product);
                 showProduct(product);
             });
         });
-    }
-
-    function sendConfigurationToServer(client: LanguageClient, name: string) {
-        client.sendNotification(
-            DidChangeConfigurationNotification.type.method,
-            { settings: workspace.getConfiguration(name) }
-        );
     }
 
     function isMontoEditor(editor: TextEditor): Boolean {
@@ -283,5 +274,4 @@ export namespace Monto {
             }
         );
     }
-
 }
