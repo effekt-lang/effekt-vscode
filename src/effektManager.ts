@@ -4,7 +4,7 @@ import * as https from 'https';
 import { compare as compareVersion } from 'compare-versions';
 import { URL } from 'url';
 import * as path from 'path';
-import * as fs from 'fs';
+import * as fs from 'fs/promises';
 
 interface InstallationResult {
     success: boolean;
@@ -61,7 +61,7 @@ export class EffektManager {
 
             const version = removePrefix(versionOutput.trim(), "Effekt "); // NOTE: the space is important here
             if (!version) {
-                throw new Error(`Output of '${path} --version' is not in the correct format 'Effekt 0.1.2'; got '${versionOutput}' instead.`)
+                throw new Error(`Output of '${path} --version' is not in the correct format 'Effekt 0.1.2'; got '${versionOutput}' instead.`);
             }
             return version;
         } catch (versionError) {
@@ -95,7 +95,7 @@ export class EffektManager {
                 if (error) {
                     reject(error);
                 } else {
-                    const output = stdout.trim() + (resolveWithStderr ? stderr.trim() : '')
+                    const output = stdout.trim() + (resolveWithStderr ? stderr.trim() : '');
                     resolve(output);
                 }
             });
@@ -207,7 +207,7 @@ export class EffektManager {
         // 1) Check if the npm root is managed by Nix in order to produce a better error
         const npmRoot = await this.execCommand('npm root -g');
         if (npmRoot.startsWith("/nix/store")) {
-            this.logMessage('ERROR', 'NPM root is in the read-only Nix store. Installation is not possible.')
+            this.logMessage('ERROR', 'NPM root is in the read-only Nix store. Installation is not possible.');
             throw new Error('Detected Nix environment: NPM global modules are stored in a read-only directory managed by Nix. Installation cannot proceed.');
         }
 
@@ -257,7 +257,7 @@ export class EffektManager {
 
     private async fileExists(filePath: string): Promise<boolean> {
         try {
-            await fs.promises.access(filePath, fs.constants.F_OK);
+            await fs.access(filePath);
             return true;
         } catch {
             return false;
@@ -300,7 +300,7 @@ export class EffektManager {
             const effektPath = await this.locateEffektExecutable();
             if (!this.effektVersion) {
                 const currentVersion = await this.fetchEffektVersion(effektPath.path);
-                this.effektVersion = currentVersion
+                this.effektVersion = currentVersion;
             }
 
             const latestVersion = await this.getLatestNPMVersion(this.effektNPMPackage);
@@ -314,7 +314,7 @@ export class EffektManager {
             return this.effektVersion || '';
         } catch (error) {
             if (error instanceof Error && error.message.includes('Effekt executable not found')) {
-                const latestVersion = await this.getLatestNPMVersion(this.effektNPMPackage)
+                const latestVersion = await this.getLatestNPMVersion(this.effektNPMPackage);
                 return this.promptForAction(latestVersion, 'install');
             } else {
                 this.showErrorWithLogs(`Failed to check Effekt: ${error}`);
@@ -371,9 +371,9 @@ export class EffektManager {
     }
 
     /**
-      * Checks if Java is installed and meets the minimum version requirement.
-      * @returns A promise that resolves with a boolean indicating if the requirements are met.
-      */
+     * Checks if Java is installed and meets the minimum version requirement.
+     * @returns A promise that resolves with a boolean indicating if the requirements are met.
+     */
     private async checkJava(): Promise<boolean> {
         try {
             const javaVersion = await this.getJavaVersion();
@@ -388,7 +388,7 @@ export class EffektManager {
 
             return true;
         } catch (error) {
-            this.logMessage("ERROR", `When checking Java version got: ${error}`)
+            this.logMessage("ERROR", `When checking Java version got: ${error}`);
 
             this.showErrorWithLogs(
                 "Java (JRE) is required to run Effekt. " +
@@ -406,7 +406,7 @@ export class EffektManager {
         try {
             const output = await this.execCommand('java -version', true);
 
-            this.logMessage('INFO', `Got ${output} from 'java -version'`)
+            this.logMessage('INFO', `Got ${output} from 'java -version'`);
 
             // Regular expressions to match different Java version formats
             const versionRegexes = [

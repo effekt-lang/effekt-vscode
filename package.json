@@ -10,7 +10,7 @@
     "version": "0.2.3",
     "publisher": "effekt-lang",
     "engines": {
-        "vscode": "^1.30.0"
+        "vscode": "^1.80.0"
     },
     "categories": [
         "Other"
@@ -192,12 +192,12 @@
     },
     "dependencies": {
         "compare-versions": "^6.1.1",
-        "vscode-languageclient": "^5.2.1"
+        "vscode-languageclient": "^8.1.0"
     },
     "devDependencies": {
         "@types/mocha": "^10.0.6",
-        "@types/node": "^18.14.6",
-        "@types/vscode": "^1.30.0",
+        "@types/node": "^20.11.25",
+        "@types/vscode": "^1.80.0",
         "@typescript-eslint/eslint-plugin": "^7.1.0",
         "@typescript-eslint/parser": "^7.1.0",
         "eslint": "^8.57.0",
