@@ -56,7 +56,9 @@ async function runEffektFile(uri: vscode.Uri) {
     const effektExecutable = await effektManager.locateEffektExecutable();
     const args = [ uri.fsPath, ...effektManager.getEffektArgs() ];
 
-    terminal.sendText("clear");
+    // Clear the terminal using API Call
+    await vscode.commands.executeCommand('workbench.action.terminal.clear');
+
     terminal.sendText(`${effektExecutable.path} ${args.join(' ')}`);
     terminal.show();
 }
