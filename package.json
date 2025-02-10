@@ -72,6 +72,21 @@
                 "path": "./syntaxes/ir.tmLanguage.json"
             }
         ],
+        "iconThemes": [
+            {
+                "id": "effekt-file-icons",
+                "label": "Effekt File Icons",
+                "path": "./fileicons/effect-icon-theme.json"
+            }
+        ],
+        "fileIcons": [
+            {
+                "id": "effekt",
+                "label": "Effekt File",
+                "icon": "./fileicons/effekt.svg",
+                "fileExtensions": ["effekt"]
+            }
+        ],
         "configuration": {
             "type": "object",
             "title": "Effekt",
