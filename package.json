@@ -31,7 +31,11 @@
                     "Effekt",
                     "effekt"
                 ],
-                "configuration": "./language-configuration.json"
+                "configuration": "./language-configuration.json",
+                "icon": {
+                    "light": "./fileicons/effekt.svg",
+                    "dark": "./fileicons/effekt.svg"
+                }
             },
             {
                 "id": "literate effekt",
@@ -70,21 +74,6 @@
                 "language": "ir",
                 "scopeName": "source.ir",
                 "path": "./syntaxes/ir.tmLanguage.json"
-            }
-        ],
-        "iconThemes": [
-            {
-                "id": "effekt-file-icons",
-                "label": "Effekt File Icons",
-                "path": "./fileicons/effect-icon-theme.json"
-            }
-        ],
-        "fileIcons": [
-            {
-                "id": "effekt",
-                "label": "Effekt File",
-                "icon": "./fileicons/effekt.svg",
-                "fileExtensions": ["effekt"]
             }
         ],
         "configuration": {
