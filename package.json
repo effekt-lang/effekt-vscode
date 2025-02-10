@@ -45,7 +45,11 @@
                 "aliases": [
                     "literate effekt"
                 ],
-                "configuration": "./language-configuration.json"
+                "configuration": "./language-configuration.json",
+                "icon": {
+                    "light": "./fileicons/effekt.svg",
+                    "dark": "./fileicons/effekt.svg"
+                }
             },
             {
                 "id": "ir",
@@ -56,7 +60,11 @@
                     "ir",
                     "IR"
                 ],
-                "configuration": "./language-configuration.json"
+                "configuration": "./language-configuration.json",
+                "icon": {
+                    "light": "./fileicons/effekt.svg",
+                    "dark": "./fileicons/effekt.svg"
+                }
             }
         ],
         "grammars": [
