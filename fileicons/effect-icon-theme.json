@@ -1,7 +1,7 @@
 {
     "iconDefinitions": {
         "effekt": {
-            "iconPath": "../fileicons/effekt.svg"
+            "iconPath": "effekt.svg"
         }
     },
     "fileExtensions": {
