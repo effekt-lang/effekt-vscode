@@ -1,0 +1,13 @@
+{
+    "iconDefinitions": {
+        "effekt": {
+            "iconPath": "../fileicons/effekt.svg"
+        }
+    },
+    "fileExtensions": {
+        "effekt": "effekt"
+    },
+    "languageIds": {
+        "effekt": "effekt"
+    }
+}
