@@ -31,7 +31,11 @@
                     "Effekt",
                     "effekt"
                 ],
-                "configuration": "./language-configuration.json"
+                "configuration": "./language-configuration.json",
+                "icon": {
+                    "light": "./fileicons/lightmode_icon.svg",
+                    "dark": "./fileicons/darkmode_icon.svg"
+                }
             },
             {
                 "id": "literate effekt",
@@ -41,7 +45,11 @@
                 "aliases": [
                     "literate effekt"
                 ],
-                "configuration": "./language-configuration.json"
+                "configuration": "./language-configuration.json",
+                "icon": {
+                    "light": "./fileicons/lightmode_icon.svg",
+                    "dark": "./fileicons/darkmode_icon.svg"
+                }
             },
             {
                 "id": "ir",
@@ -52,7 +60,11 @@
                     "ir",
                     "IR"
                 ],
-                "configuration": "./language-configuration.json"
+                "configuration": "./language-configuration.json",
+                "icon": {
+                    "light": "./fileicons/lightmode_icon.svg",
+                    "dark": "./fileicons/darkmode_icon.svg"
+                }
             }
         ],
         "grammars": [
