@@ -307,7 +307,7 @@ export class EffektManager {
 
             // check if the latest version strictly newer than the current version
             if (!this.effektVersion || compareVersion(latestVersion, this.effektVersion, '>')) {
-                return  this.promptForAction(latestVersion, 'update');
+                return this.promptForAction(latestVersion, 'update');
             }
 
             this.updateStatusBar();
