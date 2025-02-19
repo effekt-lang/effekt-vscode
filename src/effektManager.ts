@@ -337,7 +337,7 @@ export class EffektManager {
         const response = await vscode.window.showInformationMessage(message, 'Yes', 'No');
         if (response === 'Yes') {
             const installedVersion = await this.installOrUpdateEffekt(version, action);
-            if(installedVersion != ''){
+            if(!!installedVersion){
                 // After installation or update is complete, offer to open the changelog
                 const changelogMessage = `Effekt ${installedVersion} has been updated. Would you like to view the changelog?`;
                 const changelogResponse = await vscode.window.showInformationMessage(changelogMessage, 'Yes', 'No');
