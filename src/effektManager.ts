@@ -307,19 +307,7 @@ export class EffektManager {
 
             // check if the latest version strictly newer than the current version
             if (!this.effektVersion || compareVersion(latestVersion, this.effektVersion, '>')) {
-                const installedVersion = await this.promptForAction(latestVersion, 'update');
-                if(installedVersion != ''){
-                    // After installation or update is complete, offer to open the changelog
-                    const changelogMessage = `Effekt ${installedVersion} has been updated. Would you like to view the changelog?`;
-                    const changelogResponse = await vscode.window.showInformationMessage(changelogMessage, 'Yes', 'No');
-
-                    if (changelogResponse === 'Yes') {
-                        const changelogUrl = `https://github.com/effekt-lang/effekt/releases/tag/v${installedVersion}`;
-                        vscode.env.openExternal(vscode.Uri.parse(changelogUrl));
-                    }
-                }
-                return installedVersion;
-                
+                return  this.promptForAction(latestVersion, 'update');
             }
 
             this.updateStatusBar();
@@ -348,7 +336,17 @@ export class EffektManager {
 
         const response = await vscode.window.showInformationMessage(message, 'Yes', 'No');
         if (response === 'Yes') {
-            return this.installOrUpdateEffekt(version, action);
+            const installedVersion = await this.installOrUpdateEffekt(version, action);
+            if(installedVersion != ''){
+                // After installation or update is complete, offer to open the changelog
+                const changelogMessage = `Effekt ${installedVersion} has been updated. Would you like to view the changelog?`;
+                const changelogResponse = await vscode.window.showInformationMessage(changelogMessage, 'Yes', 'No');
+
+                if (changelogResponse === 'Yes') {
+                    const changelogUrl = `https://github.com/effekt-lang/effekt/releases/tag/v${installedVersion}`;
+                    vscode.env.openExternal(vscode.Uri.parse(changelogUrl));
+                }
+            }
         }
         this.updateStatusBar();
         return this.effektVersion || '';
