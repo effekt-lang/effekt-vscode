@@ -307,7 +307,19 @@ export class EffektManager {
 
             // check if the latest version strictly newer than the current version
             if (!this.effektVersion || compareVersion(latestVersion, this.effektVersion, '>')) {
-                return this.promptForAction(latestVersion, 'update');
+                const installedVersion = await this.promptForAction(latestVersion, 'update');
+                if(installedVersion != ''){
+                    // After installation or update is complete, offer to open the changelog
+                    const changelogMessage = `Effekt ${installedVersion} has been updated. Would you like to view the changelog?`;
+                    const changelogResponse = await vscode.window.showInformationMessage(changelogMessage, 'Yes', 'No');
+
+                    if (changelogResponse === 'Yes') {
+                        const changelogUrl = `https://github.com/effekt-lang/effekt/releases/tag/v${installedVersion}`;
+                        vscode.env.openExternal(vscode.Uri.parse(changelogUrl));
+                    }
+                }
+                return installedVersion;
+                
             }
 
             this.updateStatusBar();
