@@ -38,7 +38,8 @@
     "definitions": {
       "patterns": [{
           "begin": "\\s*(extern)\\s+((?:(?:\\{[^\\}]*\\}|[a-zA-Z][a-z-A-Z0-9_$]*)\\s+)?)\\s*(def)\\s+([a-zA-Z][a-z-A-Z0-9_$]*)\\b",
-          "end": "(?=\\n)|(?<=\\S)\\s*(?==(?!>))",
+          "end": "(?=//|\\n)|(?<=\\S)\\s*(?==(?!>))"
+,
           "captures": {
             "1": { "name": "storage.modifier.extern.effekt" },
             "2": { "patterns": [{ "include": "#capabilities" }] },
@@ -48,7 +49,8 @@
           "patterns": [{ "include": "#parameters" }]
         }, {
           "begin": "\\s*(def)\\s+([a-zA-Z][a-z-A-Z0-9_$]*)\\b",
-          "end": "(?=\\n)|(?<=\\S)\\s*(?==(?!>))",
+          "end": "(?=//|\\n)|(?<=\\S)\\s*(?==(?!>))"
+,
           "captures": {
             "1": { "name": "keyword.declaration.function.effekt" },
             "2": { "name": "entity.name.function.effekt" }
