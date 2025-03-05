@@ -517,7 +517,12 @@ export class EffektManager {
         if (effektLib) args.push("--lib", effektLib);
 
         const folders = vscode.workspace.workspaceFolders || [];
-        folders.forEach(folder => args.push("--includes", folder.uri.fsPath));
+        // We deliberately use folder.uri.path rather than folder.uri.fsPath
+        // While the effekt binary is able to handle either, Git Bash on Windows
+        // cannot handle backslashes in paths.
+        // Using folder.uri.path rather than folder.uri.fsPath means that Effekt tasks
+        // works in PowerShell, cmd.exe and Git Bash.
+        folders.forEach(folder => args.push("--includes", folder.uri.path));
 
         return args;
     }

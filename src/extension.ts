@@ -41,7 +41,12 @@ async function runEffektFile(uri: vscode.Uri) {
     }
 
     const effektExecutable = await effektManager.locateEffektExecutable();
-    const args = [uri.fsPath, ...effektManager.getEffektArgs()];
+    // We deliberately use uri.path rather than uri.fsPath
+    // While the effekt binary is able to handle either, Git Bash on Windows
+    // cannot handle backslashes in paths.
+    // Using uri.path rather than uri.fsPath means that Effekt tasks
+    // works in PowerShell, cmd.exe and Git Bash.
+    const args = [uri.path, ...effektManager.getEffektArgs()];
 
     const taskDefinition = {
         type: 'shell',
