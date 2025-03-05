@@ -203,17 +203,16 @@ export async function activate(context: vscode.ExtensionContext) {
         timeout = setTimeout(updateHoles, 50);
     }
 
+
     function updateCaptures() {
         if (!editor) { return; }
 
         if (!config.get<boolean>("showCaptures")) { return; }
 
-        client.sendRequest(ExecuteCommandRequest.type, {
-            command: "inferredCaptures", arguments: [{
-                uri: editor.document.uri.toString()
-            }]
-        }).then(
-            (result: [{ location: vscode.Location, captureText: string }]) => {
+        client.sendRequest(ExecuteCommandRequest.type, { command: "inferredCaptures", arguments: [{
+            uri: editor.document.uri.toString()
+        }]}).then(
+            (result : [{ location: vscode.Location, captureText: string }]) => {
                 if (!editor) { return; }
 
                 let captureAnnotations: vscode.DecorationOptions[] = [];
