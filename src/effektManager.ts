@@ -308,6 +308,8 @@ export class EffektManager {
             // check if the latest version strictly newer than the current version
             if (!this.effektVersion || compareVersion(latestVersion, this.effektVersion, '>')) {
                 return this.promptForAction(latestVersion, 'update');
+            } else {
+                vscode.window.showInformationMessage(`Effekt is up-to-date (version ${this.effektVersion}).`);
             }
 
             this.updateStatusBar();
