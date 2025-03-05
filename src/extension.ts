@@ -16,7 +16,6 @@ import * as net from 'net';
 
 let client: LanguageClient;
 let effektManager: EffektManager;
-let effektRunnerTerminal: vscode.Terminal | null = null;
 
 function registerCommands(context: vscode.ExtensionContext) {
     context.subscriptions.push(
@@ -119,15 +118,6 @@ export async function activate(context: vscode.ExtensionContext) {
             { language: 'literate effekt', scheme: 'file' },
             new EffektRunCodeLensProvider()
         )
-    );
-
-    // Clean up REPL when closed
-    context.subscriptions.push(
-        vscode.window.onDidCloseTerminal(terminal => {
-            if (terminal === effektRunnerTerminal) {
-                effektRunnerTerminal = null;
-            }
-        })
     );
 
     const config = vscode.workspace.getConfiguration("effekt");
@@ -304,7 +294,6 @@ export async function activate(context: vscode.ExtensionContext) {
 }
 
 export function deactivate(): Thenable<void> | undefined {
-    if (effektRunnerTerminal) effektRunnerTerminal.dispose();
     if (!client) {
         return undefined;
     }
