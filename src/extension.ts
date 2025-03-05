@@ -16,7 +16,6 @@ import * as net from 'net';
 
 let client: LanguageClient;
 let effektManager: EffektManager;
-let effektRunnerTerminal: vscode.Terminal | null = null;
 
 function registerCommands(context: vscode.ExtensionContext) {
     context.subscriptions.push(
@@ -33,17 +32,6 @@ function registerCommands(context: vscode.ExtensionContext) {
     );
 }
 
-async function getEffektTerminal() {
-    if (effektRunnerTerminal === null || effektRunnerTerminal.exitStatus !== undefined) {
-        effektRunnerTerminal = vscode.window.createTerminal({
-            name: 'Effekt Runner',
-            isTransient: true, // Don't persist across VSCode restarts
-        });
-        effektRunnerTerminal.hide();
-    }
-    return effektRunnerTerminal;
-}
-
 async function runEffektFile(uri: vscode.Uri) {
     // Save the document if it has unsaved changes
     const document = await vscode.workspace.openTextDocument(uri);
@@ -51,14 +39,41 @@ async function runEffektFile(uri: vscode.Uri) {
         await document.save();
     }
 
-    const terminal = await getEffektTerminal();
-
     const effektExecutable = await effektManager.locateEffektExecutable();
-    const args = [ uri.fsPath, ...effektManager.getEffektArgs() ];
+    // We deliberately use uri.path rather than uri.fsPath
+    // While the effekt binary is able to handle either, Git Bash on Windows
+    // cannot handle backslashes in paths.
+    // Using uri.path rather than uri.fsPath means that Effekt tasks
+    // works in PowerShell, cmd.exe and Git Bash.
+    const args = [uri.path, ...effektManager.getEffektArgs()];
 
-    terminal.sendText("clear");
-    terminal.sendText(`${effektExecutable.path} ${args.join(' ')}`);
-    terminal.show();
+    const taskDefinition = {
+        type: 'shell',
+        command: effektExecutable.path,
+        args: args,
+        presentation: {
+            reveal: vscode.TaskRevealKind.Always,
+            panel: vscode.TaskPanelKind.Dedicated,
+            clear: true
+        }
+    };
+
+    const execution = new vscode.ShellExecution(
+        effektExecutable.path,
+        args,
+        { cwd: vscode.workspace.workspaceFolders?.[0]?.uri.fsPath }
+    );
+
+    const task = new vscode.Task(
+        taskDefinition,
+        vscode.TaskScope.Workspace,
+        'Run Effekt File',
+        'Effekt',
+        execution,
+        []
+    );
+
+    await vscode.tasks.executeTask(task);
 }
 
 class EffektRunCodeLensProvider implements vscode.CodeLensProvider {
@@ -103,15 +118,6 @@ export async function activate(context: vscode.ExtensionContext) {
             { language: 'literate effekt', scheme: 'file' },
             new EffektRunCodeLensProvider()
         )
-    );
-
-    // Clean up REPL when closed
-    context.subscriptions.push(
-        vscode.window.onDidCloseTerminal(terminal => {
-            if (terminal === effektRunnerTerminal) {
-                effektRunnerTerminal = null;
-            }
-        })
     );
 
     const config = vscode.workspace.getConfiguration("effekt");
@@ -196,6 +202,7 @@ export async function activate(context: vscode.ExtensionContext) {
         if (timeout) { clearTimeout(timeout); }
         timeout = setTimeout(updateHoles, 50);
     }
+
 
     function updateCaptures() {
         if (!editor) { return; }
@@ -286,7 +293,6 @@ export async function activate(context: vscode.ExtensionContext) {
 }
 
 export function deactivate(): Thenable<void> | undefined {
-    if (effektRunnerTerminal) effektRunnerTerminal.dispose();
     if (!client) {
         return undefined;
     }
