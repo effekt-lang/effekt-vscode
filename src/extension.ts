@@ -33,17 +33,6 @@ function registerCommands(context: vscode.ExtensionContext) {
     );
 }
 
-async function getEffektTerminal() {
-    if (effektRunnerTerminal === null || effektRunnerTerminal.exitStatus !== undefined) {
-        effektRunnerTerminal = vscode.window.createTerminal({
-            name: 'Effekt Runner',
-            isTransient: true, // Don't persist across VSCode restarts
-        });
-        effektRunnerTerminal.hide();
-    }
-    return effektRunnerTerminal;
-}
-
 async function runEffektFile(uri: vscode.Uri) {
     // Save the document if it has unsaved changes
     const document = await vscode.workspace.openTextDocument(uri);
@@ -51,14 +40,36 @@ async function runEffektFile(uri: vscode.Uri) {
         await document.save();
     }
 
-    const terminal = await getEffektTerminal();
-
     const effektExecutable = await effektManager.locateEffektExecutable();
-    const args = [ uri.fsPath, ...effektManager.getEffektArgs() ];
+    const args = [uri.fsPath, ...effektManager.getEffektArgs()];
 
-    terminal.sendText("clear");
-    terminal.sendText(`${effektExecutable.path} ${args.join(' ')}`);
-    terminal.show();
+    const taskDefinition = {
+        type: 'shell',
+        command: effektExecutable.path,
+        args: args,
+        presentation: {
+            reveal: vscode.TaskRevealKind.Always,
+            panel: vscode.TaskPanelKind.Dedicated,
+            clear: true
+        }
+    };
+
+    const execution = new vscode.ShellExecution(
+        effektExecutable.path,
+        args,
+        { cwd: vscode.workspace.workspaceFolders?.[0]?.uri.fsPath }
+    );
+
+    const task = new vscode.Task(
+        taskDefinition,
+        vscode.TaskScope.Workspace,
+        'Run Effekt File',
+        'Effekt',
+        execution,
+        []
+    );
+
+    await vscode.tasks.executeTask(task);
 }
 
 class EffektRunCodeLensProvider implements vscode.CodeLensProvider {
@@ -202,10 +213,12 @@ export async function activate(context: vscode.ExtensionContext) {
 
         if (!config.get<boolean>("showCaptures")) { return; }
 
-        client.sendRequest(ExecuteCommandRequest.type, { command: "inferredCaptures", arguments: [{
-            uri: editor.document.uri.toString()
-        }]}).then(
-            (result : [{ location: vscode.Location, captureText: string }]) => {
+        client.sendRequest(ExecuteCommandRequest.type, {
+            command: "inferredCaptures", arguments: [{
+                uri: editor.document.uri.toString()
+            }]
+        }).then(
+            (result: [{ location: vscode.Location, captureText: string }]) => {
                 if (!editor) { return; }
 
                 let captureAnnotations: vscode.DecorationOptions[] = [];
