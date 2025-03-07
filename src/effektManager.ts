@@ -338,8 +338,24 @@ export class EffektManager {
 
         const response = await vscode.window.showInformationMessage(message, 'Yes', 'No');
         if (response === 'Yes') {
-            return this.installOrUpdateEffekt(version, action);
-        }
+            const installedVersion = await this.installOrUpdateEffekt(version, action);
+            if (!!installedVersion) {
+                const isUpdate = action === 'update';
+                const actionCompleted = isUpdate ? 'updated' : 'installed';
+                const changelogMessage = `Effekt ${installedVersion} has been ${actionCompleted}`;
+            
+                const options = isUpdate ? ['View Release Notes', 'Close'] : ['View Language Introduction', 'Close'];
+                const changelogResponse = await vscode.window.showInformationMessage(changelogMessage, ...options);
+            
+                if (changelogResponse === 'View Release Notes') {
+                    const changelogUrl = `https://github.com/effekt-lang/effekt/releases/tag/v${installedVersion}`;
+                    vscode.env.openExternal(vscode.Uri.parse(changelogUrl));
+                } else if (changelogResponse === 'View Language Introduction') {
+                    const introUrl = 'https://effekt-lang.org/docs/introduction';
+                    vscode.env.openExternal(vscode.Uri.parse(introUrl));
+                }
+            }
+        }            
         this.updateStatusBar();
         return this.effektVersion || '';
     }
