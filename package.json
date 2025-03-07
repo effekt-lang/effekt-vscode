@@ -117,11 +117,6 @@
                     "default": true,
                     "description": "Display additional information when hovering over identifier."
                 },
-                "effekt.showCaptures": {
-                    "type": "boolean",
-                    "default": false,
-                    "description": "Show additional information about resources used by a function."
-                },
                 "effekt.showIR": {
                     "type": "string",
                     "default": "none",
