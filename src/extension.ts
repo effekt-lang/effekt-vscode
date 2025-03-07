@@ -5,7 +5,6 @@ import {
     LanguageClient,
     LanguageClientOptions,
     ServerOptions,
-    ExecuteCommandRequest,
     StreamInfo,
     State as ClientState
 } from 'vscode-languageclient/node';
@@ -191,9 +190,6 @@ export async function activate(context: vscode.ExtensionContext) {
         dark: { backgroundColor: "rgba(255,255,255,0.05)" }
     });
 
-    // the decorations themselves don't have styles. Only the added before-elements.
-    const captureDecoration = vscode.window.createTextEditorDecorationType({});
-
     // based on https://github.com/microsoft/vscode-extension-samples/blob/master/decorator-sample/src/extension.ts
     let timeout: NodeJS.Timeout;
     let editor = vscode.window.activeTextEditor;
@@ -201,47 +197,6 @@ export async function activate(context: vscode.ExtensionContext) {
     function scheduleDecorations() {
         if (timeout) { clearTimeout(timeout); }
         timeout = setTimeout(updateHoles, 50);
-    }
-
-
-    function updateCaptures() {
-        if (!editor) { return; }
-
-        if (!config.get<boolean>("showCaptures")) { return; }
-
-        client.sendRequest(ExecuteCommandRequest.type, { command: "inferredCaptures", arguments: [{
-            uri: editor.document.uri.toString()
-        }]}).then(
-            (result : [{ location: vscode.Location, captureText: string }]) => {
-                if (!editor) { return; }
-
-                let captureAnnotations: vscode.DecorationOptions[] = [];
-
-                if (result == null) return;
-
-                result.forEach(response => {
-                    if (!editor) { return; }
-                    const loc = response.location;
-                    if (loc.uri != editor.document.uri) return;
-
-                    captureAnnotations.push({
-                        range: loc.range,
-                        renderOptions: {
-                            before: {
-                                contentText: response.captureText,
-                                backgroundColor: "rgba(170,210,255,0.3)",
-                                color: "rgba(50,50,50,0.5)",
-                                fontStyle: "italic",
-                                margin: "0 0.5em 0 0.5em"
-                            }
-                        }
-                    });
-                });
-
-                if (!editor) { return; }
-                return editor.setDecorations(captureDecoration, captureAnnotations);
-            }
-        );
     }
 
     const holeRegex = /<>|<{|}>/g;
@@ -281,10 +236,6 @@ export async function activate(context: vscode.ExtensionContext) {
             scheduleDecorations();
         }
     }, null, context.subscriptions);
-
-    vscode.workspace.onDidSaveTextDocument(ev => {
-        setTimeout(updateCaptures, 50);
-    });
 
     scheduleDecorations();
 
