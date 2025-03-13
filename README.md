@@ -17,3 +17,9 @@ As a last step, you might need to set the path to the `effekt` binary in the VSC
 For Mac OS and Unix users this probably works out of the box after installing `effekt` with npm (that is, once the `effekt` command is in your path). For Windows users, you might need to set the path to `effekt.cmd`.
 
 With this setup the extension should start the server when an Effekt file is opened.
+
+## Inlay Hints
+
+This extension supports inlay hints that can display useful information about Effekt programs that is not explicitly written out in the source code.
+For example, this includes showing inferred types and [Effekt captures](https://effekt-lang.org/tour/captures).
+You can enable inlay hints in the [VSCode settings](vscode://settings/editor.inlayHints.enabled) at `Editor › Inlay Hints: Enabled`.
