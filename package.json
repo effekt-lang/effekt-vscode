@@ -146,6 +146,11 @@
                     "type": "string",
                     "description": "Path to the standard library."
                 },
+                "effekt.updateOnChange": {
+                    "type": "boolean",
+                    "default": false,
+                    "markdownDescription": "Process file on every change, even when not saved. When disabled, autocomplete may not work reliably.\n\n⚠️ **WARNING:** This option is experimental and may break other features in unexpected ways."
+                },
                 "effekt.debug": {
                     "type": "boolean",
                     "default": false,
