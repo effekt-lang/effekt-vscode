@@ -251,7 +251,11 @@ export async function activate(context: vscode.ExtensionContext) {
         const uri = vscode.Uri.parse(`effekt-ir:${filename}`);
         effektIRContentProvider.update(uri, content);
         vscode.workspace.openTextDocument(uri).then(doc => {
-            vscode.window.showTextDocument(doc, { viewColumn: vscode.ViewColumn.Beside, preview: false });
+            vscode.window.showTextDocument(doc, {
+                viewColumn: vscode.ViewColumn.Beside,
+                preview: false,
+                preserveFocus: true
+            });
         });
     });
 
