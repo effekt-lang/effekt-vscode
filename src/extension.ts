@@ -152,6 +152,7 @@ export async function activate(context: vscode.ExtensionContext) {
     }
 
     let clientOptions: LanguageClientOptions = {
+        initializationOptions: vscode.workspace.getConfiguration('effekt'),
         documentSelector: [
             { scheme: 'file', language: 'effekt' },
             { scheme: 'file', language: 'literate effekt' }
