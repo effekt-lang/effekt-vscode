@@ -10,6 +10,7 @@ import {
 } from 'vscode-languageclient/node';
 import { EffektManager } from './effektManager';
 import { Monto } from './monto';
+import { EffektIRContentProvider } from './irProvider';
 
 import * as net from 'net';
 
@@ -152,6 +153,7 @@ export async function activate(context: vscode.ExtensionContext) {
     }
 
     let clientOptions: LanguageClientOptions = {
+        initializationOptions: vscode.workspace.getConfiguration('effekt'),
         documentSelector: [
             { scheme: 'file', language: 'effekt' },
             { scheme: 'file', language: 'literate effekt' }
@@ -238,6 +240,24 @@ export async function activate(context: vscode.ExtensionContext) {
     }, null, context.subscriptions);
 
     scheduleDecorations();
+
+    const effektIRContentProvider = new EffektIRContentProvider();
+    context.subscriptions.push(
+        vscode.workspace.registerTextDocumentContentProvider('effekt-ir', effektIRContentProvider)
+    );
+
+    client.onNotification('$/effekt/publishIR', (params: { filename: string, content: string }) => {
+        const { filename, content } = params;
+        const uri = vscode.Uri.parse(`effekt-ir:${filename}`);
+        effektIRContentProvider.update(uri, content);
+        vscode.workspace.openTextDocument(uri).then(doc => {
+            vscode.window.showTextDocument(doc, {
+                viewColumn: vscode.ViewColumn.Beside,
+                preview: false,
+                preserveFocus: true
+            });
+        });
+    });
 
     await client.start();
     context.subscriptions.push(client);
