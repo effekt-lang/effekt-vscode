@@ -46,7 +46,7 @@
             "4": { "name": "entity.name.function.effekt" }
           },
           "patterns": [{ "include": "#parameters" },
-          { "include": "#comments" }]
+                       { "include": "#comments" }]
         }, {
           "begin": "\\s*(def)\\s+([a-zA-Z][a-z-A-Z0-9_$]*)\\b",
           "end": "(?=\\n)|(?<=\\S)\\s*(?==(?!>))",
