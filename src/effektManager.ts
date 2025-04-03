@@ -264,14 +264,25 @@ export class EffektManager {
         }
     }
 
-    private handleInstallationResult(result: InstallationResult, action: 'install' | 'update'): void {
+    private async handleInstallationResult(result: InstallationResult, action: 'install' | 'update'): Promise<void> {
         if (result.success && result.version) {
             const baseMessage = `Effekt has been ${action === 'update' ? 'updated' : 'installed'} to version ${result.version}.`;
 
             if (result.executable && !result.executable.includes(path.sep)) {
-                // Effekt is in PATH
-                vscode.window.showInformationMessage(baseMessage);
-                this.logMessage('INFO', baseMessage);
+                // Effekt is in PATH            
+                const isUpdate = action === 'update';
+                
+                const options = isUpdate ? ['View Release Notes', 'Close'] : ['View Language Introduction', 'Close'];
+                const changelogResponse = await vscode.window.showInformationMessage(baseMessage, ...options);
+            
+                if (changelogResponse === 'View Release Notes') {
+                    const changelogUrl = `https://github.com/effekt-lang/effekt/releases/tag/v${result.version}`;
+                    vscode.env.openExternal(vscode.Uri.parse(changelogUrl));
+                } else if (changelogResponse === 'View Language Introduction') {
+                    const introUrl = 'https://effekt-lang.org/docs/introduction';
+                    vscode.env.openExternal(vscode.Uri.parse(introUrl));
+                }
+                                    
             } else {
                 // Effekt is not in PATH
                 const fullMessage = `${baseMessage}\n${result.message}\nConsider adding it to your PATH for easier access.`;
@@ -336,24 +347,8 @@ export class EffektManager {
 
         const response = await vscode.window.showInformationMessage(message, 'Yes', 'No');
         if (response === 'Yes') {
-            const installedVersion = await this.installOrUpdateEffekt(version, action);
-            if (!!installedVersion) {
-                const isUpdate = action === 'update';
-                const actionCompleted = isUpdate ? 'updated' : 'installed';
-                const changelogMessage = `Effekt ${installedVersion} has been ${actionCompleted}`;
-            
-                const options = isUpdate ? ['View Release Notes', 'Close'] : ['View Language Introduction', 'Close'];
-                const changelogResponse = await vscode.window.showInformationMessage(changelogMessage, ...options);
-            
-                if (changelogResponse === 'View Release Notes') {
-                    const changelogUrl = `https://github.com/effekt-lang/effekt/releases/tag/v${installedVersion}`;
-                    vscode.env.openExternal(vscode.Uri.parse(changelogUrl));
-                } else if (changelogResponse === 'View Language Introduction') {
-                    const introUrl = 'https://effekt-lang.org/docs/introduction';
-                    vscode.env.openExternal(vscode.Uri.parse(introUrl));
-                }
-            }
-        }            
+            return this.installOrUpdateEffekt(version, action);
+        }
         this.updateStatusBar();
         return this.effektVersion || '';
     }
