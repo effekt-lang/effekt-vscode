@@ -9,7 +9,6 @@ import {
     State as ClientState
 } from 'vscode-languageclient/node';
 import { EffektManager } from './effektManager';
-import { Monto } from './monto';
 import { EffektIRContentProvider } from './irProvider';
 
 import * as net from 'net';
@@ -178,8 +177,6 @@ export async function activate(context: vscode.ExtensionContext) {
             effektManager.updateServerStatus('stopped');
         }
     });
-
-    Monto.setup("effekt", context, client);
 
     // Decorate holes
     // ---

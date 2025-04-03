@@ -25,5 +25,4 @@ You can enable inlay hints in the [VSCode settings](vscode://settings/editor.inl
 
 ## License
 
-The file `src/monto.ts` is based on [Tony Sloane's minijava-vscode](https://github.com/inkytonik/minijava-vscode/) and licensed under the MPL 2.0. See [LICENSE-MPL](LICENSE-MPL) for details.
-The remainder of this project is licensed under the MIT license. See [LICENSE-MIT](LICENSE-MIT) for details.
+This project is licensed under the MIT license. See [LICENSE](LICENSE) for details.
