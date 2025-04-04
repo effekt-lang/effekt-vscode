@@ -156,11 +156,6 @@
         "commands": [
             {
                 "category": "Effekt",
-                "command": "effekt.selectLinkedEditors",
-                "title": "Focus Product Editors"
-            },
-            {
-                "category": "Effekt",
                 "command": "effekt.checkForUpdates",
                 "title": "Check for Effekt Updates"
             },
@@ -170,14 +165,7 @@
                 "title": "Restart LSP Server"
             }
         ],
-        "keybindings": [
-            {
-                "command": "effekt.selectLinkedEditors",
-                "key": "ctrl+alt+p",
-                "mac": "cmd+alt+p",
-                "when": "editorTextFocus && editorLangId == 'effekt'"
-            }
-        ],
+        "keybindings": [],
         "configurationDefaults": {
             "[effekt]": {
                 "editor.tabSize": 2,
