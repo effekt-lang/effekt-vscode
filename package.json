@@ -124,7 +124,6 @@
                         "none",
                         "source",
                         "core",
-                        "lifted-core",
                         "machine",
                         "target"
                     ],
@@ -132,7 +131,6 @@
                         "Disable showing intermediate representation.",
                         "Show source tree after parsing.",
                         "Show the core intermediate representation after capability-passing transformation.",
-                        "Show the core intermediate representation after lift inference.",
                         "Show the machine representation.",
                         "Show the generated code in the target language."
                     ]
