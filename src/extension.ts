@@ -7,7 +7,8 @@ import {
     ServerOptions,
     ExecuteCommandRequest,
     StreamInfo,
-    State as ClientState
+    State as ClientState,
+    NotebookDocument,
 } from 'vscode-languageclient/node';
 import { EffektManager } from './effektManager';
 import { Monto } from './monto';
@@ -283,13 +284,15 @@ export async function activate(context: vscode.ExtensionContext) {
 
     scheduleDecorations();
 
-    context.subscriptions.push(client.start());
-
     // Notebook
     context.subscriptions.push(
+        //Notebook registration
         vscode.workspace.registerNotebookSerializer('effekt-notebook', new NotebookSerializer()),
-        new Controller(client),
+        new Controller(client, effektManager),
     );
+    
+    await client.start();
+    context.subscriptions.push(client);
 }
 
 export function deactivate(): Thenable<void> | undefined {
