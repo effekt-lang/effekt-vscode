@@ -10,7 +10,7 @@ import {
 } from 'vscode-languageclient/node';
 import { EffektManager } from './effektManager';
 import { EffektIRContentProvider } from './irProvider';
-
+import { InlayHintProvider } from './InlayHintsProvider';
 import * as net from 'net';
 
 let client: LanguageClient;
@@ -258,6 +258,12 @@ export async function activate(context: vscode.ExtensionContext) {
 
     await client.start();
     context.subscriptions.push(client);
+
+    // Register Inlay Hints Provider
+    vscode.languages.registerInlayHintsProvider(
+        { scheme: 'file', language: 'effekt' },
+        new InlayHintProvider(client)
+    );
 }
 
 export function deactivate(): Thenable<void> | undefined {
