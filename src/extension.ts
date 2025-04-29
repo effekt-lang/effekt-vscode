@@ -103,11 +103,15 @@ export async function activate(context: vscode.ExtensionContext) {
     // Start the LSP immediately, even before checking for updates
     await startEffektLanguageServer(context);
 
+    // Register commands, CodeLens providers, and IR provider first
     registerCommands(context);
     registerCodeLensProviders(context);
     registerIRProvider(context);
 
- 
+    // Initialize hole decorations
+    initializeHoleDecorations(context);
+
+    // Check for updates and handle accordingly
     const effektVersion = await effektManager.checkForUpdatesAndInstall();
     if (!effektVersion) {
         vscode.window.showWarningMessage('Effekt is not installed. LSP features may not work correctly.');
@@ -117,7 +121,6 @@ export async function activate(context: vscode.ExtensionContext) {
     } else {
         vscode.window.showInformationMessage('Using the existing version of Effekt.');
     }
-
    
 }
 
@@ -140,6 +143,11 @@ async function startEffektLanguageServer(context: vscode.ExtensionContext) {
         const effektExecutable = await effektManager.locateEffektExecutable();
         const args = ["--server", ...effektManager.getEffektArgs()];
 
+        /* > Node.js will now error with EINVAL if a .bat or .cmd file is passed to child_process.spawn and child_process.spawnSync without the shell option set.
+         * > If the input to spawn/spawnSync is sanitized, users can now pass { shell: true } as an option to prevent the occurrence of EINVALs errors.
+         *
+         * https://nodejs.org/en/blog/vulnerability/april-2024-security-releases-2
+         */
         const isWindows = process.platform === 'win32';
         const execOptions = { shell: isWindows };
 
@@ -218,6 +226,61 @@ function registerIRProvider(context: vscode.ExtensionContext) {
             });
         });
     });
+}
+
+// Initialize hole decorations
+function initializeHoleDecorations(context: vscode.ExtensionContext) {
+    const holeDelimiterDecoration = vscode.window.createTextEditorDecorationType({
+        opacity: '0.5',
+        borderRadius: '4pt',
+        light: { backgroundColor: "rgba(0,0,0,0.05)" },
+        dark: { backgroundColor: "rgba(255,255,255,0.05)" }
+    });
+
+    let timeout: NodeJS.Timeout;
+    let editor = vscode.window.activeTextEditor;
+
+    function scheduleDecorations() {
+        if (timeout) { clearTimeout(timeout); }
+        timeout = setTimeout(updateHoles, 50);
+    }
+
+    const holeRegex = /<>|<{|}>/g;
+
+    function updateHoles() {
+        if (!editor) { return; }
+
+        const text = editor.document.getText();
+        const positionAt = editor.document.positionAt;
+
+        let holeDelimiters: vscode.DecorationOptions[] = [];
+        let match;
+
+        function addDelimiter(from: number, to: number) {
+            const begin = positionAt(from);
+            const end = positionAt(to);
+            holeDelimiters.push({ range: new vscode.Range(begin, end) });
+        }
+
+        while (match = holeRegex.exec(text)) {
+            addDelimiter(match.index, match.index + 2);
+        }
+
+        editor.setDecorations(holeDelimiterDecoration, holeDelimiters);
+    }
+
+    vscode.window.onDidChangeActiveTextEditor(ed => {
+        editor = ed;
+        scheduleDecorations();
+    }, null, context.subscriptions);
+
+    vscode.workspace.onDidChangeTextDocument(event => {
+        if (editor && event.document === editor.document) {
+            scheduleDecorations();
+        }
+    }, null, context.subscriptions);
+
+    scheduleDecorations();
 }
 
 export function deactivate(): Thenable<void> | undefined {
