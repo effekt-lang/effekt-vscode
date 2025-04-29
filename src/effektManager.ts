@@ -83,6 +83,11 @@ export class EffektManager {
         throw new Error("Unable to determine Effekt version");
     }
 
+    // DRAFT HELPER 
+    public async getEffektVersion(): Promise<string> {
+        return this.effektVersion || '';
+    }
+
     /**
      * Executes a shell command and returns the output.
      * @param command The command to execute.
