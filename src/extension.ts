@@ -228,8 +228,10 @@ function registerIRProvider(context: vscode.ExtensionContext) {
     });
 }
 
-// Initialize hole decorations
-function initializeHoleDecorations(context: vscode.ExtensionContext) {
+    // Decorate holes
+    // ---
+    // It would be nice if there was a way to reuse the scopes of the tmLanguage file
+    function initializeHoleDecorations(context: vscode.ExtensionContext) {
     const holeDelimiterDecoration = vscode.window.createTextEditorDecorationType({
         opacity: '0.5',
         borderRadius: '4pt',
@@ -237,6 +239,7 @@ function initializeHoleDecorations(context: vscode.ExtensionContext) {
         dark: { backgroundColor: "rgba(255,255,255,0.05)" }
     });
 
+    // based on https://github.com/microsoft/vscode-extension-samples/blob/master/decorator-sample/src/extension.ts
     let timeout: NodeJS.Timeout;
     let editor = vscode.window.activeTextEditor;
 
@@ -246,7 +249,10 @@ function initializeHoleDecorations(context: vscode.ExtensionContext) {
     }
 
     const holeRegex = /<>|<{|}>/g;
-
+    
+    /**
+     * TODO clean this up -- ideally move it to the language server
+     */
     function updateHoles() {
         if (!editor) { return; }
 
