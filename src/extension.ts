@@ -115,7 +115,7 @@ export async function activate(context: vscode.ExtensionContext) {
     const effektVersion = await effektManager.checkForUpdatesAndInstall();
     if (!effektVersion) {
         vscode.window.showWarningMessage('Effekt is not installed. LSP features may not work correctly.');
-    } else if (effektVersion !== await effektManager.getEffektVersion()) {
+    } else if (effektVersion !== await effektManager.getEffektVersion() /* THIS SHOULD BE REMOVED */) { 
         // If the version was updated, restart the server
         await restartEffektLanguageServer(context);
     } else {
