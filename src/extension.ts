@@ -113,10 +113,10 @@ export async function activate(context: vscode.ExtensionContext) {
 
     initializeHoleDecorations(context);
 
-    const effektVersion = await effektManager.checkForUpdatesAndInstall();
-    if (!effektVersion) {
+    const installedEffektVersion = await effektManager.checkForUpdatesAndInstall();
+    if (!installedEffektVersion) {
         vscode.window.showWarningMessage('Effekt is not installed. LSP features may not work correctly.');
-    } else if (effektVersion !== await effektManager.getEffektVersion()) { 
+    } else if (installedEffektVersion !== await effektManager.getEffektVersion()) { 
         await restartEffektLanguageServer(context);
     } else {
         logMessage('INFO', "Using the existing version of Effekt");        

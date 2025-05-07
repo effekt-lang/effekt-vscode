@@ -83,7 +83,14 @@ export class EffektManager {
         throw new Error("Unable to determine Effekt version");
     }
 
+    // this should eliminate other functions having the side-effect of changing the `effektVersion` field 
     public async getEffektVersion(): Promise<string> {
+        const effektPath = await this.locateEffektExecutable();
+
+        if (!this.effektVersion) {
+            const currentVersion = await this.fetchEffektVersion(effektPath.path);
+            this.effektVersion = currentVersion;
+        }
         return this.effektVersion || '';
     }
 
@@ -312,19 +319,14 @@ export class EffektManager {
      */
     public async checkForUpdatesAndInstall(): Promise<string> {
         try {
-            const effektPath = await this.locateEffektExecutable();
-            if (!this.effektVersion) {
-                const currentVersion = await this.fetchEffektVersion(effektPath.path);
-                this.effektVersion = currentVersion;
-            }
-
+            let currentVersion = await this.getEffektVersion();
             const latestVersion = await this.getLatestNPMVersion(this.effektNPMPackage);
 
             // check if the latest version strictly newer than the current version
-            if (!this.effektVersion || compareVersion(latestVersion, this.effektVersion, '>')) {
+            if (!currentVersion || compareVersion(latestVersion, currentVersion, '>')) {
                 return this.promptForAction(latestVersion, 'update');
             } else {
-                vscode.window.showInformationMessage(`Effekt is up-to-date (version ${this.effektVersion}).`);
+                vscode.window.showInformationMessage(`Effekt is up-to-date (version ${currentVersion}).`);
             }
 
             this.updateStatusBar();
