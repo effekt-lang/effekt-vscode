@@ -15,6 +15,11 @@ import * as net from 'net';
 
 let client: LanguageClient;
 let effektManager: EffektManager;
+let outputChannel = vscode.window.createOutputChannel("Effekt Extension")
+
+function logMessage(level: 'INFO' | 'ERROR', message: string) {
+    outputChannel.appendLine(`[${new Date().toISOString()}] ${level}: ${message}`);
+}
 
 function registerCommands(context: vscode.ExtensionContext) {
     context.subscriptions.push(
@@ -100,26 +105,21 @@ class EffektRunCodeLensProvider implements vscode.CodeLensProvider {
 export async function activate(context: vscode.ExtensionContext) {
     effektManager = new EffektManager();
 
-    // Start the LSP immediately, even before checking for updates
     await startEffektLanguageServer(context);
 
-    // Register commands, CodeLens providers, and IR provider first
     registerCommands(context);
     registerCodeLensProviders(context);
     registerIRProvider(context);
 
-    // Initialize hole decorations
     initializeHoleDecorations(context);
 
-    // Check for updates and handle accordingly
     const effektVersion = await effektManager.checkForUpdatesAndInstall();
     if (!effektVersion) {
         vscode.window.showWarningMessage('Effekt is not installed. LSP features may not work correctly.');
-    } else if (effektVersion !== await effektManager.getEffektVersion() /* THIS SHOULD BE REMOVED */) { 
-        // If the version was updated, restart the server
+    } else if (effektVersion !== await effektManager.getEffektVersion()) { 
         await restartEffektLanguageServer(context);
     } else {
-        vscode.window.showInformationMessage('Using the existing version of Effekt.');
+        logMessage('INFO', "Using the existing version of Effekt");        
     }
    
 }

@@ -83,7 +83,6 @@ export class EffektManager {
         throw new Error("Unable to determine Effekt version");
     }
 
-    // THIS SHOULD BE HANDLED DIFFERENTLY! 
     public async getEffektVersion(): Promise<string> {
         return this.effektVersion || '';
     }
