@@ -286,6 +286,11 @@ export async function activate(context: vscode.ExtensionContext) {
         { scheme: 'file', language: 'effekt' },
         new InlayHintProvider(client)
     );
+    
+    vscode.languages.registerInlayHintsProvider(
+        { scheme: 'file', language: 'literate effekt' },
+        new InlayHintProvider(client)
+    );
 }
 
 export function deactivate(): Thenable<void> | undefined {
