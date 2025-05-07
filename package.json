@@ -152,7 +152,7 @@
                 "effekt.inlayHints.captures": {
                     "type": "boolean",
                     "default": true,
-                    "description": "Show capture inlay hints."
+                    "markdownDescription": "Show capture inlay hints: \n\n ``` '{io}' def main(): Unit = { println(\" Hello Effekt! \") } ```"
                 }
             }
         },

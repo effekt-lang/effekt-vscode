@@ -38,7 +38,7 @@ export class InlayHintProvider implements vscode.InlayHintsProvider {
 
             const inlayHint = new vscode.InlayHint(
                 new vscode.Position(hint.position.line, hint.position.character),
-                hint.label
+                hint.label + ' ' // add a whitespace to restore legacy layout
             );
             inlayHint.kind = hint.kind;
             inlayHint.tooltip = hint.tooltip;
