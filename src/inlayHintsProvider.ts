@@ -1,11 +1,14 @@
 import * as vscode from 'vscode';
-import { LanguageClient } from 'vscode-languageclient/node';
+import { LanguageClient, Protocol2CodeConverter } from 'vscode-languageclient/node';
+import * as lsp from 'vscode-languageserver-protocol';
 
 export class InlayHintProvider implements vscode.InlayHintsProvider {
     private client: LanguageClient;
+    private converter: Protocol2CodeConverter;
 
     constructor(client: LanguageClient) {
         this.client = client;
+        this.converter = client.protocol2CodeConverter;
     }
 
     async provideInlayHints(
@@ -21,7 +24,7 @@ export class InlayHintProvider implements vscode.InlayHintsProvider {
         if (editorHintsEnabled === 'off') {
             return [];
         }
-
+        console.log("Im here :)")
         // Fetch inlay hints from the language server
         const response = await this.client.sendRequest('textDocument/inlayHint', {
             textDocument: { uri: document.uri.toString() },
@@ -29,37 +32,26 @@ export class InlayHintProvider implements vscode.InlayHintsProvider {
                 start: { line: range.start.line, character: range.start.character },
                 end: { line: range.end.line, character: range.end.character }
             }
-        }) as { 
-            position: { line: number, character: number }, 
-            label: string, 
-            kind?: vscode.InlayHintKind, 
-            tooltip?: string, 
-            data?: string,
-            paddingRight?: boolean, 
-            paddingLeft? : boolean
-        }[];
+        }) 
 
-        // Filter inlay hints based on user preferences
-        const hints: vscode.InlayHint[] = [];
-        for (const hint of response) {
-            if (hint.data === 'capture' && !showCaptureHints) continue;
-
-            // Apply padding based on the response
-            if (hint.paddingRight) {
-                hint.label = hint.label + ' ';
-            }
-            if (hint.paddingLeft) {
-                hint.label = ' ' + hint.label;
-            }
-            const inlayHint = new vscode.InlayHint(
-                new vscode.Position(hint.position.line, hint.position.character),
-                hint.label 
-            );
-            inlayHint.kind = hint.kind;
-            inlayHint.tooltip = hint.tooltip;
-            hints.push(inlayHint);
+        console.log("response")
+        if (!response) {
+            return [];
         }
+/*
+        // Filter and convert inlay hints using Protocol2CodeConverter
+        const filteredHints = response.filter(hint => {
+            if (hint.data === 'capture' && !showCaptureHints) {
+                return false;
+            }
+            return true;
+        });
+        console.log(filteredHints)
+        */
 
-        return hints;
+        let res =  await this.converter.asInlayHints(response) || [];
+        console.log(res)
+        return res
+
     }
 }
