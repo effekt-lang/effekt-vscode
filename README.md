@@ -22,6 +22,7 @@ With this setup the extension should start the server when an Effekt file is ope
 This extension supports inlay hints that can display useful information about Effekt programs that is not explicitly written out in the source code.
 For example, this includes showing inferred types and [Effekt captures](https://effekt-lang.org/tour/captures).
 You can enable inlay hints in the [VSCode settings](vscode://settings/editor.inlayHints.enabled) at `Editor › Inlay Hints: Enabled`.
+Currently you can choose if you want to display the capture inlay hints at `Effekt › Inlay Hints: Captures`.
 
 ## License
 
