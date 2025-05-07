@@ -25,7 +25,6 @@ export class InlayHintProvider implements vscode.InlayHintsProvider {
     const config = vscode.workspace.getConfiguration('effekt');
     const showCaptureHints = config.get<boolean>('inlayHints.captures', true);
 
-    // bail out if user has disabled inlay hints
     const editorHintsEnabled = vscode.workspace
       .getConfiguration('editor.inlayHints')
       .get<string>('enabled', 'on');
@@ -33,13 +32,11 @@ export class InlayHintProvider implements vscode.InlayHintsProvider {
       return [];
     }
 
-    // build an LSP‐style params object by converting from vscode types
     const params: InlayHintParams = {
       textDocument: this.code2protocol.asTextDocumentIdentifier(document),
-      range:this.code2protocol.asRange(range)
+      range: this.code2protocol.asRange(range)
     };
 
-    // send a strongly‐typed LSP request
     const response = (await this.client.sendRequest(
       InlayHintRequest.type,
       params
@@ -49,12 +46,10 @@ export class InlayHintProvider implements vscode.InlayHintsProvider {
       return [];
     }
 
-    // filter out unwanted hints before conversion
     const filtered = response.filter(h => {
       return !(h.data === 'capture' && !showCaptureHints);
     });
 
-    // convert the filtered LSP hints to vscode.InlayHint
     const hints = await this.protocol2code.asInlayHints(filtered, _token);
     return hints || [];
   }
