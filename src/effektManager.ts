@@ -172,7 +172,22 @@ export class EffektManager {
             }
         }
 
-        throw new Error('Effekt executable not found');
+        const npmRoot = await this.execCommand('npm root -g');
+        for (const execName of this.possibleEffektExecutables) {
+            const fullPath = path.join(npmRoot, execName);
+            if (await this.fileExists(fullPath)) {
+                try {
+                    const version = await this.fetchEffektVersion(fullPath);
+                    return {
+                        path: fullPath,
+                        version
+                    };
+                } catch {
+                    // Executable exists but doesn't work, continue to next
+                }
+            }
+        }
+        throw('Effekt executable not found');
     }
 
     /**
@@ -239,26 +254,6 @@ export class EffektManager {
                 version
             };
         } catch (error) {
-            // If locateEffektExecutable fails, try to locate in global npm directory
-            const npmRoot = await this.execCommand('npm root -g');
-
-            for (const execName of this.possibleEffektExecutables) {
-                const fullPath = path.join(npmRoot, execName);
-                if (await this.fileExists(fullPath)) {
-                    try {
-                        const version = await this.fetchEffektVersion(fullPath);
-                        return {
-                            success: true,
-                            executable: fullPath,
-                            message: `Effekt found at ${fullPath}, but not in PATH.`,
-                            version
-                        };
-                    } catch {
-                        // Executable exists but doesn't work, continue to next
-                    }
-                }
-            }
-
             return {
                 success: false,
                 message: "Effekt was installed but couldn't be located or executed. Please check your installation."

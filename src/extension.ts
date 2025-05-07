@@ -283,7 +283,6 @@ function registerInlayProvider(){
     }
 
     const holeRegex = /<>|<{|}>/g;
-    
     /**
      * TODO clean this up -- ideally move it to the language server
      */
