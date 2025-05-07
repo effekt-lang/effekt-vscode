@@ -14,12 +14,12 @@ import { InlayHintProvider } from './InlayHintsProvider';
 import * as net from 'net';
 
 /**
- * Overrides the `registerFeature` method to disable the automatic inlay hints feature.
+ * Overrides the `registerFeature` method to disable the built-in inlay hints feature.
  *
- * The LSP may provide inlay hints automatically, which can duplicate custom inlay hints 
- * provided by this extension. To ensure a consistient and controlled user experience, 
- * we intercept the registration of the inlay hints feature and prevent it from being registered.
- *
+ * By default the LanguageClient provides inlay hints automatically, which does not allow 
+ * for filtering Inlay Hints based on their 'data'-field. We use the 'data'-field to allow
+ * the user to select which inlay hints the extension should show.
+ * 
  * By doing this, we retain full control over how inlay hints are displayed, allowing us to
  * implement custom logic.
  *
