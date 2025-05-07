@@ -148,6 +148,11 @@
                     "type": "boolean",
                     "default": false,
                     "markdownDescription": "Connect to a running LSP server in debug mode. This setting is only for development of the VSCode plugin and the Effekt compiler.\n\n⚠️ **WARNING:** For this option to work, you first need to start `effekt --server --debug` as a separate process."
+                },
+                "effekt.inlayHints.captures": {
+                    "type": "boolean",
+                    "default": true,
+                    "markdownDescription": "Show capture inlay hints:\n\n ```effekt\n'{io}' def main(): Unit = { println(\" Hello Effekt! \") }\n```"
                 }
             }
         },

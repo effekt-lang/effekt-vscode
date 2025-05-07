@@ -10,10 +10,32 @@ import {
 } from 'vscode-languageclient/node';
 import { EffektManager } from './effektManager';
 import { EffektIRContentProvider } from './irProvider';
-
+import { InlayHintProvider } from './inlayHintsProvider';
 import * as net from 'net';
 
-let client: LanguageClient;
+/**
+ * Overrides the `registerFeature` method to disable the built-in inlay hints feature.
+ *
+ * By default the LanguageClient provides inlay hints automatically, which does not allow 
+ * for filtering Inlay Hints based on their 'data'-field. We use the 'data'-field to allow
+ * the user to select which inlay hints the extension should show.
+ * 
+ * By doing this, we retain full control over how inlay hints are displayed, allowing us to
+ * implement custom logic.
+ *
+ * Note: This approach relies on identifying the inlay hints feature by its constructor name
+ * (`InlayHintsFeature`). If the LSP implementation changes, this logic may need to be updated.
+ */
+class EffektLanguageClient extends LanguageClient {
+    public registerFeature(feature: any) {
+        if (feature.constructor.name === 'InlayHintsFeature') { 
+            return; 
+        }
+        super.registerFeature(feature);
+    }
+}
+
+let client: EffektLanguageClient;
 let effektManager: EffektManager;
 let outputChannel = vscode.window.createOutputChannel("Effekt Extension")
 
@@ -110,6 +132,7 @@ export async function activate(context: vscode.ExtensionContext) {
     registerCommands(context);
     registerCodeLensProviders(context);
     registerIRProvider(context);
+    registerInlayProvider();
 
     initializeHoleDecorations(context);
 
@@ -166,7 +189,7 @@ async function startEffektLanguageServer(context: vscode.ExtensionContext) {
         diagnosticCollectionName: "effekt"
     };
 
-    client = new LanguageClient(
+    client = new EffektLanguageClient(
         'effektLanguageServer',
         'Effekt Language Server',
         serverOptions,
@@ -228,6 +251,17 @@ function registerIRProvider(context: vscode.ExtensionContext) {
     });
 }
 
+function registerInlayProvider(){
+    vscode.languages.registerInlayHintsProvider(
+        { scheme: 'file', language: 'effekt' },
+        new InlayHintProvider(client)
+    );
+
+    vscode.languages.registerInlayHintsProvider(
+        { scheme: 'file', language: 'literate effekt' },
+        new InlayHintProvider(client)
+    );
+}
     // Decorate holes
     // ---
     // It would be nice if there was a way to reuse the scopes of the tmLanguage file
