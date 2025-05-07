@@ -13,7 +13,29 @@ import { EffektIRContentProvider } from './irProvider';
 import { InlayHintProvider } from './InlayHintsProvider';
 import * as net from 'net';
 
-let client: LanguageClient;
+/**
+ * Overrides the `registerFeature` method to disable the automatic inlay hints feature.
+ *
+ * The LSP may provide inlay hints automatically, which can duplicate custom inlay hints 
+ * provided by this extension. To ensure a consistient and controlled user experience, 
+ * we intercept the registration of the inlay hints feature and prevent it from being registered.
+ *
+ * By doing this, we retain full control over how inlay hints are displayed, allowing us to
+ * implement custom logic.
+ *
+ * Note: This approach relies on identifying the inlay hints feature by its constructor name
+ * (`InlayHintsFeature`). If the LSP implementation changes, this logic may need to be updated.
+ */
+class EffektLanguageClient extends LanguageClient {
+    public registerFeature(feature: any) {
+        if (feature.constructor.name === 'InlayHintsFeature') { 
+            return; 
+        }
+        super.registerFeature(feature);
+    }
+}
+
+let client: EffektLanguageClient;
 let effektManager: EffektManager;
 
 function registerCommands(context: vscode.ExtensionContext) {
@@ -160,7 +182,7 @@ export async function activate(context: vscode.ExtensionContext) {
         diagnosticCollectionName: "effekt"
     };
 
-    client = new LanguageClient(
+    client = new EffektLanguageClient(
         'effektLanguageServer',
         'Effekt Language Server',
         serverOptions,
