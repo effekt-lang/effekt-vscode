@@ -83,11 +83,9 @@ export class EffektManager {
         throw new Error("Unable to determine Effekt version");
     }
 
-    // this should eliminate other functions having the side-effect of changing the `effektVersion` field 
     public async getEffektVersion(): Promise<string> {
-        const effektPath = await this.locateEffektExecutable();
-
         if (!this.effektVersion) {
+            const effektPath = await this.locateEffektExecutable();
             const currentVersion = await this.fetchEffektVersion(effektPath.path);
             this.effektVersion = currentVersion;
         }

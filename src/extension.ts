@@ -147,7 +147,6 @@ export async function activate(context: vscode.ExtensionContext) {
    
 }
 
-// Start the Effekt Language Server
 async function startEffektLanguageServer(context: vscode.ExtensionContext) {
     const config = vscode.workspace.getConfiguration("effekt");
     let serverOptions: ServerOptions;
@@ -210,7 +209,6 @@ async function startEffektLanguageServer(context: vscode.ExtensionContext) {
     context.subscriptions.push(client);
 }
 
-// Restart the Effekt Language Server
 async function restartEffektLanguageServer(context: vscode.ExtensionContext) {
     if (client) {
         await client.stop();
