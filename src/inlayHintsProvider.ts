@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { LanguageClient, Protocol2CodeConverter } from 'vscode-languageclient/node';
+import { Code2ProtocolConverter, LanguageClient, Protocol2CodeConverter } from 'vscode-languageclient/node';
 import {
   InlayHintRequest,
   InlayHintParams,
@@ -9,10 +9,12 @@ import {
 export class InlayHintProvider implements vscode.InlayHintsProvider {
   private client: LanguageClient;
   private protocol2code: Protocol2CodeConverter;
+  private code2protocol : Code2ProtocolConverter;
 
   constructor(client: LanguageClient) {
     this.client = client;
     this.protocol2code = client.protocol2CodeConverter;
+    this.code2protocol = client.code2ProtocolConverter;
   }
 
   async provideInlayHints(
@@ -33,11 +35,11 @@ export class InlayHintProvider implements vscode.InlayHintsProvider {
 
     // build an LSP‐style params object by converting from vscode types
     const params: InlayHintParams = {
-      textDocument: this.client.code2ProtocolConverter.asTextDocumentIdentifier(document),
-      range: this.client.code2ProtocolConverter.asRange(range)
+      textDocument: this.code2protocol.asTextDocumentIdentifier(document),
+      range:this.code2protocol.asRange(range)
     };
 
-    // send a strongly‐typed LSP request instead of a raw string
+    // send a strongly‐typed LSP request
     const response = (await this.client.sendRequest(
       InlayHintRequest.type,
       params

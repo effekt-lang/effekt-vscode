@@ -281,7 +281,6 @@ export async function activate(context: vscode.ExtensionContext) {
     await client.start();
     context.subscriptions.push(client);
 
-    // Register Inlay Hints Provider
     vscode.languages.registerInlayHintsProvider(
         { scheme: 'file', language: 'effekt' },
         new InlayHintProvider(client)
