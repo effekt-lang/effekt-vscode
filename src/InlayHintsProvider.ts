@@ -29,16 +29,33 @@ export class InlayHintProvider implements vscode.InlayHintsProvider {
                 start: { line: range.start.line, character: range.start.character },
                 end: { line: range.end.line, character: range.end.character }
             }
-        }) as { position: { line: number, character: number }, label: string, kind?: vscode.InlayHintKind, tooltip?: string, data?: string }[];
+        }) as { 
+            position: { line: number, character: number }, 
+            label: string, 
+            kind?: vscode.InlayHintKind, 
+            tooltip?: string, 
+            data?: string,
+            padLeft?: boolean, 
+            padRight?: boolean 
+        }[];
 
         // Filter inlay hints based on user preferences
         const hints: vscode.InlayHint[] = [];
         for (const hint of response) {
             if (hint.data === 'capture' && !showCaptureHints) continue;
 
+            // Apply padding based on the response
+            let label = hint.label;
+            if (hint.padLeft) {
+                label = ' ' + label;
+            }
+            if (hint.padRight) {
+                label = label + ' ';
+            }
+            
             const inlayHint = new vscode.InlayHint(
                 new vscode.Position(hint.position.line, hint.position.character),
-                hint.label + ' ' // add a whitespace to restore legacy layout
+                hint.label 
             );
             inlayHint.kind = hint.kind;
             inlayHint.tooltip = hint.tooltip;
