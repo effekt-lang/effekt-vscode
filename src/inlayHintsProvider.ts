@@ -24,7 +24,7 @@ export class InlayHintProvider implements vscode.InlayHintsProvider {
         if (editorHintsEnabled === 'off') {
             return [];
         }
-        console.log("Im here :)")
+
         // Fetch inlay hints from the language server
         const response = await this.client.sendRequest('textDocument/inlayHint', {
             textDocument: { uri: document.uri.toString() },
@@ -32,26 +32,23 @@ export class InlayHintProvider implements vscode.InlayHintsProvider {
                 start: { line: range.start.line, character: range.start.character },
                 end: { line: range.end.line, character: range.end.character }
             }
-        }) 
+        }) as lsp.InlayHint[] | null | undefined;
 
-        console.log("response")
         if (!response) {
             return [];
         }
-/*
-        // Filter and convert inlay hints using Protocol2CodeConverter
-        const filteredHints = response.filter(hint => {
+
+        // Filter inlay hints based on user preferences
+        const filteredResponse = response.filter(hint => {
             if (hint.data === 'capture' && !showCaptureHints) {
                 return false;
             }
             return true;
         });
-        console.log(filteredHints)
-        */
 
-        let res =  await this.converter.asInlayHints(response) || [];
-        console.log(res)
-        return res
+        // Convert filtered inlay hints using Protocol2CodeConverter
+        const hints = await this.converter.asInlayHints(filteredResponse, _token);
 
+        return hints || [];
     }
 }
