@@ -5,6 +5,7 @@ import { compare as compareVersion } from 'compare-versions';
 import { URL } from 'url';
 import * as path from 'path';
 import * as fs from 'fs/promises';
+import { EffektLanguageClient } from './effektLanguageClient';
 
 interface InstallationResult {
     success: boolean;
@@ -179,7 +180,7 @@ export class EffektManager {
      * @param action The action being performed ('install' or 'update').
      * @returns A promise that resolves with the installed/updated version or an empty string.
      */
-    private async installOrUpdateEffekt(version: string, action: 'install' | 'update'): Promise<string> {
+    private async installOrUpdateEffekt(version: string, action: 'install' | 'update', client : EffektLanguageClient): Promise<string> {
         if (!(await this.checkJava())) {
             this.logMessage('INFO', 'Java is not installed.');
             return '';
@@ -195,6 +196,10 @@ export class EffektManager {
             cancellable: false
         }, async (progress) => {
             try {
+                console.log("Right before the try stop")
+                await client.stop(10000)
+                console.log("right after the try -  stop")
+
                 progress.report({ increment: 0, message: 'Preparing...' });
                 await this.runNpmInstall();
                 progress.report({ increment: 50, message: 'Verifying installation...' });
@@ -203,10 +208,19 @@ export class EffektManager {
                 progress.report({ increment: 100, message: 'Completed' });
 
                 this.handleInstallationResult(verificationResult, action);
+                console.log("right before the try start")
+                await client.start();
+                console.log("right after the try start")
+
                 return verificationResult.success ? verificationResult.version || '' : '';
             } catch (error) {
                 this.showErrorWithLogs(`Failed to ${action} Effekt: ${error}`);
                 this.updateStatusBar();
+                console.log("right before the catch start")
+
+                await client.start();
+                console.log("right after the catch start")
+
                 return '';
             }
         });
@@ -315,14 +329,14 @@ export class EffektManager {
      * Checks for Effekt updates and offers to install/update if necessary.
      * @returns A promise that resolves with the current Effekt version.
      */
-    public async checkForUpdatesAndInstall(): Promise<string> {
+    public async checkForUpdatesAndInstall(client: EffektLanguageClient): Promise<string> {
         try {
             let currentVersion = await this.getEffektVersion();
             const latestVersion = await this.getLatestNPMVersion(this.effektNPMPackage);
 
             // check if the latest version strictly newer than the current version
             if (!currentVersion || compareVersion(latestVersion, currentVersion, '>')) {
-                return this.promptForAction(latestVersion, 'update');
+                return this.promptForAction(latestVersion, 'update',client);
             } else {
                 vscode.window.showInformationMessage(`Effekt is up-to-date (version ${currentVersion}).`);
             }
@@ -332,7 +346,7 @@ export class EffektManager {
         } catch (error) {
             if (error instanceof Error && error.message.includes('Effekt executable not found')) {
                 const latestVersion = await this.getLatestNPMVersion(this.effektNPMPackage);
-                return this.promptForAction(latestVersion, 'install');
+                return this.promptForAction(latestVersion, 'install',client);
             } else {
                 this.showErrorWithLogs(`Failed to check Effekt: ${error}`);
                 return '';
@@ -346,14 +360,14 @@ export class EffektManager {
      * @param action The action to perform ('install' or 'update').
      * @returns A promise that resolves with the installed/updated version or an empty string.
      */
-    private async promptForAction(version: string, action: 'install' | 'update'): Promise<string> {
+    private async promptForAction(version: string, action: 'install' | 'update', client : EffektLanguageClient): Promise<string> {
         const message = action === 'update'
             ? `A new version of Effekt is available (${version}). Would you like to update?`
             : `Effekt ${version} is available. Would you like to install it?`;
 
         const response = await vscode.window.showInformationMessage(message, 'Yes', 'No');
         if (response === 'Yes') {
-            return this.installOrUpdateEffekt(version, action);
+            return this.installOrUpdateEffekt(version, action,client);
         }
         this.updateStatusBar();
         return this.effektVersion || '';

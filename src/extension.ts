@@ -2,7 +2,6 @@
 
 import * as vscode from 'vscode';
 import {
-    LanguageClient,
     LanguageClientOptions,
     ServerOptions,
     StreamInfo,
@@ -11,29 +10,10 @@ import {
 import { EffektManager } from './effektManager';
 import { EffektIRContentProvider } from './irProvider';
 import { InlayHintProvider } from './inlayHintsProvider';
+import { EffektLanguageClient } from './effektLanguageClient';
 import * as net from 'net';
 
-/**
- * Overrides the `registerFeature` method to disable the built-in inlay hints feature.
- *
- * By default the LanguageClient provides inlay hints automatically, which does not allow 
- * for filtering Inlay Hints based on their 'data'-field. We use the 'data'-field to allow
- * the user to select which inlay hints the extension should show.
- * 
- * By doing this, we retain full control over how inlay hints are displayed, allowing us to
- * implement custom logic.
- *
- * Note: This approach relies on identifying the inlay hints feature by its constructor name
- * (`InlayHintsFeature`). If the LSP implementation changes, this logic may need to be updated.
- */
-class EffektLanguageClient extends LanguageClient {
-    public registerFeature(feature: any) {
-        if (feature.constructor.name === 'InlayHintsFeature') { 
-            return; 
-        }
-        super.registerFeature(feature);
-    }
-}
+
 
 let client: EffektLanguageClient;
 let effektManager: EffektManager;
@@ -46,7 +26,7 @@ function logMessage(level: 'INFO' | 'ERROR', message: string) {
 function registerCommands(context: vscode.ExtensionContext) {
     context.subscriptions.push(
         vscode.commands.registerCommand('effekt.checkForUpdates', async () => {
-            await effektManager?.checkForUpdatesAndInstall();
+            await effektManager?.checkForUpdatesAndInstall(client);
         }),
         vscode.commands.registerCommand('effekt.restartServer', async () => {
             if (client) {
@@ -136,12 +116,12 @@ export async function activate(context: vscode.ExtensionContext) {
 
     initializeHoleDecorations(context);
 
-    const installedEffektVersion = await effektManager.checkForUpdatesAndInstall();
+    const installedEffektVersion = await effektManager.checkForUpdatesAndInstall(client);
     if (!installedEffektVersion) {
         vscode.window.showWarningMessage('Effekt is not installed. LSP features may not work correctly.');
-    } else if (installedEffektVersion !== await effektManager.getEffektVersion()) { 
+    }/* else if (installedEffektVersion !== await effektManager.getEffektVersion()) { 
         await restartEffektLanguageServer(context);
-    } else {
+    } */else {
         logMessage('INFO', "Using the existing version of Effekt");        
     }
    
@@ -209,12 +189,15 @@ async function startEffektLanguageServer(context: vscode.ExtensionContext) {
     context.subscriptions.push(client);
 }
 
+/*
 async function restartEffektLanguageServer(context: vscode.ExtensionContext) {
     if (client) {
+        console.log("restart stop")
         await client.stop();
+        
     }
     await startEffektLanguageServer(context);
-}
+}*/
 
 function registerCodeLensProviders(context: vscode.ExtensionContext) {
     context.subscriptions.push(
