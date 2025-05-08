@@ -256,7 +256,7 @@ export class EffektManager {
                     }
                 }
             }
-        
+            
             return {
                 success: false,
                 message: "Effekt was installed but couldn't be located or executed. Please check your installation."
