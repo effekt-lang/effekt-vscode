@@ -179,7 +179,11 @@ export async function activate(context: vscode.ExtensionContext) {
             { scheme: 'file', language: 'effekt' },
             { scheme: 'file', language: 'literate effekt' }
         ],
-        diagnosticCollectionName: "effekt"
+        diagnosticCollectionName: "effekt",
+        synchronize: {
+            // Send configuration updates to the language server
+            configurationSection: 'effekt'
+        }
     };
 
     client = new EffektLanguageClient(

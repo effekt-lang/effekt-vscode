@@ -137,7 +137,7 @@
                 },
                 "effekt.showTree": {
                     "type": "boolean",
-                    "default": "false",
+                    "default": false,
                     "description": "Show tree of IR instead of rendered version (only relevant if 'showIR' is neither 'none' nor 'js'."
                 },
                 "effekt.lib": {
