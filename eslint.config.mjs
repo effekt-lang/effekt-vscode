@@ -7,6 +7,10 @@
 import js from '@eslint/js';
 import tseslint from 'typescript-eslint';
 
+import prettier from 'eslint-config-prettier';
+import prettierPlugin from 'eslint-plugin-prettier';
+
+// Extend Prettier config
 export default tseslint.config(
 	{
 		ignores: [
@@ -17,9 +21,13 @@ export default tseslint.config(
 	js.configs.recommended,
 	...tseslint.configs.recommended,
 	...tseslint.configs.stylistic,
+	prettier, // Disable conflicting ESLint rules
 	{
-		
+		plugins: {
+			prettier: prettierPlugin // Enable Prettier plugin
+		},
 		rules: {
+			'prettier/prettier': 'error', // Treat Prettier issues as ESLint errors
 			'curly': 'warn',
 			'@typescript-eslint/no-empty-function': 'off',
 			'@typescript-eslint/naming-convention': [

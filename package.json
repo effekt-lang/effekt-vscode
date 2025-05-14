@@ -188,7 +188,7 @@
         "watch": "tsc -b -w",
         "lint": "eslint 'src/**/*.ts'",
         "lint:fix": "eslint 'src/**/*.ts' --fix",
-        "prettier-format": "prettier --config .prettierrc 'src/**/*.ts' --write"
+        "format": "prettier --config .prettierrc 'src/**/*.ts' --write"
     },
     "dependencies": {
         "compare-versions": "^6.1.1",
@@ -202,6 +202,8 @@
         "@typescript-eslint/eslint-plugin": "^7.1.0",
         "@typescript-eslint/parser": "^7.1.0",
         "eslint": "^8.57.1",
+        "eslint-config-prettier": "^10.1.5",
+        "eslint-plugin-prettier": "^5.4.0",
         "mocha": "^10.3.0",
         "prettier": "^3.5.3",
         "typescript": "^5.8.3",
