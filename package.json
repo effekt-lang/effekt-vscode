@@ -186,8 +186,8 @@
         "vscode:prepublish": "npm run compile",
         "compile": "tsc -b",
         "watch": "tsc -b -w",
-        "lint": "eslint",
-        "lint:fix": "eslint --fix",
+        "lint": "eslint 'src/**/*.ts'",
+        "lint:fix": "eslint 'src/**/*.ts' --fix",
         "prettier-format": "prettier --config .prettierrc 'src/**/*.ts' --write"
 
     },
