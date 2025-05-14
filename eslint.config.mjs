@@ -6,11 +6,9 @@
 // @ts-check
 import js from '@eslint/js';
 import tseslint from 'typescript-eslint';
-
 import prettier from 'eslint-config-prettier';
 import prettierPlugin from 'eslint-plugin-prettier';
 
-// Extend Prettier config
 export default tseslint.config(
 	{
 		ignores: [
@@ -40,9 +38,11 @@ export default tseslint.config(
 			'@typescript-eslint/no-unused-vars': [
 				'error',
 				{
-					'argsIgnorePattern': '^_'
+					'argsIgnorePattern': '^_', // Allow unused variables with a prefix '_'
+					'varsIgnorePattern': '^_'  // Allow unused vars with a prefix '_'
 				}
-			]
+			],
+			'@typescript-eslint/no-explicit-any': 'off' // Allow 'any' type
 		}
 	}
 );

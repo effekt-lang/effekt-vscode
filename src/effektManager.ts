@@ -276,7 +276,7 @@ export class EffektManager {
         message: `Effekt found successfully in ${execPath}.`,
         version
       };
-    } catch (error) {
+    } catch {
       // If locateEffektExecutable fails, try to locate in global npm directory
       const npmRoot = await this.execCommand('npm root -g');
 
@@ -454,7 +454,7 @@ export class EffektManager {
       this.logMessage('INFO', `Found Node.js version ${nodeVersion}`);
 
       return true;
-    } catch (error) {
+    } catch {
       this.showErrorWithLogs(
         'Node.js and npm are required to install Effekt automatically. ' +
           'Please install Node.js (which includes npm), then restart VSCode.'
@@ -560,7 +560,9 @@ export class EffektManager {
    */
   private trimErrorMessage(message: string): string {
     const maxLength = 160;
-    if (message.length <= maxLength) {return message;}
+    if (message.length <= maxLength) {
+      return message;
+    }
     return message.substring(0, maxLength) + '... (see logs for full message)';
   }
 
@@ -637,8 +639,12 @@ export class EffektManager {
     const effektBackend = this.config.get<string>('backend');
     const effektLib = this.config.get<string>('lib');
 
-    if (effektBackend) {args.push('--backend', effektBackend);}
-    if (effektLib) {args.push('--lib', effektLib);}
+    if (effektBackend) {
+      args.push('--backend', effektBackend);
+    }
+    if (effektLib) {
+      args.push('--lib', effektLib);
+    }
 
     const folders = vscode.workspace.workspaceFolders || [];
     // We deliberately use folder.uri.path rather than folder.uri.fsPath

@@ -188,7 +188,8 @@
         "watch": "tsc -b -w",
         "lint": "eslint 'src/**/*.ts'",
         "lint:fix": "eslint 'src/**/*.ts' --fix",
-        "format": "prettier --config .prettierrc 'src/**/*.ts' --write"
+        "format": "prettier --config .prettierrc 'src/**/*.ts' --write",
+        "format:check": "prettier --config .prettierrc 'src/**/*.ts' --check"
     },
     "dependencies": {
         "compare-versions": "^6.1.1",
