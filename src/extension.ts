@@ -175,7 +175,7 @@ export async function activate(context: vscode.ExtensionContext) {
     };
   }
 
-  let clientOptions: LanguageClientOptions = {
+  const clientOptions: LanguageClientOptions = {
     initializationOptions: vscode.workspace.getConfiguration('effekt'),
     documentSelector: [
       { scheme: 'file', language: 'effekt' },
@@ -241,7 +241,7 @@ export async function activate(context: vscode.ExtensionContext) {
     const text = editor.document.getText();
     const positionAt = editor.document.positionAt;
 
-    let holeDelimiters: vscode.DecorationOptions[] = [];
+    const holeDelimiters: vscode.DecorationOptions[] = [];
     let match;
 
     function addDelimiter(from: number, to: number) {

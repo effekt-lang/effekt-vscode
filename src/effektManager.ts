@@ -560,7 +560,7 @@ export class EffektManager {
    */
   private trimErrorMessage(message: string): string {
     const maxLength = 160;
-    if (message.length <= maxLength) return message;
+    if (message.length <= maxLength) {return message;}
     return message.substring(0, maxLength) + '... (see logs for full message)';
   }
 
@@ -637,8 +637,8 @@ export class EffektManager {
     const effektBackend = this.config.get<string>('backend');
     const effektLib = this.config.get<string>('lib');
 
-    if (effektBackend) args.push('--backend', effektBackend);
-    if (effektLib) args.push('--lib', effektLib);
+    if (effektBackend) {args.push('--backend', effektBackend);}
+    if (effektLib) {args.push('--lib', effektLib);}
 
     const folders = vscode.workspace.workspaceFolders || [];
     // We deliberately use folder.uri.path rather than folder.uri.fsPath

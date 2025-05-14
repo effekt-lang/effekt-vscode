@@ -6,7 +6,7 @@ export class EffektIRContentProvider
   private _onDidChange = new vscode.EventEmitter<vscode.Uri>();
   onDidChange?: vscode.Event<vscode.Uri> = this._onDidChange.event;
 
-  private contents: Map<string, string> = new Map();
+  private contents = new Map<string, string>();
 
   update(uri: vscode.Uri, content: string) {
     this.contents.set(uri.toString(), content);
