@@ -186,7 +186,10 @@
         "vscode:prepublish": "npm run compile",
         "compile": "tsc -b",
         "watch": "tsc -b -w",
-        "lint": "eslint"
+        "lint": "eslint",
+        "lint:fix": "eslint --fix",
+        "prettier-format": "prettier --config .prettierrc 'src/**/*.ts' --write"
+
     },
     "dependencies": {
         "compare-versions": "^6.1.1",
