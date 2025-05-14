@@ -21,5 +21,11 @@ jobs:
     - run: npm install -g vsce
     - run: npm install
 
+    - name: Run ESLint
+      run: npm run lint
+
+    - name: Run Prettier Check
+      run: npm run format:check
+
     - name: Package VSCode extension into .vsix file
       run: vsce package
