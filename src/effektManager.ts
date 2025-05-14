@@ -203,7 +203,7 @@ export class EffektManager {
             cancellable: false
         }, async (progress) => {
             try {
-                if (client) {
+                if (client) { // The client is optional as when installing Effekt, there is no LSP initialized yet
                     await client.stop();
                 }
                 progress.report({ increment: 0, message: 'Preparing...' });
@@ -351,7 +351,7 @@ export class EffektManager {
         } catch (error) {
             if (error instanceof Error && error.message.includes('Effekt executable not found')) {
                 const latestVersion = await this.getLatestNPMVersion(this.effektNPMPackage);
-                return this.promptForAction(latestVersion, 'install',client);
+                return this.promptForAction(latestVersion, 'install', client);
             } else {
                 this.showErrorWithLogs(`Failed to check Effekt: ${error}`);
                 return '';
@@ -372,7 +372,7 @@ export class EffektManager {
 
         const response = await vscode.window.showInformationMessage(message, 'Yes', 'No');
         if (response === 'Yes') {
-            return this.installOrUpdateEffekt(version, action,client);
+            return this.installOrUpdateEffekt(version, action, client);
         }
         this.updateStatusBar();
         return this.effektVersion || '';

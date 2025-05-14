@@ -108,14 +108,14 @@ export async function activate(context: vscode.ExtensionContext) {
     effektManager = new EffektManager();
 
     try {
-        // If effekt exists (no matter which version) start lsp
+        // If Effekt is installed (no matter which version), start the language server
         await ensureEffektIsAvailable();
         await initializeLSPAndProviders(context);
 
         await handleEffektUpdates();
     } catch (error) {
         if (error instanceof EffektExecutableNotFoundError) {
-            // Handle the case where Effekt is not installed
+            // If Effekt is not installed, we prompt the user to install it
             await handleEffektUpdates();
             await initializeLSPAndProviders(context);
         } else {
