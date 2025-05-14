@@ -7,7 +7,7 @@ import {
     StreamInfo,
     State as ClientState
 } from 'vscode-languageclient/node';
-import { EffektManager } from './effektManager';
+import { EffektManager, EffektExecutableNotFoundError } from './effektManager';
 import { EffektIRContentProvider } from './irProvider';
 import { InlayHintProvider } from './inlayHintsProvider';
 import { EffektLanguageClient } from './effektLanguageClient';
@@ -107,24 +107,47 @@ class EffektRunCodeLensProvider implements vscode.CodeLensProvider {
 export async function activate(context: vscode.ExtensionContext) {
     effektManager = new EffektManager();
 
-    await startEffektLanguageServer(context);
+    try {
+        // If effekt exists (no matter which version) start lsp
+        await ensureEffektIsAvailable();
+        await initializeLSPAndProviders(context);
 
+        await handleEffektUpdates();
+    } catch (error) {
+        if (error instanceof EffektExecutableNotFoundError) {
+            // Handle the case where Effekt is not installed
+            await handleEffektUpdates();
+            await initializeLSPAndProviders(context);
+        } else {
+            // Handle unexpected errors
+            console.error("An unexpected error occurred:", error);
+            vscode.window.showErrorMessage('An unexpected error occurred. Check the logs for details.');
+        }
+    }
+}
+
+async function ensureEffektIsAvailable() {
+    await effektManager.locateEffektExecutable();
+}
+
+async function initializeLSPAndProviders(context: vscode.ExtensionContext) {
+    await startEffektLanguageServer(context);
     registerCommands(context);
     registerCodeLensProviders(context);
     registerIRProvider(context);
     registerInlayProvider();
-
     initializeHoleDecorations(context);
+}
 
+async function handleEffektUpdates() {
     const installedEffektVersion = await effektManager.checkForUpdatesAndInstall(client);
     if (!installedEffektVersion) {
-        vscode.window.showWarningMessage('Effekt is not installed. LSP features may not work correctly.');
-    }/* else if (installedEffektVersion !== await effektManager.getEffektVersion()) { 
-        await restartEffektLanguageServer(context);
-    } */else {
-        logMessage('INFO', "Using the existing version of Effekt");        
+        vscode.window.showWarningMessage(
+            'Effekt is not installed. LSP features may not work correctly.'
+        );
+    } else {
+        logMessage('INFO', "Using the existing version of Effekt");
     }
-   
 }
 
 async function startEffektLanguageServer(context: vscode.ExtensionContext) {
@@ -142,7 +165,9 @@ async function startEffektLanguageServer(context: vscode.ExtensionContext) {
             return Promise.resolve(result);
         };
     } else {
+       
         const effektExecutable = await effektManager.locateEffektExecutable();
+       
         const args = ["--server", ...effektManager.getEffektArgs()];
 
         /* > Node.js will now error with EINVAL if a .bat or .cmd file is passed to child_process.spawn and child_process.spawnSync without the shell option set.
@@ -188,16 +213,6 @@ async function startEffektLanguageServer(context: vscode.ExtensionContext) {
     await client.start();
     context.subscriptions.push(client);
 }
-
-/*
-async function restartEffektLanguageServer(context: vscode.ExtensionContext) {
-    if (client) {
-        console.log("restart stop")
-        await client.stop();
-        
-    }
-    await startEffektLanguageServer(context);
-}*/
 
 function registerCodeLensProviders(context: vscode.ExtensionContext) {
     context.subscriptions.push(
