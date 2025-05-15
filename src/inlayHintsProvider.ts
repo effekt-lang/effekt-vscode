@@ -2,12 +2,12 @@ import * as vscode from 'vscode';
 import {
   Code2ProtocolConverter,
   LanguageClient,
-  Protocol2CodeConverter
+  Protocol2CodeConverter,
 } from 'vscode-languageclient/node';
 import {
   InlayHintRequest,
   InlayHintParams,
-  InlayHint as LspInlayHint
+  InlayHint as LspInlayHint,
 } from 'vscode-languageserver-protocol';
 
 export class InlayHintProvider implements vscode.InlayHintsProvider {
@@ -24,7 +24,7 @@ export class InlayHintProvider implements vscode.InlayHintsProvider {
   async provideInlayHints(
     document: vscode.TextDocument,
     range: vscode.Range,
-    _token: vscode.CancellationToken
+    _token: vscode.CancellationToken,
   ): Promise<vscode.InlayHint[]> {
     const config = vscode.workspace.getConfiguration('effekt');
     const showCaptureHints = config.get<boolean>('inlayHints.captures', true);
@@ -38,12 +38,12 @@ export class InlayHintProvider implements vscode.InlayHintsProvider {
 
     const params: InlayHintParams = {
       textDocument: this.code2protocol.asTextDocumentIdentifier(document),
-      range: this.code2protocol.asRange(range)
+      range: this.code2protocol.asRange(range),
     };
 
     const response = (await this.client.sendRequest(
       InlayHintRequest.type,
-      params
+      params,
     )) as LspInlayHint[] | null | undefined;
 
     if (!response) {

@@ -5,7 +5,7 @@ import {
   LanguageClientOptions,
   ServerOptions,
   StreamInfo,
-  State as ClientState
+  State as ClientState,
 } from 'vscode-languageclient/node';
 import { EffektManager, EffektExecutableNotFoundError } from './effektManager';
 import { EffektIRContentProvider } from './irProvider';
@@ -19,7 +19,7 @@ const outputChannel = vscode.window.createOutputChannel('Effekt Extension');
 
 function logMessage(level: 'INFO' | 'ERROR', message: string) {
   outputChannel.appendLine(
-    `[${new Date().toISOString()}] ${level}: ${message}`
+    `[${new Date().toISOString()}] ${level}: ${message}`,
   );
 }
 
@@ -34,7 +34,7 @@ function registerCommands(context: vscode.ExtensionContext) {
         client.start();
       }
     }),
-    vscode.commands.registerCommand('effekt.runFile', runEffektFile)
+    vscode.commands.registerCommand('effekt.runFile', runEffektFile),
   );
 }
 
@@ -60,12 +60,12 @@ async function runEffektFile(uri: vscode.Uri) {
     presentation: {
       reveal: vscode.TaskRevealKind.Always,
       panel: vscode.TaskPanelKind.Dedicated,
-      clear: true
-    }
+      clear: true,
+    },
   };
 
   const execution = new vscode.ShellExecution(effektExecutable.path, args, {
-    cwd: vscode.workspace.workspaceFolders?.[0]?.uri.fsPath
+    cwd: vscode.workspace.workspaceFolders?.[0]?.uri.fsPath,
   });
 
   const task = new vscode.Task(
@@ -74,7 +74,7 @@ async function runEffektFile(uri: vscode.Uri) {
     'Run Effekt File',
     'Effekt',
     execution,
-    []
+    [],
   );
 
   await vscode.tasks.executeTask(task);
@@ -95,8 +95,8 @@ class EffektRunCodeLensProvider implements vscode.CodeLensProvider {
         new vscode.CodeLens(range, {
           title: '$(play) Run',
           command: 'effekt.runFile',
-          arguments: [document.uri]
-        })
+          arguments: [document.uri],
+        }),
       );
     }
 
@@ -122,7 +122,7 @@ export async function activate(context: vscode.ExtensionContext) {
       // Handle unexpected errors
       console.error('An unexpected error occurred:', error);
       vscode.window.showErrorMessage(
-        'An unexpected error occurred. Check the logs for details.'
+        'An unexpected error occurred. Check the logs for details.',
       );
     }
   }
@@ -146,7 +146,7 @@ async function handleEffektUpdates() {
     await effektManager.checkForUpdatesAndInstall(client);
   if (!installedEffektVersion) {
     vscode.window.showWarningMessage(
-      'Effekt is not installed. LSP features may not work correctly.'
+      'Effekt is not installed. LSP features may not work correctly.',
     );
   } else {
     logMessage('INFO', 'Using the existing version of Effekt');
@@ -163,7 +163,7 @@ async function startEffektLanguageServer(context: vscode.ExtensionContext) {
       const socket = net.connect({ port: 5007 });
       const result: StreamInfo = {
         writer: socket,
-        reader: socket
+        reader: socket,
       };
       return Promise.resolve(result);
     };
@@ -182,7 +182,7 @@ async function startEffektLanguageServer(context: vscode.ExtensionContext) {
 
     serverOptions = {
       run: { command: effektExecutable.path, args, options: execOptions },
-      debug: { command: effektExecutable.path, args, options: execOptions }
+      debug: { command: effektExecutable.path, args, options: execOptions },
     };
   }
 
@@ -190,20 +190,20 @@ async function startEffektLanguageServer(context: vscode.ExtensionContext) {
     initializationOptions: vscode.workspace.getConfiguration('effekt'),
     documentSelector: [
       { scheme: 'file', language: 'effekt' },
-      { scheme: 'file', language: 'literate effekt' }
+      { scheme: 'file', language: 'literate effekt' },
     ],
     diagnosticCollectionName: 'effekt',
     synchronize: {
       // Send configuration updates to the language server
-      configurationSection: 'effekt'
-    }
+      configurationSection: 'effekt',
+    },
   };
 
   client = new EffektLanguageClient(
     'effektLanguageServer',
     'Effekt Language Server',
     serverOptions,
-    clientOptions
+    clientOptions,
   );
 
   client.onDidChangeState((event) => {
@@ -224,12 +224,12 @@ function registerCodeLensProviders(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     vscode.languages.registerCodeLensProvider(
       { language: 'effekt', scheme: 'file' },
-      new EffektRunCodeLensProvider()
+      new EffektRunCodeLensProvider(),
     ),
     vscode.languages.registerCodeLensProvider(
       { language: 'literate effekt', scheme: 'file' },
-      new EffektRunCodeLensProvider()
-    )
+      new EffektRunCodeLensProvider(),
+    ),
   );
 }
 
@@ -238,8 +238,8 @@ function registerIRProvider(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     vscode.workspace.registerTextDocumentContentProvider(
       'effekt-ir',
-      effektIRContentProvider
-    )
+      effektIRContentProvider,
+    ),
   );
 
   client.onNotification(
@@ -252,22 +252,22 @@ function registerIRProvider(context: vscode.ExtensionContext) {
         vscode.window.showTextDocument(doc, {
           viewColumn: vscode.ViewColumn.Beside,
           preview: false,
-          preserveFocus: true
+          preserveFocus: true,
         });
       });
-    }
+    },
   );
 }
 
 function registerInlayProvider() {
   vscode.languages.registerInlayHintsProvider(
     { scheme: 'file', language: 'effekt' },
-    new InlayHintProvider(client)
+    new InlayHintProvider(client),
   );
 
   vscode.languages.registerInlayHintsProvider(
     { scheme: 'file', language: 'literate effekt' },
-    new InlayHintProvider(client)
+    new InlayHintProvider(client),
   );
 }
 // Decorate holes
@@ -278,7 +278,7 @@ function initializeHoleDecorations(context: vscode.ExtensionContext) {
     opacity: '0.5',
     borderRadius: '4pt',
     light: { backgroundColor: 'rgba(0,0,0,0.05)' },
-    dark: { backgroundColor: 'rgba(255,255,255,0.05)' }
+    dark: { backgroundColor: 'rgba(255,255,255,0.05)' },
   });
 
   // based on https://github.com/microsoft/vscode-extension-samples/blob/master/decorator-sample/src/extension.ts
@@ -326,7 +326,7 @@ function initializeHoleDecorations(context: vscode.ExtensionContext) {
       scheduleDecorations();
     },
     null,
-    context.subscriptions
+    context.subscriptions,
   );
 
   vscode.workspace.onDidChangeTextDocument(
@@ -336,7 +336,7 @@ function initializeHoleDecorations(context: vscode.ExtensionContext) {
       }
     },
     null,
-    context.subscriptions
+    context.subscriptions,
   );
 
   scheduleDecorations();

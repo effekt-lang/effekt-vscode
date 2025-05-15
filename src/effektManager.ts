@@ -45,14 +45,14 @@ export class EffektManager {
 
   constructor() {
     this.statusBarItem = vscode.window.createStatusBarItem(
-      vscode.StatusBarAlignment.Left
+      vscode.StatusBarAlignment.Left,
     );
     this.statusBarItem.text = 'Ξ Effekt';
     this.statusBarItem.command = 'effekt.checkForUpdates';
     this.statusBarItem.show();
     this.config = vscode.workspace.getConfiguration('effekt');
     this.outputChannel = vscode.window.createOutputChannel(
-      'Effekt Version Manager'
+      'Effekt Version Manager',
     );
     this.updateStatusBar();
   }
@@ -75,7 +75,7 @@ export class EffektManager {
       const version = removePrefix(versionOutput.trim(), 'Effekt '); // NOTE: the space is important here
       if (!version) {
         throw new Error(
-          `Output of '${path} --version' is not in the correct format 'Effekt 0.1.2'; got '${versionOutput}' instead.`
+          `Output of '${path} --version' is not in the correct format 'Effekt 0.1.2'; got '${versionOutput}' instead.`,
         );
       }
       return version;
@@ -91,7 +91,7 @@ export class EffektManager {
       } catch (helpError) {
         // If both `--version` and `--help` fail, throw an error
         throw new Error(
-          `Failed to determine Effekt version: ${versionError}\nHelp command also failed: ${helpError}`
+          `Failed to determine Effekt version: ${versionError}\nHelp command also failed: ${helpError}`,
         );
       }
     }
@@ -117,7 +117,7 @@ export class EffektManager {
    */
   private async execCommand(
     command: string,
-    resolveWithStderr?: boolean
+    resolveWithStderr?: boolean,
   ): Promise<string> {
     return new Promise<string>((resolve, reject) => {
       cp.exec(
@@ -131,7 +131,7 @@ export class EffektManager {
               stdout.trim() + (resolveWithStderr ? stderr.trim() : '');
             resolve(output);
           }
-        }
+        },
       );
     });
   }
@@ -143,7 +143,7 @@ export class EffektManager {
    */
   private logMessage(level: 'INFO' | 'ERROR', message: string) {
     this.outputChannel.appendLine(
-      `[${new Date().toISOString()}] ${level}: ${message}`
+      `[${new Date().toISOString()}] ${level}: ${message}`,
     );
   }
 
@@ -165,14 +165,14 @@ export class EffektManager {
               resolve(json.version);
             } catch (error) {
               reject(
-                new Error(`Failed to parse npm registry response: ${error}`)
+                new Error(`Failed to parse npm registry response: ${error}`),
               );
             }
           });
         })
         .on('error', (error) => {
           reject(
-            new Error(`Failed to fetch latest version from npm: ${error}`)
+            new Error(`Failed to fetch latest version from npm: ${error}`),
           );
         });
     });
@@ -188,12 +188,12 @@ export class EffektManager {
         const version = await this.fetchEffektVersion(customEffektPath);
         this.logMessage(
           'INFO',
-          `Located executable at custom path ${customEffektPath} with version ${version}`
+          `Located executable at custom path ${customEffektPath} with version ${version}`,
         );
         return { path: customEffektPath, version };
       } catch (error) {
         this.showErrorWithLogs(
-          `Custom Effekt executable not working: ${customEffektPath}. ${error}`
+          `Custom Effekt executable not working: ${customEffektPath}. ${error}`,
         );
       }
     }
@@ -203,7 +203,7 @@ export class EffektManager {
         const version = await this.fetchEffektVersion(effektPath);
         this.logMessage(
           'INFO',
-          `Located executable at path ${effektPath} with version ${version}`
+          `Located executable at path ${effektPath} with version ${version}`,
         );
         return { path: effektPath, version };
       } catch {
@@ -221,7 +221,7 @@ export class EffektManager {
    */
   private async installOrUpdateEffekt(
     action: 'install' | 'update',
-    client?: EffektLanguageClient
+    client?: EffektLanguageClient,
   ): Promise<string> {
     if (!(await this.checkJava())) {
       this.logMessage('INFO', 'Java is not installed.');
@@ -236,7 +236,7 @@ export class EffektManager {
       {
         location: vscode.ProgressLocation.Notification,
         title: `${action === 'update' ? 'Updating' : 'Installing'} Effekt`,
-        cancellable: false
+        cancellable: false,
       },
       async (progress) => {
         try {
@@ -246,7 +246,7 @@ export class EffektManager {
           await this.runNpmInstall();
           progress.report({
             increment: 50,
-            message: 'Verifying installation...'
+            message: 'Verifying installation...',
           });
 
           const verificationResult = await this.verifyEffektInstallation();
@@ -265,7 +265,7 @@ export class EffektManager {
           await client?.start();
           return '';
         }
-      }
+      },
     );
   }
 
@@ -275,10 +275,10 @@ export class EffektManager {
     if (npmRoot.startsWith('/nix/store')) {
       this.logMessage(
         'ERROR',
-        'NPM root is in the read-only Nix store. Installation is not possible.'
+        'NPM root is in the read-only Nix store. Installation is not possible.',
       );
       throw new Error(
-        'Detected Nix environment: NPM global modules are stored in a read-only directory managed by Nix. Installation cannot proceed.'
+        'Detected Nix environment: NPM global modules are stored in a read-only directory managed by Nix. Installation cannot proceed.',
       );
     }
 
@@ -296,7 +296,7 @@ export class EffektManager {
         success: true,
         executable: execPath,
         message: `Effekt found successfully in ${execPath}.`,
-        version
+        version,
       };
     } catch {
       // If locateEffektExecutable fails, try to locate in global npm directory
@@ -311,7 +311,7 @@ export class EffektManager {
               success: true,
               executable: fullPath,
               message: `Effekt found at ${fullPath}, but not in PATH.`,
-              version
+              version,
             };
           } catch {
             // Executable exists but doesn't work, continue to next
@@ -322,7 +322,7 @@ export class EffektManager {
       return {
         success: false,
         message:
-          "Effekt was installed but couldn't be located or executed. Please check your installation."
+          "Effekt was installed but couldn't be located or executed. Please check your installation.",
       };
     }
   }
@@ -338,7 +338,7 @@ export class EffektManager {
 
   private async handleInstallationResult(
     result: InstallationResult,
-    action: 'install' | 'update'
+    action: 'install' | 'update',
   ): Promise<void> {
     if (result.success && result.version) {
       const baseMessage = `Effekt has been ${action === 'update' ? 'updated' : 'installed'} to version ${result.version}.`;
@@ -352,7 +352,7 @@ export class EffektManager {
           : ['View Language Introduction', 'Close'];
         const changelogResponse = await vscode.window.showInformationMessage(
           baseMessage,
-          ...options
+          ...options,
         );
 
         if (changelogResponse === 'View Release Notes') {
@@ -387,12 +387,12 @@ export class EffektManager {
    * @returns A promise that resolves with the current Effekt version.
    */
   public async checkForUpdatesAndInstall(
-    client?: EffektLanguageClient
+    client?: EffektLanguageClient,
   ): Promise<string> {
     try {
       const currentVersion = await this.getEffektVersion();
       const latestVersion = await this.getLatestNPMVersion(
-        this.effektNPMPackage
+        this.effektNPMPackage,
       );
 
       // check if the latest version strictly newer than the current version
@@ -403,7 +403,7 @@ export class EffektManager {
         return this.promptForAction(latestVersion, 'update', client);
       } else {
         vscode.window.showInformationMessage(
-          `Effekt is up-to-date (version ${currentVersion}).`
+          `Effekt is up-to-date (version ${currentVersion}).`,
         );
       }
 
@@ -415,7 +415,7 @@ export class EffektManager {
         error.message.includes('Effekt executable not found')
       ) {
         const latestVersion = await this.getLatestNPMVersion(
-          this.effektNPMPackage
+          this.effektNPMPackage,
         );
         return this.promptForAction(latestVersion, 'install', client);
       } else {
@@ -434,7 +434,7 @@ export class EffektManager {
   private async promptForAction(
     version: string,
     action: 'install' | 'update',
-    client?: EffektLanguageClient
+    client?: EffektLanguageClient,
   ): Promise<string> {
     const message =
       action === 'update'
@@ -444,7 +444,7 @@ export class EffektManager {
     const response = await vscode.window.showInformationMessage(
       message,
       'Yes',
-      'No'
+      'No',
     );
     if (response === 'Yes') {
       return this.installOrUpdateEffekt(action, client);
@@ -466,7 +466,7 @@ export class EffektManager {
 
       if (compareVersion(nodeVersion, minNodeVersion, '<')) {
         this.showErrorWithLogs(
-          `Node.js version ${minNodeVersion} or higher is required. You have ${nodeVersion}.`
+          `Node.js version ${minNodeVersion} or higher is required. You have ${nodeVersion}.`,
         );
         return false;
       }
@@ -477,7 +477,7 @@ export class EffektManager {
     } catch {
       this.showErrorWithLogs(
         'Node.js and npm are required to install Effekt automatically. ' +
-          'Please install Node.js (which includes npm), then restart VSCode.'
+          'Please install Node.js (which includes npm), then restart VSCode.',
       );
       return false;
     }
@@ -494,7 +494,7 @@ export class EffektManager {
 
       if (compareVersion(javaVersion, minJavaVersion, '<')) {
         this.showErrorWithLogs(
-          `Java version ${minJavaVersion} or higher is required. You have ${javaVersion}.`
+          `Java version ${minJavaVersion} or higher is required. You have ${javaVersion}.`,
         );
         return false;
       }
@@ -507,7 +507,7 @@ export class EffektManager {
 
       this.showErrorWithLogs(
         'Java (JRE) is required to run Effekt. ' +
-          'Please install Java, then restart VSCode.'
+          'Please install Java, then restart VSCode.',
       );
       return false;
     }
@@ -527,7 +527,7 @@ export class EffektManager {
       const versionRegexes = [
         /version "((\d+\.\d+\.\d+).*?)"/, // Standard format: "11.0.2" or "1.8.0_292"
         /version "((\d+).*?)"/, // OpenJDK format on some systems: "11" or "11-internal"
-        /(\d+\.\d+\.\d+)/ // Fallback for version without quotes
+        /(\d+\.\d+\.\d+)/, // Fallback for version without quotes
       ];
 
       let version = '';
@@ -591,7 +591,7 @@ export class EffektManager {
    * @param status The new server status.
    */
   public updateServerStatus(
-    status: 'starting' | 'running' | 'stopped' | 'error'
+    status: 'starting' | 'running' | 'stopped' | 'error',
   ) {
     this.serverStatus = status;
     this.updateStatusBar();
@@ -606,26 +606,26 @@ export class EffektManager {
         icon: '$(loading~spin) ',
         tooltip: 'Effekt server is starting...',
         color: undefined,
-        bgColor: undefined
+        bgColor: undefined,
       },
       running: {
         icon: '$(check) ',
         tooltip: 'Effekt server is running.',
         color: undefined,
-        bgColor: undefined
+        bgColor: undefined,
       },
       stopped: {
         icon: '$(stop-circle) ',
         tooltip: 'Effekt server is stopped.',
         color: 'statusBarItem.warningForeground',
-        bgColor: 'statusBarItem.warningBackground'
+        bgColor: 'statusBarItem.warningBackground',
       },
       error: {
         icon: '$(error) ',
         tooltip: 'Effekt server encountered an error.',
         color: 'statusBarItem.errorForeground',
-        bgColor: 'statusBarItem.errorBackground'
-      }
+        bgColor: 'statusBarItem.errorBackground',
+      },
     };
 
     const config = statusConfig[this.serverStatus];
@@ -637,7 +637,7 @@ export class EffektManager {
         `**Effekt Information:**\n` +
         `- Version: ${this.effektVersion || '<unknown>'}\n` +
         `- Status: ${this.serverStatus}\n` +
-        `- Backend: ${this.config.get<string>('backend') || '<unknown>'}`
+        `- Backend: ${this.config.get<string>('backend') || '<unknown>'}`,
     );
     this.statusBarItem.tooltip.isTrusted = true;
 
