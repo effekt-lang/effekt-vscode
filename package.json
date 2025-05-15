@@ -153,6 +153,11 @@
                     "type": "boolean",
                     "default": true,
                     "markdownDescription": "Show capture inlay hints:\n\n ```effekt\n'{io}' def main(): Unit = { println(\" Hello Effekt! \") }\n```"
+                },
+                "effekt.showHoles":{
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Show the holes panel with additional information"
                 }
             }
         },
