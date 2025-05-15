@@ -1,0 +1,11 @@
+# .git-blame-ignore-revs
+
+# using `git blame --ignore-revs-file .git-blame-ignore-revs`
+# or configuring git to always do so : `git config blame.ignoreRevsFile .git-blame-ignore-revs`
+
+
+# First time linting and formatting the whole codebase
+87e78e4db73d7f28aad21613bc64ed1ea80c4d6d
+
+# Reformat with trailing commata on 
+0c41364313629aa1cf42c0b1f40c3f78c7e48196

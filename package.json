@@ -186,20 +186,28 @@
         "vscode:prepublish": "npm run compile",
         "compile": "tsc -b",
         "watch": "tsc -b -w",
-        "lint": "eslint ./client/src ./server/src --ext .ts,.tsx"
+        "lint": "eslint 'src/**/*.ts'",
+        "lint:fix": "eslint 'src/**/*.ts' --fix",
+        "format": "prettier --config .prettierrc 'src/**/*.ts' --write",
+        "format:check": "prettier --config .prettierrc 'src/**/*.ts' --check"
     },
     "dependencies": {
         "compare-versions": "^6.1.1",
         "vscode-languageclient": "^8.1.0"
     },
     "devDependencies": {
+        "@eslint/js": "^9.26.0",
         "@types/mocha": "^10.0.6",
         "@types/node": "^20.11.25",
         "@types/vscode": "^1.80.0",
         "@typescript-eslint/eslint-plugin": "^7.1.0",
         "@typescript-eslint/parser": "^7.1.0",
-        "eslint": "^8.57.0",
+        "eslint": "^8.57.1",
+        "eslint-config-prettier": "^10.1.5",
+        "eslint-plugin-prettier": "^5.4.0",
         "mocha": "^10.3.0",
-        "typescript": "^5.3.3"
+        "prettier": "^3.5.3",
+        "typescript": "^5.8.3",
+        "typescript-eslint": "^8.32.1"
     }
 }
