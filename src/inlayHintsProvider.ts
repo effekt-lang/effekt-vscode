@@ -1,5 +1,9 @@
 import * as vscode from 'vscode';
-import { Code2ProtocolConverter, LanguageClient, Protocol2CodeConverter } from 'vscode-languageclient/node';
+import {
+  Code2ProtocolConverter,
+  LanguageClient,
+  Protocol2CodeConverter
+} from 'vscode-languageclient/node';
 import {
   InlayHintRequest,
   InlayHintParams,
@@ -9,7 +13,7 @@ import {
 export class InlayHintProvider implements vscode.InlayHintsProvider {
   private client: LanguageClient;
   private protocol2code: Protocol2CodeConverter;
-  private code2protocol : Code2ProtocolConverter;
+  private code2protocol: Code2ProtocolConverter;
 
   constructor(client: LanguageClient) {
     this.client = client;
@@ -46,7 +50,7 @@ export class InlayHintProvider implements vscode.InlayHintsProvider {
       return [];
     }
 
-    const filtered = response.filter(h => {
+    const filtered = response.filter((h) => {
       return !(h.data === 'capture' && !showCaptureHints);
     });
 
