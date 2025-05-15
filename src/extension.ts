@@ -253,8 +253,9 @@ function registerHolesProvider(context: vscode.ExtensionContext) {
     '$/effekt/publishHoles',
     (params: { uri: string; holes: EffektHoleInfo[] }) => {
       console.log('on Notification');
-
       const { uri, holes } = params;
+      console.log(holes);
+
       const content = generateHolesContent(holes);
       const uriObject = vscode.Uri.parse(`effekt-holes:${uri}`);
       effektHolesContentProvider.update(uriObject, content);
