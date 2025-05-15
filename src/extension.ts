@@ -11,6 +11,11 @@ import { EffektManager, EffektExecutableNotFoundError } from './effektManager';
 import { EffektIRContentProvider } from './irProvider';
 import { InlayHintProvider } from './inlayHintsProvider';
 import { EffektLanguageClient } from './effektLanguageClient';
+import {
+  EffektHolesContentProvider,
+  EffektHoleInfo,
+  generateHolesContent,
+} from './holesProvider';
 import * as net from 'net';
 
 let client: EffektLanguageClient;
@@ -106,7 +111,7 @@ class EffektRunCodeLensProvider implements vscode.CodeLensProvider {
 
 export async function activate(context: vscode.ExtensionContext) {
   effektManager = new EffektManager();
-
+  console.log('hello');
   try {
     // If Effekt is installed (no matter which version), start the language server
     await ensureEffektIsAvailable();
@@ -138,6 +143,7 @@ async function initializeLSPAndProviders(context: vscode.ExtensionContext) {
   registerCodeLensProviders(context);
   registerIRProvider(context);
   registerInlayProvider();
+  registerHolesProvider(context);
   initializeHoleDecorations(context);
 }
 
@@ -230,6 +236,36 @@ function registerCodeLensProviders(context: vscode.ExtensionContext) {
       { language: 'literate effekt', scheme: 'file' },
       new EffektRunCodeLensProvider(),
     ),
+  );
+}
+
+function registerHolesProvider(context: vscode.ExtensionContext) {
+  console.log('registering Holes provider');
+  const effektHolesContentProvider = new EffektHolesContentProvider();
+  context.subscriptions.push(
+    vscode.workspace.registerTextDocumentContentProvider(
+      'effekt-holes',
+      effektHolesContentProvider,
+    ),
+  );
+
+  client.onNotification(
+    '$/effekt/publishHoles',
+    (params: { uri: string; holes: EffektHoleInfo[] }) => {
+      console.log('on Notification');
+
+      const { uri, holes } = params;
+      const content = generateHolesContent(holes);
+      const uriObject = vscode.Uri.parse(`effekt-holes:${uri}`);
+      effektHolesContentProvider.update(uriObject, content);
+      vscode.workspace.openTextDocument(uriObject).then((doc) => {
+        vscode.window.showTextDocument(doc, {
+          viewColumn: vscode.ViewColumn.Beside,
+          preview: false,
+          preserveFocus: true,
+        });
+      });
+    },
   );
 }
 

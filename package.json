@@ -158,6 +158,11 @@
                     "type": "boolean",
                     "default": true,
                     "markdownDescription": "Show inlay hints for function return types:\n\n ```effekt\ndef foo()': Int / { raise }' = { do raise(); 5 } \n```"
+                },       
+                "effekt.showHoles":{
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Show the holes panel with additional information"
                 }
             }
         },
