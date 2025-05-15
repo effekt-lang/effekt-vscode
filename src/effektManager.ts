@@ -5,6 +5,7 @@ import { compare as compareVersion } from 'compare-versions';
 import { URL } from 'url';
 import * as path from 'path';
 import * as fs from 'fs/promises';
+import { EffektLanguageClient } from './effektLanguageClient';
 
 interface InstallationResult {
     success: boolean;
@@ -16,6 +17,13 @@ interface InstallationResult {
 interface EffektExecutableInfo {
     path: string;
     version: string;
+}
+
+export class EffektExecutableNotFoundError extends Error {
+    constructor(message: string = "Effekt executable not found") {
+        super(message);
+        this.name = "EffektExecutableNotFoundError";
+    }
 }
 
 /**
@@ -81,6 +89,15 @@ export class EffektManager {
 
         // If we reach this point, it means --help succeeded but didn't contain "Effekt"
         throw new Error("Unable to determine Effekt version");
+    }
+
+    public async getEffektVersion(): Promise<string> {
+        if (!this.effektVersion) {
+            const effektPath = await this.locateEffektExecutable();
+            const currentVersion = await this.fetchEffektVersion(effektPath.path);
+            this.effektVersion = currentVersion;
+        }
+        return this.effektVersion || '';
     }
 
     /**
@@ -161,16 +178,15 @@ export class EffektManager {
             }
         }
 
-        throw new Error('Effekt executable not found');
+        throw new EffektExecutableNotFoundError('Effekt executable not found');
     }
 
     /**
      * Installs or updates Effekt.
-     * @param version The version to install or update to.
      * @param action The action being performed ('install' or 'update').
      * @returns A promise that resolves with the installed/updated version or an empty string.
      */
-    private async installOrUpdateEffekt(version: string, action: 'install' | 'update'): Promise<string> {
+    private async installOrUpdateEffekt(action: 'install' | 'update', client?: EffektLanguageClient): Promise<string> {
         if (!(await this.checkJava())) {
             this.logMessage('INFO', 'Java is not installed.');
             return '';
@@ -186,6 +202,8 @@ export class EffektManager {
             cancellable: false
         }, async (progress) => {
             try {
+                // The client is optional as when installing Effekt, there is no LSP initialized yet
+                await client?.stop();
                 progress.report({ increment: 0, message: 'Preparing...' });
                 await this.runNpmInstall();
                 progress.report({ increment: 50, message: 'Verifying installation...' });
@@ -194,10 +212,14 @@ export class EffektManager {
                 progress.report({ increment: 100, message: 'Completed' });
 
                 this.handleInstallationResult(verificationResult, action);
+
+                await client?.start();
                 return verificationResult.success ? verificationResult.version || '' : '';
             } catch (error) {
                 this.showErrorWithLogs(`Failed to ${action} Effekt: ${error}`);
                 this.updateStatusBar();
+
+                await client?.start();
                 return '';
             }
         });
@@ -269,12 +291,12 @@ export class EffektManager {
             const baseMessage = `Effekt has been ${action === 'update' ? 'updated' : 'installed'} to version ${result.version}.`;
 
             if (result.executable && !result.executable.includes(path.sep)) {
-                // Effekt is in PATH            
+                // Effekt is in PATH
                 const isUpdate = action === 'update';
-                
+
                 const options = isUpdate ? ['View Release Notes', 'Close'] : ['View Language Introduction', 'Close'];
                 const changelogResponse = await vscode.window.showInformationMessage(baseMessage, ...options);
-            
+
                 if (changelogResponse === 'View Release Notes') {
                     const changelogUrl = `https://github.com/effekt-lang/effekt/releases/tag/v${result.version}`;
                     vscode.env.openExternal(vscode.Uri.parse(changelogUrl));
@@ -282,7 +304,7 @@ export class EffektManager {
                     const introUrl = 'https://effekt-lang.org/docs/introduction';
                     vscode.env.openExternal(vscode.Uri.parse(introUrl));
                 }
-                                    
+
             } else {
                 // Effekt is not in PATH
                 const fullMessage = `${baseMessage}\n${result.message}\nConsider adding it to your PATH for easier access.`;
@@ -306,21 +328,16 @@ export class EffektManager {
      * Checks for Effekt updates and offers to install/update if necessary.
      * @returns A promise that resolves with the current Effekt version.
      */
-    public async checkForUpdatesAndInstall(): Promise<string> {
+    public async checkForUpdatesAndInstall(client?: EffektLanguageClient): Promise<string> {
         try {
-            const effektPath = await this.locateEffektExecutable();
-            if (!this.effektVersion) {
-                const currentVersion = await this.fetchEffektVersion(effektPath.path);
-                this.effektVersion = currentVersion;
-            }
-
+            let currentVersion = await this.getEffektVersion();
             const latestVersion = await this.getLatestNPMVersion(this.effektNPMPackage);
 
             // check if the latest version strictly newer than the current version
-            if (!this.effektVersion || compareVersion(latestVersion, this.effektVersion, '>')) {
-                return this.promptForAction(latestVersion, 'update');
+            if (!currentVersion || compareVersion(latestVersion, currentVersion, '>')) {
+                return this.promptForAction(latestVersion, 'update', client);
             } else {
-                vscode.window.showInformationMessage(`Effekt is up-to-date (version ${this.effektVersion}).`);
+                vscode.window.showInformationMessage(`Effekt is up-to-date (version ${currentVersion}).`);
             }
 
             this.updateStatusBar();
@@ -328,7 +345,7 @@ export class EffektManager {
         } catch (error) {
             if (error instanceof Error && error.message.includes('Effekt executable not found')) {
                 const latestVersion = await this.getLatestNPMVersion(this.effektNPMPackage);
-                return this.promptForAction(latestVersion, 'install');
+                return this.promptForAction(latestVersion, 'install', client);
             } else {
                 this.showErrorWithLogs(`Failed to check Effekt: ${error}`);
                 return '';
@@ -342,14 +359,14 @@ export class EffektManager {
      * @param action The action to perform ('install' or 'update').
      * @returns A promise that resolves with the installed/updated version or an empty string.
      */
-    private async promptForAction(version: string, action: 'install' | 'update'): Promise<string> {
+    private async promptForAction(version: string, action: 'install' | 'update', client?: EffektLanguageClient): Promise<string> {
         const message = action === 'update'
             ? `A new version of Effekt is available (${version}). Would you like to update?`
             : `Effekt ${version} is available. Would you like to install it?`;
 
         const response = await vscode.window.showInformationMessage(message, 'Yes', 'No');
         if (response === 'Yes') {
-            return this.installOrUpdateEffekt(version, action);
+            return this.installOrUpdateEffekt(action, client);
         }
         this.updateStatusBar();
         return this.effektVersion || '';

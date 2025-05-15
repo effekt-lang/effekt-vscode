@@ -2,46 +2,31 @@
 
 import * as vscode from 'vscode';
 import {
-    LanguageClient,
     LanguageClientOptions,
     ServerOptions,
     StreamInfo,
     State as ClientState
 } from 'vscode-languageclient/node';
-import { EffektManager } from './effektManager';
+import { EffektManager, EffektExecutableNotFoundError } from './effektManager';
 import { EffektIRContentProvider } from './irProvider';
 import { InlayHintProvider } from './inlayHintsProvider';
+import { EffektLanguageClient } from './effektLanguageClient';
 import * as net from 'net';
 
-/**
- * Overrides the `registerFeature` method to disable the built-in inlay hints feature.
- *
- * By default the LanguageClient provides inlay hints automatically, which does not allow 
- * for filtering Inlay Hints based on their 'data'-field. We use the 'data'-field to allow
- * the user to select which inlay hints the extension should show.
- * 
- * By doing this, we retain full control over how inlay hints are displayed, allowing us to
- * implement custom logic.
- *
- * Note: This approach relies on identifying the inlay hints feature by its constructor name
- * (`InlayHintsFeature`). If the LSP implementation changes, this logic may need to be updated.
- */
-class EffektLanguageClient extends LanguageClient {
-    public registerFeature(feature: any) {
-        if (feature.constructor.name === 'InlayHintsFeature') { 
-            return; 
-        }
-        super.registerFeature(feature);
-    }
-}
+
 
 let client: EffektLanguageClient;
 let effektManager: EffektManager;
+let outputChannel = vscode.window.createOutputChannel("Effekt Extension")
+
+function logMessage(level: 'INFO' | 'ERROR', message: string) {
+    outputChannel.appendLine(`[${new Date().toISOString()}] ${level}: ${message}`);
+}
 
 function registerCommands(context: vscode.ExtensionContext) {
     context.subscriptions.push(
         vscode.commands.registerCommand('effekt.checkForUpdates', async () => {
-            await effektManager?.checkForUpdatesAndInstall();
+            await effektManager?.checkForUpdatesAndInstall(client);
         }),
         vscode.commands.registerCommand('effekt.restartServer', async () => {
             if (client) {
@@ -122,27 +107,51 @@ class EffektRunCodeLensProvider implements vscode.CodeLensProvider {
 export async function activate(context: vscode.ExtensionContext) {
     effektManager = new EffektManager();
 
-    const effektVersion = await effektManager.checkForUpdatesAndInstall();
-    if (!effektVersion) {
-        vscode.window.showWarningMessage('Effekt is not installed. LSP features may not work correctly.');
+    try {
+        // If Effekt is installed (no matter which version), start the language server
+        await ensureEffektIsAvailable();
+        await initializeLSPAndProviders(context);
+
+        await handleEffektUpdates();
+    } catch (error) {
+        if (error instanceof EffektExecutableNotFoundError) {
+            // If Effekt is not installed, we prompt the user to install it
+            await handleEffektUpdates();
+            await initializeLSPAndProviders(context);
+        } else {
+            // Handle unexpected errors
+            console.error("An unexpected error occurred:", error);
+            vscode.window.showErrorMessage('An unexpected error occurred. Check the logs for details.');
+        }
     }
+}
 
+async function ensureEffektIsAvailable() {
+    await effektManager.locateEffektExecutable();
+}
+
+async function initializeLSPAndProviders(context: vscode.ExtensionContext) {
+    await startEffektLanguageServer(context);
     registerCommands(context);
+    registerCodeLensProviders(context);
+    registerIRProvider(context);
+    registerInlayProvider();
+    initializeHoleDecorations(context);
+}
 
-    // Register the CodeLens provider
-    context.subscriptions.push(
-        vscode.languages.registerCodeLensProvider(
-            { language: 'effekt', scheme: 'file' },
-            new EffektRunCodeLensProvider()
-        ),
-        vscode.languages.registerCodeLensProvider(
-            { language: 'literate effekt', scheme: 'file' },
-            new EffektRunCodeLensProvider()
-        )
-    );
+async function handleEffektUpdates() {
+    const installedEffektVersion = await effektManager.checkForUpdatesAndInstall(client);
+    if (!installedEffektVersion) {
+        vscode.window.showWarningMessage(
+            'Effekt is not installed. LSP features may not work correctly.'
+        );
+    } else {
+        logMessage('INFO', "Using the existing version of Effekt");
+    }
+}
 
+async function startEffektLanguageServer(context: vscode.ExtensionContext) {
     const config = vscode.workspace.getConfiguration("effekt");
-
     let serverOptions: ServerOptions;
 
     if (config.get<boolean>("debug")) {
@@ -156,7 +165,9 @@ export async function activate(context: vscode.ExtensionContext) {
             return Promise.resolve(result);
         };
     } else {
+       
         const effektExecutable = await effektManager.locateEffektExecutable();
+       
         const args = ["--server", ...effektManager.getEffektArgs()];
 
         /* > Node.js will now error with EINVAL if a .bat or .cmd file is passed to child_process.spawn and child_process.spawnSync without the shell option set.
@@ -173,7 +184,7 @@ export async function activate(context: vscode.ExtensionContext) {
         };
     }
 
-    let clientOptions: LanguageClientOptions = {
+    const clientOptions: LanguageClientOptions = {
         initializationOptions: vscode.workspace.getConfiguration('effekt'),
         documentSelector: [
             { scheme: 'file', language: 'effekt' },
@@ -193,7 +204,6 @@ export async function activate(context: vscode.ExtensionContext) {
         clientOptions
     );
 
-    // Update server status
     client.onDidChangeState(event => {
         if (event.newState === ClientState.Starting) {
             effektManager.updateServerStatus('starting');
@@ -204,10 +214,58 @@ export async function activate(context: vscode.ExtensionContext) {
         }
     });
 
+    await client.start();
+    context.subscriptions.push(client);
+}
+
+function registerCodeLensProviders(context: vscode.ExtensionContext) {
+    context.subscriptions.push(
+        vscode.languages.registerCodeLensProvider(
+            { language: 'effekt', scheme: 'file' },
+            new EffektRunCodeLensProvider()
+        ),
+        vscode.languages.registerCodeLensProvider(
+            { language: 'literate effekt', scheme: 'file' },
+            new EffektRunCodeLensProvider()
+        )
+    );
+}
+
+function registerIRProvider(context: vscode.ExtensionContext) {
+    const effektIRContentProvider = new EffektIRContentProvider();
+    context.subscriptions.push(
+        vscode.workspace.registerTextDocumentContentProvider('effekt-ir', effektIRContentProvider)
+    );
+
+    client.onNotification('$/effekt/publishIR', (params: { filename: string, content: string }) => {
+        const { filename, content } = params;
+        const uri = vscode.Uri.parse(`effekt-ir:${filename}`);
+        effektIRContentProvider.update(uri, content);
+        vscode.workspace.openTextDocument(uri).then(doc => {
+            vscode.window.showTextDocument(doc, {
+                viewColumn: vscode.ViewColumn.Beside,
+                preview: false,
+                preserveFocus: true
+            });
+        });
+    });
+}
+
+function registerInlayProvider(){
+    vscode.languages.registerInlayHintsProvider(
+        { scheme: 'file', language: 'effekt' },
+        new InlayHintProvider(client)
+    );
+
+    vscode.languages.registerInlayHintsProvider(
+        { scheme: 'file', language: 'literate effekt' },
+        new InlayHintProvider(client)
+    );
+}
     // Decorate holes
     // ---
     // It would be nice if there was a way to reuse the scopes of the tmLanguage file
-
+    function initializeHoleDecorations(context: vscode.ExtensionContext) {
     const holeDelimiterDecoration = vscode.window.createTextEditorDecorationType({
         opacity: '0.5',
         borderRadius: '4pt',
@@ -225,7 +283,6 @@ export async function activate(context: vscode.ExtensionContext) {
     }
 
     const holeRegex = /<>|<{|}>/g;
-
     /**
      * TODO clean this up -- ideally move it to the language server
      */
@@ -263,37 +320,6 @@ export async function activate(context: vscode.ExtensionContext) {
     }, null, context.subscriptions);
 
     scheduleDecorations();
-
-    const effektIRContentProvider = new EffektIRContentProvider();
-    context.subscriptions.push(
-        vscode.workspace.registerTextDocumentContentProvider('effekt-ir', effektIRContentProvider)
-    );
-
-    client.onNotification('$/effekt/publishIR', (params: { filename: string, content: string }) => {
-        const { filename, content } = params;
-        const uri = vscode.Uri.parse(`effekt-ir:${filename}`);
-        effektIRContentProvider.update(uri, content);
-        vscode.workspace.openTextDocument(uri).then(doc => {
-            vscode.window.showTextDocument(doc, {
-                viewColumn: vscode.ViewColumn.Beside,
-                preview: false,
-                preserveFocus: true
-            });
-        });
-    });
-
-    await client.start();
-    context.subscriptions.push(client);
-
-    vscode.languages.registerInlayHintsProvider(
-        { scheme: 'file', language: 'effekt' },
-        new InlayHintProvider(client)
-    );
-
-    vscode.languages.registerInlayHintsProvider(
-        { scheme: 'file', language: 'literate effekt' },
-        new InlayHintProvider(client)
-    );
 }
 
 export function deactivate(): Thenable<void> | undefined {
