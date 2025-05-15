@@ -20,6 +20,12 @@ export class EffektHolesContentProvider
 
 export function generateHolesContent(holes: EffektHoleInfo[]): string {
   console.log('generating content');
+
+  if (!Array.isArray(holes)) {
+    console.error('Invalid input: holes is not an array', holes);
+    return 'Invalid holes data';
+  }
+
   return holes
     .map(
       (hole) =>
