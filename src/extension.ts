@@ -84,7 +84,7 @@ class EffektRunCodeLensProvider implements vscode.CodeLensProvider {
   public provideCodeLenses(document: vscode.TextDocument): vscode.CodeLens[] {
     const codeLenses: vscode.CodeLens[] = [];
     const text = document.getText();
-    const mainFunctionRegex = /(?<=^|\s)def\s+main\s*\(\s*\)/gm;
+    const mainFunctionRegex = /^[^\S\r\n]*def\s+main\s*\(\s*\)/gm;
     let match: RegExpExecArray | null;
 
     while ((match = mainFunctionRegex.exec(text)) !== null) {
