@@ -288,7 +288,7 @@ export async function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(
         //Notebook registration
         vscode.workspace.registerNotebookSerializer('effekt-notebook', new NotebookSerializer()),
-        new Controller(client, effektManager),
+        new Controller(client),
     );
     
     await client.start();

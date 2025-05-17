@@ -1,14 +1,127 @@
+import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
 import * as vscode from 'vscode';
 import { LanguageClient, ExecuteCommandRequest } from 'vscode-languageclient/node';
-import { exec } from 'child_process';
-import * as util from 'util';
-import * as fs from 'fs';
-import * as os from 'os';
-import * as path from 'path';
-import { EffektManager } from './effektManager';
 
-// convert callback-based method exec to promise-based 
-const execPromise = util.promisify(exec); 
+let replSession: ChildProcessWithoutNullStreams | null = null;
+
+function startREPL(): Promise<void>{
+    if(replSession) {
+        console.log("REPL session already started");
+        return Promise.resolve();
+    }
+
+    // spawn new repl
+    replSession = spawn('effekt.sh', [], { stdio:'pipe', shell: true });
+    console.log("REPL session started");
+
+    // ignore welcome banner
+    let initBuffer = '';
+    return new Promise(resolve => {
+        const onInit = (data: Buffer) => {
+            initBuffer += data.toString();
+            if(initBuffer.includes('\n>')){
+                replSession?.stdout.off('data', onInit);
+                console.log("Swallowed welcome banner: \n"+initBuffer.trim());
+                resolve();
+            }
+        };
+        replSession!.stdout.on('data', onInit);
+
+        replSession!.on('close', (code) => {
+            console.log(`REPL process exited with code ${code}`);
+        });
+        replSession!.on('error', (error) => {
+            console.error(`Error starting REPL process: ${error}`);
+        });
+    });
+}
+function stopREPL(){
+    if(replSession) {
+        replSession.kill();
+        replSession = null;
+        console.log("REPL session stopped");
+    }
+}
+
+function execCellREPL(cellCode: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+        if (!replSession) {
+            reject("REPL session not started");
+            return;
+        }
+        // Buffer the output until we see ">"
+        let outputBuffer = '';
+    
+        // listen for data once
+        const onData = (chunk: Buffer) => {
+            const text = chunk.toString();
+            outputBuffer += text;
+
+            // check if REPL has finished processing => buffer ends with ">"
+            if(outputBuffer.trim().endsWith('>')){
+                const lines = outputBuffer.split('\n');
+                
+                //filter out any lines 
+                const resultLines = lines
+                    .filter(l => {
+                    const t = l.trim();
+                    
+                    // ignore promt line
+                    if (t === ">" || t.startsWith(">")) return false;
+
+                    //ignore input content , so it will not be shown in output cell
+                    if (t === cellCode.trim()) return false;
+
+                    // keep non-empty lines
+                    return t.length > 0;
+                    });
+                
+                // join the filtered lines back into on string
+                const result = resultLines.join("\n").trim();
+                
+                // remove listeners so future REPL output doesn't trigger again
+                cleanup();
+                outputBuffer = '';
+                
+                // return executed cell content
+                resolve(result);
+            }
+
+        };
+
+        // Handler for stderr
+        const onStderr = (error: Buffer) => {
+            cleanup();
+            reject(new Error(error.toString()));
+        };
+
+        // Remove listeners when REPL sends output or error
+        const cleanup = () => {
+            replSession?.stdout.off('data', onData);
+            replSession?.stderr.off('data', onStderr);
+        };
+
+        // Attach listeners to the REPL process
+        replSession.stdout.on('data', onData);
+        console.log("stdout:" + replSession.stdout.toString());
+        replSession.stderr.on('data', (buf: Buffer) => {
+            // ignore "Debugger attached" message
+            const text = buf.toString();
+            if(text.includes('ebugger')) {
+                return;
+            }
+            console.error("stderr:" + text);
+        });
+
+        // Send cell content to REPL
+        replSession.stdin.write(cellCode + '\n');
+    });
+}
+      
+// check if REPL already started
+function isREPLActive(): boolean {
+    return replSession !== null;
+}
 
 export class Controller {
     readonly controllerId = 'notebook-controller_id';
@@ -19,9 +132,8 @@ export class Controller {
     private readonly _controller: vscode.NotebookController;
     private _executionOrder = 0;
     private readonly client: LanguageClient;
-    private readonly effektManager: EffektManager;
 
-    constructor(client: LanguageClient, effektManager: EffektManager) {
+    constructor(client: LanguageClient) {
         this._controller = vscode.notebooks.createNotebookController(
             this.controllerId,
             this.notebookType,
@@ -29,7 +141,6 @@ export class Controller {
         );
 
         this.client = client;
-        this.effektManager = effektManager;
         this._controller.supportedLanguages = this.supportedLanguages;
         this._controller.supportsExecutionOrder = true;
         this._controller.executeHandler = this._execute.bind(this);
@@ -49,24 +160,6 @@ export class Controller {
         }
     }
 
-    // Executes a temporary file generated from the cell content, using Effekt CLI (similar to runEffektFile)
-    private async runEffektCLI(tmpUri: vscode.Uri): Promise<string> {
-        const effektExecutable = await this.effektManager.locateEffektExecutable();
-        const args = [tmpUri.fsPath, ...this.effektManager.getEffektArgs()];
-
-        const command = `${effektExecutable.path} ${args.join(' ')}`;
-        console.log('Running command:', command);
-
-        const { stdout, stderr } = await execPromise(command);
-
-        if (stderr) {
-            console.error('Effekt Error:', stderr);
-            return stderr;
-        }
-
-        return stdout;
-    }
-
     // runs the content of a cell when user clicks Run, and updates the cell output
     private async _doExecution(cell: vscode.NotebookCell): Promise<void> {
         const execution = this._controller.createNotebookCellExecution(cell);
@@ -75,34 +168,28 @@ export class Controller {
 
         /* Do execution here */
         try {            
-            // Syntax check request to server
-            // TODO: move this to main file ? 
-            const cellClient = await this.client.sendRequest(ExecuteCommandRequest.type, 
-                { command: "compileCell", arguments: [{
-                uri: cell.document.uri.toString()
-            }]})
-
-            // Create a temporary file with cell content, which will be deleted afterwards
             const cellContent = cell.document.getText();
-            const tmpDir = os.tmpdir();
-            const tmpFilePath = path.join(tmpDir, `effekt_cell.effekt`);
+    
+            var result = "";
 
-            await fs.promises.writeFile(tmpFilePath, cellContent);
-            
-            const tmpUri = vscode.Uri.file(tmpFilePath);
-            
-            // execute temporary file 
-            const result = await this.runEffektCLI(tmpUri);
+            //start REPL session
+            if(!isREPLActive()) {
+                await startREPL();
+            } 
+            //send cell content to REPL
+
+            result = (await execCellREPL(cellContent)).toString();
 
             execution.replaceOutput(new vscode.NotebookCellOutput([
-                vscode.NotebookCellOutputItem.text(result, 'text/plain')
-            ]));
+                vscode.NotebookCellOutputItem.text(result)
+            ]));         
         } catch (error: any) {
             execution.replaceOutput([
                 new vscode.NotebookCellOutput([
                     vscode.NotebookCellOutputItem.error(error)
                 ])
-            ])
+            ]);
+            stopREPL();
         }
         execution.end(true, Date.now());
     }
