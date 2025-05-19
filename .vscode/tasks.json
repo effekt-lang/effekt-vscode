@@ -2,6 +2,7 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
+			"label": "npm: compile",
 			"type": "npm",
 			"script": "compile",
 			"group": "build",
@@ -14,6 +15,7 @@
 			]
 		},
 		{
+			"label": "npm: watch",
 			"type": "npm",
 			"script": "watch",
 			"isBackground": true,
