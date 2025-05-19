@@ -391,38 +391,44 @@ export class EffektManager {
   ): Promise<string> {
     try {
       const currentVersion = await this.getEffektVersion();
-      const latestVersion = await this.getLatestNPMVersion(
-        this.effektNPMPackage,
-      ).catch(function (_err: string) {
-        return null;
-      });
-
-      if (latestVersion === null) {
-        // requesting latest version from NPM failed
-        if (currentVersion) {
-          vscode.window.showWarningMessage(
-            'Could not retrieve current Effekt version, using locally installed Effekt.',
-          );
-        } else {
-          vscode.window.showErrorMessage(
-            'Effekt is not installed and we could not connect to NPM. Please check your network connection and reload.',
-          );
-          return '';
-        }
-      } else if (
-        // check if the latest version strictly newer than the current version
-        !currentVersion ||
-        compareVersion(latestVersion, currentVersion, '>')
-      ) {
-        return this.promptForAction(latestVersion, 'update', client);
-      } else {
-        vscode.window.showInformationMessage(
-          `Effekt is up-to-date (version ${currentVersion}).`,
+      try {
+        const latestVersion = await this.getLatestNPMVersion(
+          this.effektNPMPackage,
         );
-      }
 
-      this.updateStatusBar();
-      return this.effektVersion || '';
+        // check if the latest version strictly newer than the current version
+        if (
+          !currentVersion ||
+          compareVersion(latestVersion, currentVersion, '>')
+        ) {
+          return this.promptForAction(latestVersion, 'update', client);
+        } else {
+          vscode.window.showInformationMessage(
+            `Effekt is up-to-date (version ${currentVersion}).`,
+          );
+        }
+
+        this.updateStatusBar();
+        return this.effektVersion || '';
+      } catch (error) {
+        if (
+          error instanceof Error &&
+          error.message.includes('Failed to fetch latest version from npm')
+        ) {
+          console.log(`Fetching current version from npm failed: ${error.message}`);
+          if (currentVersion) {
+            vscode.window.showWarningMessage(
+              'Could not retrieve current Effekt version, using locally installed Effekt.',
+            );
+            return currentVersion;
+          } else {
+            vscode.window.showErrorMessage(
+              'Effekt is not installed and we could not connect to NPM. Please check your network connection and reload.',
+            );
+            return '';
+          }
+        } else { throw error; } // rethrow
+      }
     } catch (error) {
       if (
         error instanceof Error &&
