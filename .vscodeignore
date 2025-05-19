@@ -1,4 +1,5 @@
 .vscode
+.github
 .git-blame-ignore-revs
 node_modules
 src/
