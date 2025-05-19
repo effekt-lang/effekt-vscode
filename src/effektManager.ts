@@ -412,6 +412,7 @@ export class EffektManager {
         return this.effektVersion || '';
       } catch (error) {
         if (
+          currentVersion &&
           error instanceof Error &&
           error.message.includes('Failed to fetch latest version from npm')
         ) {
@@ -419,17 +420,10 @@ export class EffektManager {
             "ERROR",
             `Fetching current version from npm failed: ${error.message}`,
           );
-          if (currentVersion) {
-            vscode.window.showWarningMessage(
-              'Could not retrieve current Effekt version, using locally installed Effekt.',
-            );
-            return currentVersion;
-          } else {
-            vscode.window.showErrorMessage(
-              'Effekt is not installed and we could not connect to NPM. Please check your network connection and reload.',
-            );
-            return '';
-          }
+          vscode.window.showWarningMessage(
+            'Could not retrieve current Effekt version, using locally installed Effekt.',
+          );
+          return currentVersion;
         } else {
           throw error; // rethrow
         }
@@ -439,10 +433,25 @@ export class EffektManager {
         error instanceof Error &&
         error.message.includes('Effekt executable not found')
       ) {
-        const latestVersion = await this.getLatestNPMVersion(
-          this.effektNPMPackage,
-        );
-        return this.promptForAction(latestVersion, 'install', client);
+        try {
+          const latestVersion = await this.getLatestNPMVersion(
+            this.effektNPMPackage,
+          );
+          return this.promptForAction(latestVersion, 'install', client);
+        } catch (error) {
+          if (
+            error instanceof Error &&
+            error.message.includes('Failed to fetch latest version from npm')
+          ) {
+            this.showErrorWithLogs(
+              `Effekt is not installed and could not retrieve current version. Check your internet connection and try again.`,
+            );
+            return '';
+          } else {
+            this.showErrorWithLogs(`Failed to check Effekt: ${error}`);
+            return '';
+          }
+        }
       } else {
         this.showErrorWithLogs(`Failed to check Effekt: ${error}`);
         return '';
