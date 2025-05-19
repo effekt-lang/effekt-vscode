@@ -407,6 +407,7 @@ export class EffektManager {
           vscode.window.showErrorMessage(
             'Effekt is not installed and we could not connect to NPM. Please check your network connection and reload.',
           );
+          return '';
         }
       } else if (
         // check if the latest version strictly newer than the current version
