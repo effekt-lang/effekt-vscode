@@ -415,7 +415,7 @@ export class EffektManager {
           error instanceof Error &&
           error.message.includes('Failed to fetch latest version from npm')
         ) {
-          console.log(
+          this.logMessage("ERROR",
             `Fetching current version from npm failed: ${error.message}`,
           );
           if (currentVersion) {
