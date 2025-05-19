@@ -401,11 +401,11 @@ export class EffektManager {
         // requesting latest version from NPM failed
         if (currentVersion) {
           vscode.window.showWarningMessage(
-            'Could not retrieve current Effekt version, using locally installed Effekt.'
+            'Could not retrieve current Effekt version, using locally installed Effekt.',
           );
         } else {
           vscode.window.showErrorMessage(
-            'Effekt is not installed and we could not connect to NPM. Please check your network connection and reload.'
+            'Effekt is not installed and we could not connect to NPM. Please check your network connection and reload.',
           );
         }
       } else if (
