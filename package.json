@@ -19,7 +19,7 @@
         "onLanguage:effekt",
         "onLanguage:literateeffekt"
     ],
-    "main": "./out/extension",
+    "main": "./dist/extension",
     "contributes": {
         "languages": [
             {
@@ -183,9 +183,13 @@
         }
     },
     "scripts": {
-        "vscode:prepublish": "npm run compile",
-        "compile": "tsc -b",
-        "watch": "tsc -b -w",
+        "compile": "npm run check-types && node esbuild.js",
+        "check-types": "tsc --noEmit",
+        "watch": "npm-run-all -p watch:*",
+        "watch:esbuild": "node esbuild.js --watch",
+        "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
+        "vscode:prepublish": "npm run package",
+        "package": "npm run check-types && node esbuild.js --production",
         "lint": "eslint 'src/**/*.ts'",
         "lint:fix": "eslint 'src/**/*.ts' --fix",
         "format": "prettier --config .prettierrc 'src/**/*.ts' --write",
@@ -202,6 +206,7 @@
         "@types/vscode": "^1.80.0",
         "@typescript-eslint/eslint-plugin": "^7.1.0",
         "@typescript-eslint/parser": "^7.1.0",
+        "esbuild": "^0.25.4",
         "eslint": "^8.57.1",
         "eslint-config-prettier": "^10.1.5",
         "eslint-plugin-prettier": "^5.4.0",
