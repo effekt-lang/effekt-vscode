@@ -8,8 +8,12 @@ async function main() {
     entryPoints: ['src/extension.ts'],
     bundle: true,
     format: 'cjs',
-    minify: production,
-    sourcemap: !production,
+    /* NOTE: Minifying doesn't seem to be semantics-preserving for our plugin.
+       The minifyed extension was observed to show the capture inlay hints twice,
+       apparently breaking the runtime reflection performed in `EffektLanguageClient.registerFeature`.
+    */
+    minify: false,
+    sourcemap: false,
     sourcesContent: false,
     platform: 'node',
     outfile: 'dist/extension.js',
