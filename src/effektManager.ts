@@ -416,7 +416,7 @@ export class EffektManager {
           error.message.includes('Failed to fetch latest version from npm')
         ) {
           console.log(
-            `Fetching current version from npm failed: ${error.message}`
+            `Fetching current version from npm failed: ${error.message}`,
           );
           if (currentVersion) {
             vscode.window.showWarningMessage(
