@@ -393,23 +393,23 @@ export class EffektManager {
       const currentVersion = await this.getEffektVersion();
       const latestVersion = await this.getLatestNPMVersion(
         this.effektNPMPackage,
-      ).catch(function(err: string) {
+      ).catch(function (_err: string) {
         return null;
       });
 
-      if(latestVersion === null) {
+      if (latestVersion === null) {
         // requesting latest version from NPM failed
         if (currentVersion) {
           vscode.window.showWarningMessage(
-            "Could not retrieve current Effekt version, using locally installed Effekt."
+            'Could not retrieve current Effekt version, using locally installed Effekt.'
           );
         } else {
           vscode.window.showErrorMessage(
-            "Effekt is not installed and we could not connect to NPM. Please check your network connection and reload."
+            'Effekt is not installed and we could not connect to NPM. Please check your network connection and reload.'
           );
         }
       } else if (
-      // check if the latest version strictly newer than the current version
+        // check if the latest version strictly newer than the current version
         !currentVersion ||
         compareVersion(latestVersion, currentVersion, '>')
       ) {
