@@ -415,7 +415,9 @@ export class EffektManager {
           error instanceof Error &&
           error.message.includes('Failed to fetch latest version from npm')
         ) {
-          console.log(`Fetching current version from npm failed: ${error.message}`);
+          console.log(
+            `Fetching current version from npm failed: ${error.message}`
+          );
           if (currentVersion) {
             vscode.window.showWarningMessage(
               'Could not retrieve current Effekt version, using locally installed Effekt.',
@@ -427,7 +429,9 @@ export class EffektManager {
             );
             return '';
           }
-        } else { throw error; } // rethrow
+        } else {
+          throw error; // rethrow
+        }
       }
     } catch (error) {
       if (
