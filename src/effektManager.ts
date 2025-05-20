@@ -25,6 +25,15 @@ export class EffektExecutableNotFoundError extends Error {
     this.name = 'EffektExecutableNotFoundError';
   }
 }
+class FetchingVersionFromNPMError extends Error {
+  constructor(
+    cause: Error,
+    message = `Failed to fetch latest version from NPM: ${cause}`,
+  ) {
+    super(message);
+    this.name = 'FetchingVersionFromNPMError';
+  }
+}
 
 /**
  * Manages Effekt installation, updates, and status within VS Code.
@@ -171,9 +180,7 @@ export class EffektManager {
           });
         })
         .on('error', (error) => {
-          reject(
-            new Error(`Failed to fetch latest version from npm: ${error}`),
-          );
+          reject(new FetchingVersionFromNPMError(error));
         });
     });
   }
@@ -211,7 +218,7 @@ export class EffektManager {
       }
     }
 
-    throw new EffektExecutableNotFoundError('Effekt executable not found');
+    throw new EffektExecutableNotFoundError();
   }
 
   /**
@@ -411,11 +418,7 @@ export class EffektManager {
         this.updateStatusBar();
         return this.effektVersion || '';
       } catch (error) {
-        if (
-          currentVersion &&
-          error instanceof Error &&
-          error.message.includes('Failed to fetch latest version from npm')
-        ) {
+        if (currentVersion && error instanceof FetchingVersionFromNPMError) {
           this.logMessage(
             'ERROR',
             `Fetching current version from npm failed: ${error.message}`,
@@ -429,20 +432,14 @@ export class EffektManager {
         }
       }
     } catch (error) {
-      if (
-        error instanceof Error &&
-        error.message.includes('Effekt executable not found')
-      ) {
+      if (error instanceof EffektExecutableNotFoundError) {
         try {
           const latestVersion = await this.getLatestNPMVersion(
             this.effektNPMPackage,
           );
           return this.promptForAction(latestVersion, 'install', client);
         } catch (error) {
-          if (
-            error instanceof Error &&
-            error.message.includes('Failed to fetch latest version from npm')
-          ) {
+          if (error instanceof FetchingVersionFromNPMError) {
             this.showErrorWithLogs(
               `Effekt is not installed and could not retrieve current version. Check your internet connection and try again.`,
             );
