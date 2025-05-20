@@ -25,6 +25,15 @@ export class EffektExecutableNotFoundError extends Error {
     this.name = 'EffektExecutableNotFoundError';
   }
 }
+class FetchingVersionFromNPMError extends Error {
+  constructor(
+    cause: Error,
+    message = `Failed to fetch latest version from NPM: ${cause}`,
+  ) {
+    super(message);
+    this.name = 'FetchingVersionFromNPMError';
+  }
+}
 
 /**
  * Manages Effekt installation, updates, and status within VS Code.
@@ -171,9 +180,7 @@ export class EffektManager {
           });
         })
         .on('error', (error) => {
-          reject(
-            new Error(`Failed to fetch latest version from npm: ${error}`),
-          );
+          reject(new FetchingVersionFromNPMError(error));
         });
     });
   }
@@ -211,7 +218,7 @@ export class EffektManager {
       }
     }
 
-    throw new EffektExecutableNotFoundError('Effekt executable not found');
+    throw new EffektExecutableNotFoundError();
   }
 
   /**
@@ -391,33 +398,57 @@ export class EffektManager {
   ): Promise<string> {
     try {
       const currentVersion = await this.getEffektVersion();
-      const latestVersion = await this.getLatestNPMVersion(
-        this.effektNPMPackage,
-      );
-
-      // check if the latest version strictly newer than the current version
-      if (
-        !currentVersion ||
-        compareVersion(latestVersion, currentVersion, '>')
-      ) {
-        return this.promptForAction(latestVersion, 'update', client);
-      } else {
-        vscode.window.showInformationMessage(
-          `Effekt is up-to-date (version ${currentVersion}).`,
-        );
-      }
-
-      this.updateStatusBar();
-      return this.effektVersion || '';
-    } catch (error) {
-      if (
-        error instanceof Error &&
-        error.message.includes('Effekt executable not found')
-      ) {
+      try {
         const latestVersion = await this.getLatestNPMVersion(
           this.effektNPMPackage,
         );
-        return this.promptForAction(latestVersion, 'install', client);
+
+        // check if the latest version strictly newer than the current version
+        if (
+          !currentVersion ||
+          compareVersion(latestVersion, currentVersion, '>')
+        ) {
+          return this.promptForAction(latestVersion, 'update', client);
+        } else {
+          vscode.window.showInformationMessage(
+            `Effekt is up-to-date (version ${currentVersion}).`,
+          );
+        }
+
+        this.updateStatusBar();
+        return this.effektVersion || '';
+      } catch (error) {
+        if (currentVersion && error instanceof FetchingVersionFromNPMError) {
+          this.logMessage(
+            'ERROR',
+            `Fetching current version from npm failed: ${error.message}`,
+          );
+          vscode.window.showWarningMessage(
+            'Could not retrieve current Effekt version, using locally installed Effekt.',
+          );
+          return currentVersion;
+        } else {
+          throw error; // rethrow
+        }
+      }
+    } catch (error) {
+      if (error instanceof EffektExecutableNotFoundError) {
+        try {
+          const latestVersion = await this.getLatestNPMVersion(
+            this.effektNPMPackage,
+          );
+          return this.promptForAction(latestVersion, 'install', client);
+        } catch (error) {
+          if (error instanceof FetchingVersionFromNPMError) {
+            this.showErrorWithLogs(
+              `Effekt is not installed and could not retrieve current version. Check your internet connection and try again.`,
+            );
+            return '';
+          } else {
+            this.showErrorWithLogs(`Failed to check Effekt: ${error}`);
+            return '';
+          }
+        }
       } else {
         this.showErrorWithLogs(`Failed to check Effekt: ${error}`);
         return '';
