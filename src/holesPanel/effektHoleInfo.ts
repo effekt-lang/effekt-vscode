@@ -1,3 +1,5 @@
+import { Range as LSPRange } from 'vscode-languageserver-protocol';
+
 export interface EffektHoleInfo {
   id: string;
   range: LSPRange;
@@ -7,17 +9,6 @@ export interface EffektHoleInfo {
   importedTypes: TypeBinding[];
   terms: TermBinding[];
   types: TypeBinding[];
-}
-
-export interface LSPRange {
-  // import from lib
-  start: LSPPosition;
-  end: LSPPosition;
-}
-
-export interface LSPPosition {
-  line: number;
-  character: number;
 }
 
 export interface TermBinding {
