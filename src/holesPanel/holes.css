@@ -11,7 +11,8 @@
   --highlight: #e8eef6;
   --shadow: 0 4px 24px rgba(27, 31, 35, 0.06);
   --radius: 8px;
-  --font: 'Segoe UI', 'Inter', system-ui, sans-serif;
+  --font: 'Inter', 'Segoe UI', system-ui, 'Roboto', 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
 
 html, body {
@@ -20,6 +21,9 @@ html, body {
   font-family: var(--font);
   margin: 0;
   padding: 0;
+}
+code, pre, .font-mono {
+  font-family: var(--font-mono);
 }
 
 .container {
@@ -212,4 +216,26 @@ summary::-webkit-details-marker {
   color: #cf222e;
   background: #fff0f0;
   border: 1px solid #f7c1c1;
+}
+.expected-type-alert {
+  background-color: #eff6ff;       /* Tailwind's bg-blue-50 */
+  border: 1px solid #bfdbfe;       /* Tailwind's border-blue-200 */
+  border-radius: 0.375rem;
+  padding: 0.75em 1em;
+  margin-bottom: 0.75rem;
+}
+
+.expected-type-alert-title {
+  font-size: 0.75rem;              /* Tailwind's text-xs */
+  font-weight: 600;                /* Tailwind's font-semibold */
+  color: #1d4ed8;                  /* Tailwind's text-blue-700 */
+  margin-bottom: 0.125rem;
+}
+
+.expected-type-alert-desc {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; /* Tailwind's font-mono */
+  font-size: 0.875rem;             /* Tailwind's text-sm */
+}
+.indented-field {
+  padding-left: 1em; /* Match the .expected-type-alert padding */
 }

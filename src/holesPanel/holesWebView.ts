@@ -46,18 +46,21 @@ export function generateWebView(
               <span class="hole-id">Hole: ${escapeHtml(hole.id)}</span>
               <span class="hole-range">[${hole.range.start.line + 1}:${hole.range.start.character + 1} - ${hole.range.end.line + 1}:${hole.range.end.character + 1}]</span>
             </div>
-            <div class="hole-field">
+           
+            <div class="expected-type-alert">
+            <div class="expected-type-alert-title">Expected Type</div>
+            <div class="expected-type-alert-desc">
+              ${hole.expectedType ? escapeHtml(hole.expectedType) : '<span class="empty">N/A</span>'}
+            </div>
+          </div>
+           <div class="hole-field indented-field">
               <span class="field-label">Inner type:</span>
               <span class="field-value">${hole.innerType ? `<code>${escapeHtml(hole.innerType)}</code>` : '<span class="empty">N/A</span>'}</span>
             </div>
             <div class="hole-field">
-              <span class="field-label">Expected type:</span>
-              <span class="field-value">${hole.expectedType ? `<code>${escapeHtml(hole.expectedType)}</code>` : '<span class="empty">N/A</span>'}</span>
-            </div>
-            <div class="hole-field">
               <details>
                 <summary class="section-header">Terms (${hole.terms.length})</summary>
-                <input class="filter-box" placeholder="Filter terms..." oninput="filterList(event, 'terms-list-${idx}')" />
+                <input class="filter-box" placeholder="Search terms..." oninput="filterList(event, 'terms-list-${idx}')" />
                 <div class="bindings-list" id="terms-list-${idx}">
                   ${
                     hole.terms
@@ -73,7 +76,7 @@ export function generateWebView(
             <div class="hole-field">
               <details>
                 <summary class="section-header">Types (${hole.types.length})</summary>
-                <input class="filter-box" placeholder="Filter types..." oninput="filterList(event, 'types-list-${idx}')" />
+                <input class="filter-box" placeholder="Search types..." oninput="filterList(event, 'types-list-${idx}')" />
                 <div class="bindings-list" id="types-list-${idx}">
                   ${
                     hole.types
@@ -89,7 +92,7 @@ export function generateWebView(
             <div class="hole-field">
               <details>
                 <summary class="section-header">Imported Terms (${uniqueByName(hole.importedTerms).length})</summary>
-                <input class="filter-box" placeholder="Filter imported terms..." oninput="filterList(event, 'imported-terms-list-${idx}')" />
+                <input class="filter-box" placeholder="Search imported terms..." oninput="filterList(event, 'imported-terms-list-${idx}')" />
                 <div class="bindings-list" id="imported-terms-list-${idx}">
                   ${
                     uniqueByName(hole.importedTerms)
@@ -105,7 +108,7 @@ export function generateWebView(
             <div class="hole-field">
               <details>
                 <summary class="section-header">Imported Types (${uniqueByName(hole.importedTypes).length})</summary>
-                <input class="filter-box" placeholder="Filter imported types..." oninput="filterList(event, 'imported-types-list-${idx}')" />
+                <input class="filter-box" placeholder="Search imported types..." oninput="filterList(event, 'imported-types-list-${idx}')" />
                 <div class="bindings-list" id="imported-types-list-${idx}">
                   ${
                     uniqueByName(hole.importedTypes)
