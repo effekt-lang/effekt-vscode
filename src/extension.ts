@@ -276,6 +276,15 @@ function initializeHolesView(context: vscode.ExtensionContext) {
       holesViewProvider.updateHoles(params.holes);
     },
   );
+  context.subscriptions.push(
+    vscode.commands.registerCommand('effekt.openHolesPanel', () => {
+      vscode.commands.executeCommand(
+        'workbench.view.panel.holeAssistantSidebar',
+      );
+      // Optionally, also reveal the webview view:
+      vscode.commands.executeCommand('effekt.holesView.focus');
+    }),
+  );
 }
 
 function registerInlayProvider() {

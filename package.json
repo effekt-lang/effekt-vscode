@@ -177,9 +177,18 @@
                 "category": "Effekt",
                 "command": "effekt.restartServer",
                 "title": "Restart LSP Server"
+            },
+            {
+                "category": "Effekt",
+                "command": "effekt.openHolesPanel",
+                "title": "Open Holes Panel"
             }
         ],
-        "keybindings": [],
+        "keybindings": [
+          {
+            "command": "effekt.openHolesPanel",
+            "key": "ctrl+alt+h"
+          }],
         "configurationDefaults": {
             "[effekt]": {
                 "editor.tabSize": 2,
@@ -193,7 +202,7 @@
             }
         },
         "viewsContainers": {
-            "activitybar": [
+            "panel": [
             {
                 "id": "holeAssistantSidebar",
                 "title": "Effekt Holes",
