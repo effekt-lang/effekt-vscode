@@ -23,6 +23,38 @@ export function generateWebView(
     return Array.from(new Map(arr.map((x) => [x.name, x])).values());
   }
 
+  // Helper for dropdown section
+  function renderExpDropdown({
+    title,
+    count,
+    idx,
+    kind,
+    placeholder,
+    itemsHtml,
+  }: {
+    title: string;
+    count: number;
+    idx: number;
+    kind: string;
+    placeholder: string;
+    itemsHtml: string;
+  }) {
+    return `
+      <div class="exp-dropdown-section">
+        <div class="exp-dropdown-header collapsed" onclick="toggleDropdown(this)">
+          <span class="exp-dropdown-toggle">&#9660;</span>
+          <span class="exp-dropdown-title">${escapeHtml(title)} (${count})</span>
+        </div>
+        <div class="exp-dropdown-body hidden" id="${kind}-dropdown-body-${idx}">
+          <input class="filter-box" placeholder="${escapeHtml(placeholder)}" oninput="filterDropdownList(event, '${kind}-dropdown-list-${idx}')" />
+          <div class="bindings-list exp-dropdown-list" id="${kind}-dropdown-list-${idx}">
+            ${itemsHtml}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
   return /*html*/ ` 
     <!DOCTYPE html>
     <html lang="en">
@@ -48,79 +80,72 @@ export function generateWebView(
             </div>
            
             <div class="expected-type-alert">
-            <div class="expected-type-alert-title">Expected Type</div>
-            <div class="expected-type-alert-desc">
-              ${hole.expectedType ? escapeHtml(hole.expectedType) : '<span class="empty">N/A</span>'}
+              <div class="expected-type-alert-title">Expected Type</div>
+              <div class="expected-type-alert-desc">
+                ${hole.expectedType ? escapeHtml(hole.expectedType) : '<span class="empty">N/A</span>'}
+              </div>
             </div>
-          </div>
-           <div class="hole-field indented-field">
+            <div class="hole-field indented-field">
               <span class="field-label">Inner type:</span>
               <span class="field-value">${hole.innerType ? `<code>${escapeHtml(hole.innerType)}</code>` : '<span class="empty">N/A</span>'}</span>
             </div>
-            <div class="hole-field">
-              <details>
-                <summary class="section-header">Terms (${hole.terms.length})</summary>
-                <input class="filter-box" placeholder="Search terms..." oninput="filterList(event, 'terms-list-${idx}')" />
-                <div class="bindings-list" id="terms-list-${idx}">
-                  ${
-                    hole.terms
-                      .map(
-                        (t) =>
-                          `<div class="binding"><span class="binding-term">${escapeHtml(t.name)}</span>: <span class="binding-type">${escapeHtml(t.type)}</span></div>`,
-                      )
-                      .join('') || '<span class="empty">None</span>'
-                  }
-                </div>
-              </details>
-            </div>
-            <div class="hole-field">
-              <details>
-                <summary class="section-header">Types (${hole.types.length})</summary>
-                <input class="filter-box" placeholder="Search types..." oninput="filterList(event, 'types-list-${idx}')" />
-                <div class="bindings-list" id="types-list-${idx}">
-                  ${
-                    hole.types
-                      .map(
-                        (t) =>
-                          `<div class="binding"><span class="binding-term">${escapeHtml(t.name)}</span>: <span class="binding-type">${escapeHtml(t.kind)}</span></div>`,
-                      )
-                      .join('') || '<span class="empty">None</span>'
-                  }
-                </div>
-              </details>
-            </div>
-            <div class="hole-field">
-              <details>
-                <summary class="section-header">Imported Terms (${uniqueByName(hole.importedTerms).length})</summary>
-                <input class="filter-box" placeholder="Search imported terms..." oninput="filterList(event, 'imported-terms-list-${idx}')" />
-                <div class="bindings-list" id="imported-terms-list-${idx}">
-                  ${
-                    uniqueByName(hole.importedTerms)
-                      .map(
-                        (t) =>
-                          `<div class="binding"><span class="binding-term">${escapeHtml(t.name)}</span>: <span class="binding-type">${escapeHtml(t.type)}</span></div>`,
-                      )
-                      .join('') || '<span class="empty">None</span>'
-                  }
-                </div>
-              </details>
-            </div>
-            <div class="hole-field">
-              <details>
-                <summary class="section-header">Imported Types (${uniqueByName(hole.importedTypes).length})</summary>
-                <input class="filter-box" placeholder="Search imported types..." oninput="filterList(event, 'imported-types-list-${idx}')" />
-                <div class="bindings-list" id="imported-types-list-${idx}">
-                  ${
-                    uniqueByName(hole.importedTypes)
-                      .map(
-                        (t) =>
-                          `<div class="binding"><span class="binding-term">${escapeHtml(t.name)}</span>: <span class="binding-type">${escapeHtml(t.kind)}</span></div>`,
-                      )
-                      .join('') || '<span class="empty">None</span>'
-                  }
-                </div>
-              </details>
-            </div>
+
+            ${renderExpDropdown({
+              title: 'Terms',
+              count: hole.terms.length,
+              idx,
+              kind: 'terms',
+              placeholder: 'Search terms...',
+              itemsHtml:
+                hole.terms
+                  .map(
+                    (t) =>
+                      `<div class="binding"><span class="binding-term">${escapeHtml(t.name)}</span>: <span class="binding-type">${escapeHtml(t.type)}</span></div>`,
+                  )
+                  .join('') || '<span class="empty">None</span>',
+            })}
+            ${renderExpDropdown({
+              title: 'Types',
+              count: hole.types.length,
+              idx,
+              kind: 'types',
+              placeholder: 'Search types...',
+              itemsHtml:
+                hole.types
+                  .map(
+                    (t) =>
+                      `<div class="binding"><span class="binding-term">${escapeHtml(t.name)}</span>: <span class="binding-type">${escapeHtml(t.kind)}</span></div>`,
+                  )
+                  .join('') || '<span class="empty">None</span>',
+            })}
+            ${renderExpDropdown({
+              title: 'Imported Terms',
+              count: uniqueByName(hole.importedTerms).length,
+              idx,
+              kind: 'imported-terms',
+              placeholder: 'Search imported terms...',
+              itemsHtml:
+                uniqueByName(hole.importedTerms)
+                  .map(
+                    (t) =>
+                      `<div class="binding"><span class="binding-term">${escapeHtml(t.name)}</span>: <span class="binding-type">${escapeHtml(t.type)}</span></div>`,
+                  )
+                  .join('') || '<span class="empty">None</span>',
+            })}
+            ${renderExpDropdown({
+              title: 'Imported Types',
+              count: uniqueByName(hole.importedTypes).length,
+              idx,
+              kind: 'imported-types',
+              placeholder: 'Search imported types...',
+              itemsHtml:
+                uniqueByName(hole.importedTypes)
+                  .map(
+                    (t) =>
+                      `<div class="binding"><span class="binding-term">${escapeHtml(t.name)}</span>: <span class="binding-type">${escapeHtml(t.kind)}</span></div>`,
+                  )
+                  .join('') || '<span class="empty">None</span>',
+            })}
           </section>
         `,
                  )
@@ -128,7 +153,7 @@ export function generateWebView(
          }
       </div>
       <script>
-        function filterList(event, listId) {
+        function filterDropdownList(event, listId) {
           const filter = event.target.value.toLowerCase();
           const items = document.querySelectorAll('#' + listId + ' .binding');
           items.forEach(item => {
@@ -136,9 +161,10 @@ export function generateWebView(
             item.style.display = text.includes(filter) ? '' : 'none';
           });
         }
-        function selectSuggestion(el) {
-          document.querySelectorAll('.suggestion').forEach(s => s.classList.remove('selected'));
-          el.classList.add('selected');
+        function toggleDropdown(header) {
+          header.classList.toggle('collapsed');
+          const body = header.nextElementSibling;
+          body.classList.toggle('hidden');
         }
       </script>
     </body>
