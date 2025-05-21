@@ -108,7 +108,6 @@ class EffektRunCodeLensProvider implements vscode.CodeLensProvider {
 
 export async function activate(context: vscode.ExtensionContext) {
   effektManager = new EffektManager();
-  console.log('hello');
   try {
     // If Effekt is installed (no matter which version), start the language server
     await ensureEffektIsAvailable();
@@ -237,14 +236,10 @@ function registerCodeLensProviders(context: vscode.ExtensionContext) {
 }
 
 function registerHolesProvider(context: vscode.ExtensionContext) {
-  console.log('registering Holes provider');
-
   client.onNotification(
     '$/effekt/publishHoles',
     (params: { uri: string; holes: EffektHoleInfo[] }) => {
-      console.log('on Notification');
       const { holes } = params;
-      console.log(holes);
 
       // Create or show a webview panel for holes
       const panel = vscode.window.createWebviewPanel(
@@ -258,7 +253,7 @@ function registerHolesProvider(context: vscode.ExtensionContext) {
       const cssUri = panel.webview.asWebviewUri(
         vscode.Uri.joinPath(
           context.extensionUri,
-          'src/holesPanel/media',
+          'src/holesPanel',
           'holes.css',
         ),
       );

@@ -55,8 +55,8 @@ export function generateWebView(
               <span class="field-value">${hole.expectedType ? `<code>${escapeHtml(hole.expectedType)}</code>` : '<span class="empty">N/A</span>'}</span>
             </div>
             <div class="hole-field">
-              <details>
-                <summary>Imported Terms (${hole.importedTerms.length})</summary>
+              <details>					
+                <summary>Imported Terms (${uniqueByName(hole.importedTerms).length})</summary>
                 <div class="bindings-list">
                   ${
                     uniqueByName(hole.importedTerms)
@@ -71,7 +71,7 @@ export function generateWebView(
             </div>
             <div class="hole-field">
               <details>
-                <summary>Imported Types (${hole.importedTypes.length})</summary>
+                <summary>Imported Types (${uniqueByName(hole.importedTypes).length})</summary>
                 <div class="bindings-list">
                   ${
                     uniqueByName(hole.importedTypes)
