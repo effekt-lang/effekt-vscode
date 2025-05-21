@@ -11,11 +11,8 @@ import { EffektManager, EffektExecutableNotFoundError } from './effektManager';
 import { EffektIRContentProvider } from './irProvider';
 import { InlayHintProvider } from './inlayHintsProvider';
 import { EffektLanguageClient } from './effektLanguageClient';
-import {
-  EffektHolesContentProvider,
-  EffektHoleInfo,
-  generateHolesContent,
-} from './holesProvider';
+import { EffektHoleInfo } from './holesPanel/holesProvider';
+import { generateWebView } from './holesPanel/holesWebView';
 import * as net from 'net';
 
 let client: EffektLanguageClient;
@@ -239,33 +236,24 @@ function registerCodeLensProviders(context: vscode.ExtensionContext) {
   );
 }
 
-function registerHolesProvider(context: vscode.ExtensionContext) {
+function registerHolesProvider(_context: vscode.ExtensionContext) {
   console.log('registering Holes provider');
-  const effektHolesContentProvider = new EffektHolesContentProvider();
-  context.subscriptions.push(
-    vscode.workspace.registerTextDocumentContentProvider(
-      'effekt-holes',
-      effektHolesContentProvider,
-    ),
-  );
 
   client.onNotification(
     '$/effekt/publishHoles',
     (params: { uri: string; holes: EffektHoleInfo[] }) => {
       console.log('on Notification');
-      const { uri, holes } = params;
+      const { holes } = params;
       console.log(holes);
 
-      const content = generateHolesContent(holes);
-      const uriObject = vscode.Uri.parse(`effekt-holes:${uri}`);
-      effektHolesContentProvider.update(uriObject, content);
-      vscode.workspace.openTextDocument(uriObject).then((doc) => {
-        vscode.window.showTextDocument(doc, {
-          viewColumn: vscode.ViewColumn.Beside,
-          preview: false,
-          preserveFocus: true,
-        });
-      });
+      // Create or show a webview panel for holes
+      const panel = vscode.window.createWebviewPanel(
+        'holesPanel',
+        'Effekt Holes',
+        vscode.ViewColumn.Beside,
+        { enableScripts: true },
+      );
+      panel.webview.html = generateWebView(holes);
     },
   );
 }

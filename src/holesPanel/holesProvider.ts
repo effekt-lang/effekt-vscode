@@ -27,19 +27,27 @@ export function generateHolesContent(holes: EffektHoleInfo[]): string {
   }
 
   return holes
-    .map(
-      (hole) =>
+    .map((hole) => {
+      // Make imported terms and types unique by name
+      const uniqueImportedTerms = Array.from(
+        new Map(hole.importedTerms.map((t) => [t.name, t])).values(),
+      );
+      const uniqueImportedTypes = Array.from(
+        new Map(hole.importedTypes.map((t) => [t.name, t])).values(),
+      );
+
+      return (
         `ID: ${hole.id}\nRange: ${JSON.stringify(hole.range)}\n` +
         `Inner Type: ${hole.innerType || 'N/A'}\n` +
         `Expected Type: ${hole.expectedType || 'N/A'}\n` +
-        `Imported Terms: ${hole.importedTerms.map((t) => t.name).join(', ')}\n` +
-        `Imported Types: ${hole.importedTypes.map((t) => t.name).join(', ')}\n` +
+        `Imported Terms: ${uniqueImportedTerms.map((t) => t.name).join(', ')}\n` +
+        `Imported Types: ${uniqueImportedTypes.map((t) => t.name).join(', ')}\n` +
         `Terms: ${hole.terms.map((t) => t.name).join(', ')}\n` +
-        `Types: ${hole.types.map((t) => t.name).join(', ')}\n`,
-    )
+        `Types: ${hole.types.map((t) => t.name).join(', ')}\n`
+      );
+    })
     .join('\n---\n');
 }
-
 export interface EffektHoleInfo {
   id: string;
   range: LSPRange;
