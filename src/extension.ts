@@ -236,7 +236,7 @@ function registerCodeLensProviders(context: vscode.ExtensionContext) {
   );
 }
 
-function registerHolesProvider(_context: vscode.ExtensionContext) {
+function registerHolesProvider(context: vscode.ExtensionContext) {
   console.log('registering Holes provider');
 
   client.onNotification(
@@ -253,7 +253,18 @@ function registerHolesProvider(_context: vscode.ExtensionContext) {
         vscode.ViewColumn.Beside,
         { enableScripts: true },
       );
-      panel.webview.html = generateWebView(holes);
+
+      // Get the URI for the CSS file
+      const cssUri = panel.webview.asWebviewUri(
+        vscode.Uri.joinPath(
+          context.extensionUri,
+          'src/holesPanel/media',
+          'holes.css',
+        ),
+      );
+
+      // Generate the HTML with the CSS included
+      panel.webview.html = generateWebView(holes, cssUri);
     },
   );
 }

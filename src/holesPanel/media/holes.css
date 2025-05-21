@@ -1,0 +1,94 @@
+
+:root {
+	--background: #ffffff;
+	--foreground: #000000;
+	--accent: #007acc;
+	--border: #ccc;
+	--section-bg: #f9f9f9;
+	--section-border: #ddd;
+	--code-bg: #f3f3f3;
+	--term: #1a73e8;
+	--type: #0f9d58;
+	--highlight: #eeeeee;
+}
+html, body {
+	background: var(--background);
+	color: var(--foreground);
+	font-family: 'Segoe UI', sans-serif;
+	margin: 0;
+	padding: 0;
+}
+.container {
+	max-width: 900px;
+	margin: 2rem auto;
+	padding: 1rem;
+}
+.hole-card {
+	background: var(--section-bg);
+	border: 1.5px solid var(--section-border);
+	border-radius: 7px;
+	margin-bottom: 1.5rem;
+	box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+	padding: 1.5rem 1.25rem 1rem 1.25rem;
+}
+.hole-header {
+	display: flex;
+	align-items: center;
+	padding-bottom: 0.5rem;
+	border-bottom: 1.5px solid var(--border);
+	margin-bottom: 1rem;
+}
+.hole-id {
+	font-family: monospace;
+	font-size: 1.1rem;
+	font-weight: 600;
+	color: var(--accent);
+}
+.hole-range {
+	margin-left: auto;
+	font-size: 0.95rem;
+	color: #666;
+	background: var(--highlight);
+	border-radius: 4px;
+	padding: 0.15em 0.6em;
+}
+.hole-field {
+	margin: 0.6em 0;
+}
+.field-label {
+	color: var(--accent);
+	font-weight: 500;
+	margin-right: 0.2em;
+}
+.field-value {
+	font-family: monospace;
+}
+.bindings-list {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5em 1.5em;
+	margin: 0.3em 0 0.6em 0;
+}
+.binding {
+	background: var(--code-bg);
+	border-radius: 4px;
+	padding: 0.15em 0.7em 0.15em 0.5em;
+}
+.binding-term { color: var(--term); }
+.binding-type { color: var(--type); }
+.empty { color: #999; font-style: italic; }
+code {
+	background: var(--code-bg);
+	border-radius: 4px;
+	padding: 0.1em 0.3em;
+}
+details summary {
+	cursor: pointer;
+	color: var(--accent);
+	font-weight: 500;
+	margin-top: 0.3em;
+	margin-bottom: 0.2em;
+}
+summary::-webkit-details-marker {
+	color: var(--accent);
+}
