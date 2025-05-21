@@ -10,6 +10,7 @@ export interface EffektHoleInfo {
 }
 
 export interface LSPRange {
+  // import from lib
   start: LSPPosition;
   end: LSPPosition;
 }

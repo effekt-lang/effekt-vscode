@@ -190,6 +190,25 @@
                 "editor.insertSpaces": true,
                 "editor.detectIndentation": false
             }
+        },
+        "viewsContainers": {
+            "activitybar": [
+            {
+                "id": "holeAssistantSidebar",
+                "title": "Effekt Holes",
+                "icon": "fileicons/darkmode_icon.svg"
+            }
+            ]
+        },
+          "views": {
+            "holeAssistantSidebar": [
+            {   "type": "webview",
+                "id": "effekt.holesView",
+                "name": "Holes Panel",
+                "icon": "fileicons/darkmode_icon.svg"
+
+            }
+            ]
         }
     },
     "scripts": {

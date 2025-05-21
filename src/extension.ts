@@ -11,8 +11,8 @@ import { EffektManager, EffektExecutableNotFoundError } from './effektManager';
 import { EffektIRContentProvider } from './irProvider';
 import { InlayHintProvider } from './inlayHintsProvider';
 import { EffektLanguageClient } from './effektLanguageClient';
-import { EffektHoleInfo } from './holesPanel/holesProvider';
-import { generateWebView } from './holesPanel/holesWebView';
+import { EffektHoleInfo } from './holesPanel/effektHoleInfo';
+import { HolesViewProvider } from './holesPanel/holesViewProvider';
 import * as net from 'net';
 
 let client: EffektLanguageClient;
@@ -139,8 +139,8 @@ async function initializeLSPAndProviders(context: vscode.ExtensionContext) {
   registerCodeLensProviders(context);
   registerIRProvider(context);
   registerInlayProvider();
-  registerHolesProvider(context);
   initializeHoleDecorations(context);
+  initializeHolesView(context);
 }
 
 async function handleEffektUpdates() {
@@ -235,35 +235,6 @@ function registerCodeLensProviders(context: vscode.ExtensionContext) {
   );
 }
 
-function registerHolesProvider(context: vscode.ExtensionContext) {
-  client.onNotification(
-    '$/effekt/publishHoles',
-    (params: { uri: string; holes: EffektHoleInfo[] }) => {
-      const { holes } = params;
-
-      // Create or show a webview panel for holes
-      const panel = vscode.window.createWebviewPanel(
-        'holesPanel',
-        'Effekt Holes',
-        vscode.ViewColumn.Beside,
-        { enableScripts: true },
-      );
-
-      // Get the URI for the CSS file
-      const cssUri = panel.webview.asWebviewUri(
-        vscode.Uri.joinPath(
-          context.extensionUri,
-          'src/holesPanel',
-          'holes.css',
-        ),
-      );
-
-      // Generate the HTML with the CSS included
-      panel.webview.html = generateWebView(holes, cssUri);
-    },
-  );
-}
-
 function registerIRProvider(context: vscode.ExtensionContext) {
   const effektIRContentProvider = new EffektIRContentProvider();
   context.subscriptions.push(
@@ -286,6 +257,23 @@ function registerIRProvider(context: vscode.ExtensionContext) {
           preserveFocus: true,
         });
       });
+    },
+  );
+}
+
+function initializeHolesView(context: vscode.ExtensionContext) {
+  const holesViewProvider = new HolesViewProvider(context);
+  context.subscriptions.push(
+    vscode.window.registerWebviewViewProvider(
+      HolesViewProvider.viewType,
+      holesViewProvider,
+    ),
+  );
+
+  client.onNotification(
+    '$/effekt/publishHoles',
+    (params: { uri: string; holes: EffektHoleInfo[] }) => {
+      holesViewProvider.updateHoles(params.holes);
     },
   );
 }

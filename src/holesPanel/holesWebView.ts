@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { EffektHoleInfo } from './holesProvider';
+import { EffektHoleInfo } from './effektHoleInfo';
 
 export function generateWebView(
   holes: EffektHoleInfo[],
