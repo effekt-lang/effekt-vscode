@@ -23,7 +23,7 @@ export function generateWebView(
     return Array.from(new Map(arr.map((x) => [x.name, x])).values());
   }
 
-  return `
+  return /*html*/ ` 
     <!DOCTYPE html>
     <html lang="en">
     <head>
