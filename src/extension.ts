@@ -12,6 +12,8 @@ import { EffektIRContentProvider } from './irProvider';
 import { InlayHintProvider } from './inlayHintsProvider';
 import { EffektLanguageClient } from './effektLanguageClient';
 import * as net from 'net';
+import { ChildProcess } from 'child_process';
+import { execa } from 'execa';
 
 let client: EffektLanguageClient;
 let effektManager: EffektManager;
@@ -169,7 +171,6 @@ async function startEffektLanguageServer(context: vscode.ExtensionContext) {
     };
   } else {
     const effektExecutable = await effektManager.locateEffektExecutable();
-
     const args = ['--server', ...effektManager.getEffektArgs()];
 
     /* > Node.js will now error with EINVAL if a .bat or .cmd file is passed to child_process.spawn and child_process.spawnSync without the shell option set.
@@ -178,16 +179,20 @@ async function startEffektLanguageServer(context: vscode.ExtensionContext) {
      * https://nodejs.org/en/blog/vulnerability/april-2024-security-releases-2
      */
     const isWindows = process.platform === 'win32';
-    const execOptions = { shell: isWindows };
 
-    serverOptions = {
-      run: { command: effektExecutable.path, args, options: execOptions },
-      debug: { command: effektExecutable.path, args, options: execOptions },
+    serverOptions = () => {
+      // We are using execa to properly quote the shell arguments, in particular on Windows.
+      // Otherwise, on Windows, we will again run into EINVAL errors when the filepath contains spaces.
+      return Promise.resolve(
+        execa(effektExecutable.path, args, {
+          shell: isWindows,
+        }) as ChildProcess,
+      );
     };
   }
 
   const clientOptions: LanguageClientOptions = {
-    initializationOptions: vscode.workspace.getConfiguration('effekt'),
+    initializationOptions: config,
     documentSelector: [
       { scheme: 'file', language: 'effekt' },
       { scheme: 'file', language: 'literate effekt' },
