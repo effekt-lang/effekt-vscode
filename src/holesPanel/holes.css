@@ -92,3 +92,59 @@ details summary {
 summary::-webkit-details-marker {
 	color: var(--accent);
 }
+.section-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	background: #f0f0f0;
+	padding: 0.5em 0.75em;
+	border-bottom: 1px solid var(--section-border);
+	cursor: pointer;
+	font-weight: 600;
+}
+.section-toggle {
+	margin-right: 0.5em;
+	transition: transform 0.2s;
+}
+.section-toggle.collapsed {
+	transform: rotate(-90deg);
+}
+.filter-box {
+	width: 100%;
+	padding: 0.3em 0.5em;
+	margin: 0.3em 0;
+	border: 1px solid var(--border);
+	border-radius: 4px;
+	font-size: 0.9em;
+}
+.suggestion-list {
+	margin-top: 1em;
+}
+.suggestion {
+	background: var(--highlight);
+	border: 1px solid var(--border);
+	border-radius: 6px;
+	padding: 0.75em;
+	margin-bottom: 0.5em;
+	cursor: pointer;
+	position: relative;
+}
+.suggestion.selected {
+	border-color: var(--accent);
+	background: #e6f0ff;
+}
+.suggestion-status {
+	position: absolute;
+	top: 0.5em;
+	right: 0.75em;
+	display: flex;
+	align-items: center;
+	font-size: 0.85em;
+	font-weight: 500;
+}
+.suggestion-status.works {
+	color: green;
+}
+.suggestion-status.error {
+	color: red;
+}
