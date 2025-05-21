@@ -190,10 +190,10 @@
         "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
         "vscode:prepublish": "npm run package",
         "package": "npm run check-types && node esbuild.js",
-        "lint": "eslint 'src/**/*.ts'",
-        "lint:fix": "eslint 'src/**/*.ts' --fix",
-        "format": "prettier --config .prettierrc 'src/**/*.ts' --write",
-        "format:check": "prettier --config .prettierrc 'src/**/*.ts' --check"
+        "lint": "eslint src/**/*.ts",
+        "lint:fix": "eslint src/**/*.ts --fix",
+        "format": "prettier --config .prettierrc src/**/*.ts --write",
+        "format:check": "prettier --config .prettierrc src/**/*.ts --check"
     },
     "dependencies": {
         "compare-versions": "^6.1.1",
