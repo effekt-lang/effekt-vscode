@@ -1,15 +1,20 @@
 {
-    "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
-    "name": "Literate Effekt",
-    "patterns": [{
-        "begin": "```[ \t]*(effekt)?[ \t]*([: \t][^`]*)?\n",
-        "end" : "```\n",
-        "name": "markup.fenced_code.block.markdown",
-        "patterns": [{
-            "include": "source.effekt"
-        }]
-    }, {
-        "include":  "text.html.markdown"
-    }],
-    "scopeName": "source.literateeffekt"
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Literate Effekt",
+  "patterns": [
+    {
+      "begin": "```[ \t]*(effekt)?[ \t]*([: \t][^`]*)?\n",
+      "end": "```\n",
+      "name": "markup.fenced_code.block.markdown",
+      "patterns": [
+        {
+          "include": "source.effekt"
+        }
+      ]
+    },
+    {
+      "include": "text.html.markdown"
+    }
+  ],
+  "scopeName": "source.literateeffekt"
 }

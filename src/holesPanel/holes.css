@@ -11,18 +11,25 @@
   --highlight: #e8eef6;
   --shadow: 0 4px 24px rgba(27, 31, 35, 0.06);
   --radius: 8px;
-  --font: 'Inter', 'Segoe UI', system-ui, 'Roboto', 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --font:
+    'Inter', 'Segoe UI', system-ui, 'Roboto', 'Helvetica Neue', Arial,
+    'Noto Sans', sans-serif;
+  --font-mono:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
+    'Courier New', monospace;
 }
 
-html, body {
+html,
+body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font);
   margin: 0;
   padding: 0;
 }
-code, pre, .font-mono {
+code,
+pre,
+.font-mono {
   font-family: var(--font-mono);
 }
 
@@ -43,7 +50,7 @@ code, pre, .font-mono {
 }
 
 .hole-card:hover {
-  box-shadow: 0 8px 32px rgba(27,31,35,0.11);
+  box-shadow: 0 8px 32px rgba(27, 31, 35, 0.11);
 }
 
 .hole-header {
@@ -105,9 +112,16 @@ code, pre, .font-mono {
   color: #2d333b;
 }
 
-.binding-term { color: var(--term); }
-.binding-type { color: var(--type); }
-.empty { color: #8b949e; font-style: italic; }
+.binding-term {
+  color: var(--term);
+}
+.binding-type {
+  color: var(--type);
+}
+.empty {
+  color: #8b949e;
+  font-style: italic;
+}
 
 code {
   background: var(--code-bg);
@@ -146,7 +160,7 @@ summary::-webkit-details-marker {
 
 .section-toggle {
   margin-right: 0.5em;
-  transition: transform 0.22s cubic-bezier(0.4,0,0.2,1);
+  transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .section-toggle.collapsed {
@@ -181,7 +195,9 @@ summary::-webkit-details-marker {
   margin-bottom: 0.6em;
   cursor: pointer;
   position: relative;
-  transition: border 0.13s, background 0.13s;
+  transition:
+    border 0.13s,
+    background 0.13s;
   font-size: 0.98em;
 }
 
@@ -203,7 +219,7 @@ summary::-webkit-details-marker {
   background: #fff;
   border-radius: 12px;
   padding: 0.11em 0.8em;
-  box-shadow: 0 1px 4px rgba(27,31,35,0.05);
+  box-shadow: 0 1px 4px rgba(27, 31, 35, 0.05);
 }
 
 .suggestion-status.works {
@@ -218,29 +234,31 @@ summary::-webkit-details-marker {
   border: 1px solid #f7c1c1;
 }
 .expected-type-alert {
-  background-color: #eff6ff;       /* Tailwind's bg-blue-50 */
-  border: 1px solid #bfdbfe;       /* Tailwind's border-blue-200 */
+  background-color: #eff6ff; /* Tailwind's bg-blue-50 */
+  border: 1px solid #bfdbfe; /* Tailwind's border-blue-200 */
   border-radius: 0.375rem;
   padding: 0.75em 1em;
   margin-bottom: 0.75rem;
 }
 
 .expected-type-alert-title {
-  font-size: 0.75rem;              /* Tailwind's text-xs */
-  font-weight: 600;                /* Tailwind's font-semibold */
-  color: #1d4ed8;                  /* Tailwind's text-blue-700 */
+  font-size: 0.75rem; /* Tailwind's text-xs */
+  font-weight: 600; /* Tailwind's font-semibold */
+  color: #1d4ed8; /* Tailwind's text-blue-700 */
   margin-bottom: 0.125rem;
 }
 
 .expected-type-alert-desc {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; /* Tailwind's font-mono */
-  font-size: 0.875rem;             /* Tailwind's text-sm */
+  font-family:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
+    'Courier New', monospace; /* Tailwind's font-mono */
+  font-size: 0.875rem; /* Tailwind's text-sm */
 }
 .indented-field {
   padding-left: 1em; /* Match the .expected-type-alert padding */
 }
 
-  .exp-dropdown-section {
+.exp-dropdown-section {
   border: 1.5px solid var(--section-border);
   border-radius: var(--radius);
   margin-bottom: 1.25rem;
@@ -262,7 +280,7 @@ summary::-webkit-details-marker {
 .exp-dropdown-toggle {
   display: inline-block;
   margin-right: 0.55em;
-  transition: transform 0.22s cubic-bezier(0.4,0,0.2,1);
+  transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1);
   font-size: 1.07em;
   color: var(--accent);
 }
