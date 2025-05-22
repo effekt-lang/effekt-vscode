@@ -269,19 +269,33 @@ function initializeHolesView(context: vscode.ExtensionContext) {
       holesViewProvider,
     ),
   );
+  let currentUri: string | undefined = undefined;
 
   client.onNotification(
     '$/effekt/publishHoles',
     (params: { uri: string; holes: EffektHoleInfo[] }) => {
-      holesViewProvider.updateHoles(params.holes);
+      const activeEditor = vscode.window.activeTextEditor;
+      if (activeEditor && activeEditor.document.uri.toString() === params.uri) {
+        holesViewProvider.updateHoles(params.holes);
+        currentUri = params.uri;
+      }
     },
   );
+
+  // Clear holes when switching away from the file
+  vscode.window.onDidChangeActiveTextEditor(
+    (editor) => {
+      if (!editor || editor.document.uri.toString() !== currentUri) {
+        holesViewProvider.updateHoles([]);
+        currentUri = editor?.document.uri.toString();
+      }
+    },
+    null,
+    context.subscriptions,
+  );
+
   context.subscriptions.push(
     vscode.commands.registerCommand('effekt.openHolesPanel', () => {
-      vscode.commands.executeCommand(
-        'workbench.view.panel.holeAssistantSidebar',
-      );
-      // Optionally, also reveal the webview view:
       vscode.commands.executeCommand('effekt.holesView.focus');
     }),
   );
