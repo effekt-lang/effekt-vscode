@@ -16,27 +16,31 @@
   ],
   "repository": {
     "comments": {
-      "patterns": [{
-        "begin": "//",
-        "end": "\\n",
-        "beginCaptures": {
-          "0": { "name": "punctuation.definition.comment.effekt" }
+      "patterns": [
+        {
+          "begin": "//",
+          "end": "\\n",
+          "beginCaptures": {
+            "0": { "name": "punctuation.definition.comment.effekt" }
+          },
+          "name": "comment.line.double-slash.effekt"
         },
-        "name": "comment.line.double-slash.effekt"
-      }, {
-        "begin": "/\\*",
-        "beginCaptures": {
-          "0": { "name": "punctuation.definition.comment.effekt" }
-        },
-        "end": "\\*/",
-        "endCaptures": {
-          "0": { "name": "punctuation.definition.comment.effekt" }
-        },
-        "name": "comment.block.effekt"
-      }]
+        {
+          "begin": "/\\*",
+          "beginCaptures": {
+            "0": { "name": "punctuation.definition.comment.effekt" }
+          },
+          "end": "\\*/",
+          "endCaptures": {
+            "0": { "name": "punctuation.definition.comment.effekt" }
+          },
+          "name": "comment.block.effekt"
+        }
+      ]
     },
     "definitions": {
-      "patterns": [{
+      "patterns": [
+        {
           "begin": "\\s*(extern)\\s+((?:(?:\\{[^\\}]*\\}|[a-zA-Z][a-z-A-Z0-9_$]*)\\s+)?)\\s*(def)\\s+([a-zA-Z][a-z-A-Z0-9_$]*)\\b",
           "end": "(?=\\n)|(?<=\\S)\\s*(?==(?!>))",
           "captures": {
@@ -45,181 +49,231 @@
             "3": { "name": "keyword.declaration.function.extern.effekt" },
             "4": { "name": "entity.name.function.effekt" }
           },
-          "patterns": [{ "include": "#parameters" },
-                       { "include": "#comments" }]
-        }, {
+          "patterns": [{ "include": "#parameters" }, { "include": "#comments" }]
+        },
+        {
           "begin": "\\s*(def)\\s+([a-zA-Z][a-z-A-Z0-9_$]*)\\b",
           "end": "(?=\\n)|(?<=\\S)\\s*(?==(?!>))",
           "captures": {
             "1": { "name": "keyword.declaration.function.effekt" },
             "2": { "name": "entity.name.function.effekt" }
           },
-          "patterns": [{ "include": "#parameters" },
-                       { "include": "#comments" }]
-        }, {
+          "patterns": [{ "include": "#parameters" }, { "include": "#comments" }]
+        },
+        {
           "match": "\\s*(val)\\s+([a-zA-Z][a-z-A-Z0-9_$]*)\\b",
           "captures": {
             "1": { "name": "keyword.declaration.val.effekt" },
             "2": { "name": "variable.other.effekt" }
           }
-        }, {
+        },
+        {
           "begin": "\\s*(var)\\s+([a-zA-Z][a-z-A-Z0-9_$]*)\\b",
           "beginCaptures": {
             "1": { "name": "keyword.declaration.var.effekt" },
             "2": { "name": "variable.other.effekt" }
           },
           "end": "(?:;|(?=\\n)|(?<=\\S)\\s*(?==(?!>)))",
-          "patterns": [{
-            "match": "\\s+(in)\\s+([a-zA-Z][a-z-A-Z0-9_$]*)\\b",
-            "captures": {
-              "1": { "name": "keyword.other.in.effekt" },
-              "2": {
-                "patterns": [{
-                  "match": "global",
-                  "name": "support.constant.effekt variable.other.capability.effekt entity.name.region.effekt"
-                }, {
-                  "match": "[a-zA-Z][a-z-A-Z0-9_$]*",
-                  "name": "variable.other.capability.effekt entity.name.region.effekt"
-                }]
+          "patterns": [
+            {
+              "match": "\\s+(in)\\s+([a-zA-Z][a-z-A-Z0-9_$]*)\\b",
+              "captures": {
+                "1": { "name": "keyword.other.in.effekt" },
+                "2": {
+                  "patterns": [
+                    {
+                      "match": "global",
+                      "name": "support.constant.effekt variable.other.capability.effekt entity.name.region.effekt"
+                    },
+                    {
+                      "match": "[a-zA-Z][a-z-A-Z0-9_$]*",
+                      "name": "variable.other.capability.effekt entity.name.region.effekt"
+                    }
+                  ]
+                }
               }
+            },
+            {
+              "include": "#parameters"
             }
-          }, {
-            "include": "#parameters"
-          }]
-        }, {
+          ]
+        },
+        {
           "match": "\\s*(extern)?\\s*(type|effect|interface|resource)\\s+([a-zA-Z][a-z-A-Z0-9_$]*)\\b",
           "captures": {
             "1": { "name": "storage.modifier.extern.effekt" },
             "2": { "name": "keyword.declaration.type.effekt" },
             "3": { "name": "entity.name.type.effekt" }
           }
-        }, {
+        },
+        {
           "match": "\\s*(namespace)\\s+([a-zA-Z][a-z-A-Z0-9_$]*)\\b",
           "captures": {
             "1": { "name": "keyword.declaration.namespace.effekt" },
             "2": { "name": "entity.name.namespace.effekt" }
           }
-        }, {
+        },
+        {
           "match": "\\s*(module)\\s+((?:[a-zA-Z][a-zA-Z0-9_]*(?:/[a-zA-Z][a-zA-Z0-9_]*)*))\\b",
           "captures": {
             "1": { "name": "keyword.declaration.module.effekt" },
             "2": { "name": "entity.name.module.effekt" }
           }
-        }, {
+        },
+        {
           "match": "\\s*(import)\\s+((?:[a-zA-Z][a-zA-Z0-9_]*(?:/[a-zA-Z][a-zA-Z0-9_]*)*))\\b",
           "captures": {
             "1": { "name": "keyword.other.import.effekt" },
             "2": { "name": "entity.name.module.import.effekt" }
           }
-        }]
+        }
+      ]
     },
     "boxed_types": {
       "comment": "Used for boxed types like 'at {}', 'at {io}', 'at {io, global}', etc.",
-      "patterns": [{
-        "begin": "\\b(at)\\s*\\{",
-        "beginCaptures": {
-          "1": { "name": "keyword.other.at.effekt" }
-        },
-        "end": "\\}",
-        "patterns": [{
-          "include": "#capabilities"
-        }]
-      }]
+      "patterns": [
+        {
+          "begin": "\\b(at)\\s*\\{",
+          "beginCaptures": {
+            "1": { "name": "keyword.other.at.effekt" }
+          },
+          "end": "\\}",
+          "patterns": [
+            {
+              "include": "#capabilities"
+            }
+          ]
+        }
+      ]
     },
     "parameters": {
-      "patterns": [{
-        "include": "#boxed_types"
-      }, {
-        "match": "\\b([a-z][a-zA-Z0-9_$]*)(?:)",
-        "name": "variable.parameter.effekt"
-      }, {
-        "match": "\\b([A-Z][a-zA-Z0-9_$]*)(?:)",
-        "name": "entity.name.type.effekt"
-      }]
+      "patterns": [
+        {
+          "include": "#boxed_types"
+        },
+        {
+          "match": "\\b([a-z][a-zA-Z0-9_$]*)(?:)",
+          "name": "variable.parameter.effekt"
+        },
+        {
+          "match": "\\b([A-Z][a-zA-Z0-9_$]*)(?:)",
+          "name": "entity.name.type.effekt"
+        }
+      ]
     },
     "capabilities": {
-      "patterns": [{
-        "match": "\\b(pure)\\b",
-        "name": "keyword.other.capability.pure.effekt"
-      }, {
-        "match": "\\b(io)\\b",
-        "name": "support.constant.effekt variable.other.capability.effekt"
-      }, {
-        "match": "\\b(global)\\b",
-        "name": "support.constant.effekt variable.other.capability.effekt entity.name.region.effekt"
-      }, {
-        "match": "\\b([a-z][a-zA-Z0-9_]*)\\b",
-        "name": "variable.other.capability.effekt"
-      }, {
-        "match": ",",
-        "name": "punctuation.separator.capability.effekt"
-      }]
+      "patterns": [
+        {
+          "match": "\\b(pure)\\b",
+          "name": "keyword.other.capability.pure.effekt"
+        },
+        {
+          "match": "\\b(io)\\b",
+          "name": "support.constant.effekt variable.other.capability.effekt"
+        },
+        {
+          "match": "\\b(global)\\b",
+          "name": "support.constant.effekt variable.other.capability.effekt entity.name.region.effekt"
+        },
+        {
+          "match": "\\b([a-z][a-zA-Z0-9_]*)\\b",
+          "name": "variable.other.capability.effekt"
+        },
+        {
+          "match": ",",
+          "name": "punctuation.separator.capability.effekt"
+        }
+      ]
     },
     "keywords": {
-      "patterns": [{
-        "match": "\\b(module|import|def|fun|val|var|effect|type|record|box|unbox|region|new|resource|interface|namespace|module|include|export)\\b",
-        "name": "keyword.other.effekt"
-      }, {
-        "match": "\\b(return)\\b",
-        "name": "keyword.control.jump.effekt"
-      }, {
-        "match": "\\b(do|resume|try|with)\\b",
-        "name": "keyword.control.effect.effekt"
-      }, {
-        "match": "\\b(while|match|case|if|else|is|and)\\b",
-        "name": "keyword.control.flow.effekt"
-      }, {
-        "match": "\\b(extern)\\b",
-        "name": "storage.modifier.extern.effekt"
-      }]
+      "patterns": [
+        {
+          "match": "\\b(module|import|def|fun|val|var|effect|type|record|box|unbox|region|new|resource|interface|namespace|module|include|export)\\b",
+          "name": "keyword.other.effekt"
+        },
+        {
+          "match": "\\b(return)\\b",
+          "name": "keyword.control.jump.effekt"
+        },
+        {
+          "match": "\\b(do|resume|try|with)\\b",
+          "name": "keyword.control.effect.effekt"
+        },
+        {
+          "match": "\\b(while|match|case|if|else|is|and)\\b",
+          "name": "keyword.control.flow.effekt"
+        },
+        {
+          "match": "\\b(extern)\\b",
+          "name": "storage.modifier.extern.effekt"
+        }
+      ]
     },
     "literals": {
-      "patterns": [{
-        "match": "\\b(true|false)\\b",
-        "name": "constant.language.boolean.effekt"
-      }, {
-        "match": "\\b([0-9]+\\.[0-9]+)\\b",
-        "name": "constant.numeric.float.effekt"
-      }, {
-        "match": "\\b([0-9]+)\\b",
-        "name": "constant.numeric.integer.effekt"
-      }, {
-        "include": "#characters"
-      }, {
-        "include": "#strings"
-      }]
+      "patterns": [
+        {
+          "match": "\\b(true|false)\\b",
+          "name": "constant.language.boolean.effekt"
+        },
+        {
+          "match": "\\b([0-9]+\\.[0-9]+)\\b",
+          "name": "constant.numeric.float.effekt"
+        },
+        {
+          "match": "\\b([0-9]+)\\b",
+          "name": "constant.numeric.integer.effekt"
+        },
+        {
+          "include": "#characters"
+        },
+        {
+          "include": "#strings"
+        }
+      ]
     },
     "characters": {
       "name": "string.quoted.single.effekt",
       "begin": "'",
       "end": "'",
-      "patterns": [{
-        "include": "#escapes"
-      }, {
-        "include": "#invalidEscapes"
-      }]
+      "patterns": [
+        {
+          "include": "#escapes"
+        },
+        {
+          "include": "#invalidEscapes"
+        }
+      ]
     },
     "strings": {
-      "patterns": [{
-        "name": "string.quoted.triple.effekt",
-        "begin": "\"\"\"",
-        "end": "\"\"\"",
-        "comment": "Important: only single-line strings can have escapes!",
-        "patterns": [{
-          "include": "#stringTemplates"
-        }]
-      }, {
-        "name": "string.quoted.double.effekt",
-        "begin": "\"",
-        "end": "\"",
-        "patterns": [{
-          "include": "#escapes"
-        }, {
-          "include": "#invalidEscapes"
-        }, {
-          "include": "#stringTemplates"
-        }]
-      }]
+      "patterns": [
+        {
+          "name": "string.quoted.triple.effekt",
+          "begin": "\"\"\"",
+          "end": "\"\"\"",
+          "comment": "Important: only single-line strings can have escapes!",
+          "patterns": [
+            {
+              "include": "#stringTemplates"
+            }
+          ]
+        },
+        {
+          "name": "string.quoted.double.effekt",
+          "begin": "\"",
+          "end": "\"",
+          "patterns": [
+            {
+              "include": "#escapes"
+            },
+            {
+              "include": "#invalidEscapes"
+            },
+            {
+              "include": "#stringTemplates"
+            }
+          ]
+        }
+      ]
     },
     "escapes": {
       "match": "\\\\([btnfr\\\\\"']|u[0-9A-Fa-f]{4})",
@@ -231,76 +285,95 @@
       "comment": "Represents any possible escape, therefore should always be used _after_ #escapes!"
     },
     "names": {
-      "patterns": [{
-        "match": "\\b([a-z][a-zA-Z0-9_]*)\\b[\\s]*[({\\[]",
-        "captures": {
-          "1": { "name": "entity.name.function.effekt" }
+      "patterns": [
+        {
+          "match": "\\b([a-z][a-zA-Z0-9_]*)\\b[\\s]*[({\\[]",
+          "captures": {
+            "1": { "name": "entity.name.function.effekt" }
+          }
+        },
+        {
+          "match": "\\b[a-z][a-zA-Z0-9_]*\\b",
+          "name": "variable.other.effekt"
+        },
+        {
+          "match": "\\b[A-Z][a-zA-Z0-9_]*\\b",
+          "name": "entity.name.type.effekt"
         }
-      }, {
-        "match": "\\b[a-z][a-zA-Z0-9_]*\\b",
-        "name": "variable.other.effekt"
-      }, {
-        "match": "\\b[A-Z][a-zA-Z0-9_]*\\b",
-        "name": "entity.name.type.effekt"
-      }]
+      ]
     },
     "stringTemplates": {
       "begin": "\\$\\{",
       "beginCaptures": {
-        "0": { "name": "punctuation.definition.template-expression.begin.effekt" }
+        "0": {
+          "name": "punctuation.definition.template-expression.begin.effekt"
+        }
       },
       "end": "\\}",
       "endCaptures": {
         "0": { "name": "punctuation.definition.template-expression.end.effekt" }
       },
       "name": "meta.embedded.line.effekt",
-      "patterns": [
-        { "include": "$self" }
-      ]
+      "patterns": [{ "include": "$self" }]
     },
     "punctuation": {
-      "patterns": [{
-        "match": "[{}\\(\\)\\[\\];,]",
-        "name": "punctuation.separator.effekt"
-      }]
+      "patterns": [
+        {
+          "match": "[{}\\(\\)\\[\\];,]",
+          "name": "punctuation.separator.effekt"
+        }
+      ]
     },
     "holes": {
       "begin": "<{",
       "end": "}>",
       "name": "meta.hole.effekt",
-      "patterns": [{
-        "include": "$self"
-      }]
+      "patterns": [
+        {
+          "include": "$self"
+        }
+      ]
     },
     "operators": {
-      "patterns": [{
-        "match": "\\|\\||&&",
-        "name": "keyword.operator.logical.effekt"
-      }, {
-        "match": "==|!=|<=|>=|<|>",
-        "name": "keyword.operator.comparison.effekt"
-      }, {
-        "match": "\\+\\+",
-        "name": "keyword.operator.concatenation.effekt"
-      }, {
-        "match": "\\+|-|\\*|/",
-        "name": "keyword.operator.arithmetic.effekt"
-      }, {
-        "match": "::",
-        "name": "keyword.operator.namespace.effekt"
-      }, {
-        "match": "=>",
-        "name": "keyword.operator.arrow.effekt"
-      }]
+      "patterns": [
+        {
+          "match": "\\|\\||&&",
+          "name": "keyword.operator.logical.effekt"
+        },
+        {
+          "match": "==|!=|<=|>=|<|>",
+          "name": "keyword.operator.comparison.effekt"
+        },
+        {
+          "match": "\\+\\+",
+          "name": "keyword.operator.concatenation.effekt"
+        },
+        {
+          "match": "\\+|-|\\*|/",
+          "name": "keyword.operator.arithmetic.effekt"
+        },
+        {
+          "match": "::",
+          "name": "keyword.operator.namespace.effekt"
+        },
+        {
+          "match": "=>",
+          "name": "keyword.operator.arrow.effekt"
+        }
+      ]
     },
     "regions": {
-      "patterns": [{
-        "match": "\\b(region)\\s+([a-zA-Z][a-zA-Z0-9_]*)\\b",
-        "captures": {
-          "1": { "name": "keyword.other.region.effekt" },
-          "2": { "name": "variable.other.capability.effekt entity.name.region.effekt" }
+      "patterns": [
+        {
+          "match": "\\b(region)\\s+([a-zA-Z][a-zA-Z0-9_]*)\\b",
+          "captures": {
+            "1": { "name": "keyword.other.region.effekt" },
+            "2": {
+              "name": "variable.other.capability.effekt entity.name.region.effekt"
+            }
+          }
         }
-      }]
+      ]
     }
   },
   "scopeName": "source.effekt"
