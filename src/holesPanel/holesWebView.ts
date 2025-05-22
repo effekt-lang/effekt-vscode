@@ -55,7 +55,7 @@ export function generateWebView(
     `;
   }
 
-  return /*html*/ ` 
+  return /*html*/ `
     <!DOCTYPE html>
     <html lang="en">
     <head>
@@ -69,12 +69,17 @@ export function generateWebView(
         <h1>Effekt Holes</h1>
          ${
            holes.length === 0
-             ? `<div class="empty">
-    No holes in this file.<br>
+             ? /*html*/ `<div class="empty">
+    There are no holes in this file.<br/><br/>
     <span class="desc">
-      Holes in Effekt are placeholders for missing code.<br>
-      You can create a hole using <code>&lt;&gt;</code> or by writing an expression like <code>int x = 5; int y = &lt;{x}&gt;;</code>.<br>
-      The assistant will show information and suggestions for filling holes here.
+      Holes are placeholders for missing code.
+      You can create a hole using the <code>&lt;&gt;</code> syntax.
+      For example, you can write a definition without a right-hand side as follows:
+      <pre>def foo = <></pre>
+      You can start to fill in a hole using <code>&lt;{ x }&gt;</code>, where <code>x</code> can be a statement or expression.
+      For example, you can write:
+      <pre>def foo = <{ println("foo"); 42 }></pre>
+      For all holes in the current file, this panel will show information about the types and terms in scope.
     </span>
    </div>`
              : holes
@@ -85,7 +90,7 @@ export function generateWebView(
               <span class="hole-id">Hole: ${escapeHtml(hole.id)}</span>
               <span class="hole-range">[${hole.range.start.line + 1}:${hole.range.start.character + 1} - ${hole.range.end.line + 1}:${hole.range.end.character + 1}]</span>
             </div>
-           
+
             <div class="expected-type-alert">
               <div class="expected-type-alert-title">Expected Type</div>
               <div class="expected-type-alert-desc">
