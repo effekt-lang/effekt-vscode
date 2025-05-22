@@ -269,25 +269,28 @@ function initializeHolesView(context: vscode.ExtensionContext) {
       holesViewProvider,
     ),
   );
-  let currentUri: string | undefined = undefined;
+
+  const holesByUri = new Map<string, EffektHoleInfo[]>();
 
   client.onNotification(
     '$/effekt/publishHoles',
     (params: { uri: string; holes: EffektHoleInfo[] }) => {
+      holesByUri.set(params.uri, params.holes);
       const activeEditor = vscode.window.activeTextEditor;
       if (activeEditor && activeEditor.document.uri.toString() === params.uri) {
         holesViewProvider.updateHoles(params.holes);
-        currentUri = params.uri;
       }
     },
   );
 
-  // Clear holes when switching away from the file
+  // Clear holes when switching away from the file and load saved holes if available
   vscode.window.onDidChangeActiveTextEditor(
     (editor) => {
-      if (!editor || editor.document.uri.toString() !== currentUri) {
+      if (!editor) {
         holesViewProvider.updateHoles([]);
-        currentUri = editor?.document.uri.toString();
+      } else {
+        const uri = editor.document.uri.toString();
+        holesViewProvider.updateHoles(holesByUri.get(uri) ?? []);
       }
     },
     null,
