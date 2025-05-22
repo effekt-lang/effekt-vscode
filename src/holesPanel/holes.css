@@ -1,25 +1,11 @@
+/* THEME-AWARE VARIABLES */
 :root {
-  --background: #fff;
-  --foreground: #161b22;
-  --accent: #2383e2;
-  --border: #d0d7de;
-  --section-bg: #f6f8fa;
-  --section-border: #eaeef2;
-  --code-bg: #f6f8fa;
-  --term: #0969da;
-  --type: #1a7f37;
-  --highlight: #e8eef6;
-  --shadow: 0 4px 24px rgba(27, 31, 35, 0.06);
   --radius: 8px;
-  --font:
-    'Inter', 'Segoe UI', system-ui, 'Roboto', 'Helvetica Neue', Arial,
-    'Noto Sans', sans-serif;
-  --font-mono:
-    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
-    'Courier New', monospace;
+  --shadow: 0 4px 24px rgba(27, 31, 35, 0.06);
+  --font: 'Inter', 'Segoe UI', system-ui, 'Roboto', 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
 }
 
-html,
 body {
   background: var(--background);
   color: var(--foreground);
@@ -27,6 +13,49 @@ body {
   margin: 0;
   padding: 0;
 }
+
+body.vscode-light {
+  --background: var(--vscode-editor-background, #fff);
+  --foreground: var(--vscode-editor-foreground, #161b22);
+  --accent: var(--vscode-textLink-foreground, #2383e2);
+  --border: var(--vscode-editorWidget-border, #d0d7de);
+  --section-bg: var(--vscode-sideBar-background, #f6f8fa);
+  --section-border: var(--vscode-editorWidget-border, #eaeef2);
+  --code-bg: var(--vscode-editorGutter-background, #f6f8fa);
+  --term: var(--vscode-terminal-ansiBlue, #0969da);
+  --type: var(--vscode-terminal-ansiGreen, #1a7f37);
+  --highlight: var(--vscode-editor-selectionHighlightBackground, #e8eef6);
+  --muted: #637381;
+}
+
+body.vscode-dark {
+  --background: var(--vscode-editor-background, #1e1e1e);
+  --foreground: var(--vscode-editor-foreground, #d4d4d4);
+  --accent: var(--vscode-textLink-foreground, #4ea1ff);
+  --border: var(--vscode-editorWidget-border, #3c3c3c);
+  --section-bg: var(--vscode-sideBar-background, #252526);
+  --section-border: var(--vscode-editorWidget-border, #3c3c3c);
+  --code-bg: var(--vscode-editorGutter-background, #2c2c2c);
+  --term: var(--vscode-terminal-ansiBlue, #4ea1ff);
+  --type: var(--vscode-terminal-ansiGreen, #6bbf59);
+  --highlight: var(--vscode-editor-selectionHighlightBackground, #444d56);
+  --muted: #9ca3af;
+}
+
+body.vscode-high-contrast {
+  --background: var(--vscode-editor-background, black);
+  --foreground: var(--vscode-editor-foreground, white);
+  --accent: var(--vscode-textLink-foreground, yellow);
+  --border: var(--vscode-editorWidget-border, white);
+  --section-bg: var(--vscode-sideBar-background, black);
+  --section-border: var(--vscode-editorWidget-border, white);
+  --code-bg: var(--vscode-editorGutter-background, black);
+  --term: var(--vscode-terminal-ansiBlue, cyan);
+  --type: var(--vscode-terminal-ansiGreen, lime);
+  --highlight: var(--vscode-editor-selectionHighlightBackground, #333);
+  --muted: #cccccc;
+}
+
 code,
 pre,
 .font-mono {
@@ -35,8 +64,9 @@ pre,
 
 .container {
   max-width: 680px;
-  margin: 2rem auto;
-  padding: 1.5rem 1.25rem;
+  margin: 0 auto;
+  padding: 0 1.25rem;
+  padding-top: 0;
 }
 
 .hole-card {
@@ -72,7 +102,7 @@ pre,
 .hole-range {
   margin-left: auto;
   font-size: 0.97rem;
-  color: #637381;
+  color: var(--muted);
   background: var(--highlight);
   border-radius: 5px;
   padding: 0.19em 0.8em;
@@ -93,7 +123,7 @@ pre,
 
 .field-value {
   font-family: monospace;
-  color: #2d333b;
+  color: var(--foreground);
 }
 
 .bindings-list {
@@ -109,18 +139,30 @@ pre,
   padding: 0.14em 0.8em 0.14em 0.6em;
   font-size: 0.98em;
   border: 1px solid var(--section-border);
-  color: #2d333b;
+  color: var(--foreground);
 }
 
 .binding-term {
   color: var(--term);
 }
+
 .binding-type {
   color: var(--type);
 }
+
 .empty {
-  color: #8b949e;
-  font-style: italic;
+  color: var(--foreground);
+  font-style: normal;
+  font-weight: 500;
+  margin-bottom: 0.5em;
+}
+
+.empty .desc {
+  display: block;
+  color: var(--foreground);
+  font-size: 0.98em;
+  margin-top: 0.3em;
+  font-weight: 400;
 }
 
 code {
@@ -149,7 +191,7 @@ summary::-webkit-details-marker {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #f3f4f6;
+  background: var(--code-bg);
   padding: 0.48em 0.93em;
   border-bottom: 1px solid var(--section-border);
   cursor: pointer;
@@ -174,7 +216,7 @@ summary::-webkit-details-marker {
   border: 1px solid var(--border);
   border-radius: 5px;
   font-size: 0.97em;
-  background: #fff;
+  background: var(--background);
   transition: border 0.15s;
 }
 
@@ -195,15 +237,13 @@ summary::-webkit-details-marker {
   margin-bottom: 0.6em;
   cursor: pointer;
   position: relative;
-  transition:
-    border 0.13s,
-    background 0.13s;
+  transition: border 0.13s, background 0.13s;
   font-size: 0.98em;
 }
 
 .suggestion.selected {
   border-color: var(--accent);
-  background: #e3f0ff;
+  background: var(--highlight);
 }
 
 .suggestion-status {
@@ -216,14 +256,14 @@ summary::-webkit-details-marker {
   font-weight: 600;
   letter-spacing: 0.01em;
   opacity: 0.93;
-  background: #fff;
+  background: var(--background);
   border-radius: 12px;
   padding: 0.11em 0.8em;
   box-shadow: 0 1px 4px rgba(27, 31, 35, 0.05);
 }
 
 .suggestion-status.works {
-  color: #1a7f37;
+  color: var(--type);
   background: #e6f9ed;
   border: 1px solid #b2e2c5;
 }
@@ -233,29 +273,29 @@ summary::-webkit-details-marker {
   background: #fff0f0;
   border: 1px solid #f7c1c1;
 }
+
 .expected-type-alert {
-  background-color: #eff6ff; /* Tailwind's bg-blue-50 */
-  border: 1px solid #bfdbfe; /* Tailwind's border-blue-200 */
+  background-color: var(--highlight);
+  border: 1px solid var(--border);
   border-radius: 0.375rem;
   padding: 0.75em 1em;
   margin-bottom: 0.75rem;
 }
 
 .expected-type-alert-title {
-  font-size: 0.75rem; /* Tailwind's text-xs */
-  font-weight: 600; /* Tailwind's font-semibold */
-  color: #1d4ed8; /* Tailwind's text-blue-700 */
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--accent);
   margin-bottom: 0.125rem;
 }
 
 .expected-type-alert-desc {
-  font-family:
-    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
-    'Courier New', monospace; /* Tailwind's font-mono */
-  font-size: 0.875rem; /* Tailwind's text-sm */
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
 }
+
 .indented-field {
-  padding-left: 1em; /* Match the .expected-type-alert padding */
+  padding-left: 1em;
 }
 
 .exp-dropdown-section {
@@ -265,18 +305,21 @@ summary::-webkit-details-marker {
   background: var(--section-bg);
   overflow: hidden;
 }
+
 .exp-dropdown-header {
   display: flex;
   align-items: center;
-  background: #f3f4f6;
+  background: var(--code-bg);
   font-weight: 600;
   padding: 0.65em 1em;
   cursor: pointer;
   transition: background 0.15s;
 }
+
 .exp-dropdown-header:hover {
-  background: #e5e7eb;
+  background: var(--highlight);
 }
+
 .exp-dropdown-toggle {
   display: inline-block;
   margin-right: 0.55em;
@@ -284,19 +327,23 @@ summary::-webkit-details-marker {
   font-size: 1.07em;
   color: var(--accent);
 }
+
 .exp-dropdown-header.collapsed .exp-dropdown-toggle {
   transform: rotate(-90deg);
 }
+
 .exp-dropdown-title {
   flex: 1 1 auto;
   color: var(--accent);
   font-size: 1em;
   letter-spacing: 0.01em;
 }
+
 .exp-dropdown-body {
   padding: 1em;
   background: var(--background);
 }
+
 .exp-dropdown-body.hidden {
   display: none;
 }

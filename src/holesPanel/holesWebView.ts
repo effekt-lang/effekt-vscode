@@ -60,16 +60,23 @@ export function generateWebView(
     <html lang="en">
     <head>
       <meta charset="UTF-8" />
-      <title>Effekt Holes Panel</title>
+      <title>Effekt Holes</title>
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <link href="${cssUri}" rel="stylesheet">
     </head>
     <body>
       <div class="container">
-        <h1>Effekt Holes Panel</h1>
+        <h1>Effekt Holes</h1>
          ${
            holes.length === 0
-             ? `<div class="empty">No holes found.</div>`
+             ? `<div class="empty">
+    No holes in this file.<br>
+    <span class="desc">
+      Holes in Effekt are placeholders for missing code.<br>
+      You can create a hole using <code>&lt;&gt;</code> or by writing an expression like <code>int x = 5; int y = &lt;{x}&gt;;</code>.<br>
+      The assistant will show information and suggestions for filling holes here.
+    </span>
+   </div>`
              : holes
                  .map(
                    (hole, idx) => `
