@@ -1,6 +1,6 @@
 import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
 import * as vscode from 'vscode';
-import { LanguageClient, ExecuteCommandRequest } from 'vscode-languageclient/node';
+import { LanguageClient, /*ExecuteCommandRequest*/ } from 'vscode-languageclient/node';
 
 let replSession: ChildProcessWithoutNullStreams | null = null;
 
@@ -49,6 +49,7 @@ function execCellREPL(cellCode: string): Promise<string> {
             reject("REPL session not started");
             return;
         }
+
         // Buffer the output until we see ">"
         let outputBuffer = '';
     
@@ -103,7 +104,6 @@ function execCellREPL(cellCode: string): Promise<string> {
 
         // Attach listeners to the REPL process
         replSession.stdout.on('data', onData);
-        console.log("stdout:" + replSession.stdout.toString());
         replSession.stderr.on('data', (buf: Buffer) => {
             // ignore "Debugger attached" message
             const text = buf.toString();
@@ -112,12 +112,18 @@ function execCellREPL(cellCode: string): Promise<string> {
             }
             console.error("stderr:" + text);
         });
-
+         // flat out the cell code
+        const flatCode = cellCode
+            .split('\n')
+            .map(line => line.trim())
+            .filter(line => line)
+            .join(' ');
+        
         // Send cell content to REPL
-        replSession.stdin.write(cellCode + '\n');
+        replSession.stdin.write(flatCode + '\n');
     });
 }
-      
+
 // check if REPL already started
 function isREPLActive(): boolean {
     return replSession !== null;
@@ -131,7 +137,7 @@ export class Controller {
 
     private readonly _controller: vscode.NotebookController;
     private _executionOrder = 0;
-    private readonly client: LanguageClient;
+    //private readonly client: LanguageClient;
 
     constructor(client: LanguageClient) {
         this._controller = vscode.notebooks.createNotebookController(
@@ -140,7 +146,7 @@ export class Controller {
             this.label
         );
 
-        this.client = client;
+        //this.client = client;
         this._controller.supportedLanguages = this.supportedLanguages;
         this._controller.supportsExecutionOrder = true;
         this._controller.executeHandler = this._execute.bind(this);
@@ -176,8 +182,8 @@ export class Controller {
             if(!isREPLActive()) {
                 await startREPL();
             } 
-            //send cell content to REPL
 
+            //send cell content to REPL
             result = (await execCellREPL(cellContent)).toString();
 
             execution.replaceOutput(new vscode.NotebookCellOutput([
