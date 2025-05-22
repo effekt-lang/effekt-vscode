@@ -162,7 +162,7 @@
         "effekt.showHoles": {
           "type": "boolean",
           "default": false,
-          "description": "Show a panel with information about all typed holes in the program"     
+          "description": "Show a panel with information about all typed holes in the program"
         }
       }
     },
