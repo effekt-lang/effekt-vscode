@@ -28,6 +28,10 @@ export class InlayHintProvider implements vscode.InlayHintsProvider {
   ): Promise<vscode.InlayHint[]> {
     const config = vscode.workspace.getConfiguration('effekt');
     const showCaptureHints = config.get<boolean>('inlayHints.captures', true);
+    const showReturnTypeHints = config.get<boolean>(
+      'inlayHints.returnTypes',
+      true,
+    );
 
     const editorHintsEnabled = vscode.workspace
       .getConfiguration('editor.inlayHints')
@@ -51,7 +55,10 @@ export class InlayHintProvider implements vscode.InlayHintsProvider {
     }
 
     const filtered = response.filter((h) => {
-      return !(h.data === 'capture' && !showCaptureHints);
+      return (
+        (h.data !== 'capture' || showCaptureHints) &&
+        (h.data !== 'return-type-annotation' || showReturnTypeHints)
+      );
     });
 
     const hints = await this.protocol2code.asInlayHints(filtered, _token);

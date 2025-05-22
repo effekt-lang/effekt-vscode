@@ -153,6 +153,11 @@
                     "type": "boolean",
                     "default": true,
                     "markdownDescription": "Show capture inlay hints:\n\n ```effekt\n'{io}' def main(): Unit = { println(\" Hello Effekt! \") }\n```"
+                },
+                "effekt.inlayHints.returnTypes": {
+                    "type": "boolean",
+                    "default": true,
+                    "markdownDescription": "Show inlay hints for function return types:\n\n ```effekt\ndef foo()': Int / { raise }' = { do raise(); 5 } \n```"
                 }
             }
         },
