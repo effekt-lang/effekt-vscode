@@ -8,7 +8,47 @@
     ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
     'Courier New', monospace;
 }
+body.vscode-light {
+  --background: var(--vscode-editor-background);
+  --foreground: var(--vscode-editor-foreground);
+  --accent: var(--vscode-textLink-foreground);
+  --border: var(--vscode-editorWidget-border);
+  --section-bg: var(--vscode-sideBar-background);
+  --section-border: var(--vscode-editorWidget-border);
+  --code-bg: var(--vscode-editorGutter-background);
+  --term: var(--vscode-terminal-ansiBlue);
+  --type: var(--vscode-terminal-ansiGreen);
+  --highlight: var(--vscode-editor-selectionHighlightBackground);
+  --muted: #637381;
+}
 
+body.vscode-dark {
+  --background: var(--vscode-editor-background);
+  --foreground: var(--vscode-editor-foreground);
+  --accent: var(--vscode-textLink-foreground);
+  --border: var(--vscode-editorWidget-border);
+  --section-bg: var(--vscode-sideBar-background);
+  --section-border: var(--vscode-editorWidget-border);
+  --code-bg: var(--vscode-editorGutter-background);
+  --term: var(--vscode-terminal-ansiBlue);
+  --type: var(--vscode-terminal-ansiGreen);
+  --highlight: var(--vscode-editor-selectionHighlightBackground);
+  --muted: #9ca3af;
+}
+
+body.vscode-high-contrast {
+  --background: var(--vscode-editor-background);
+  --foreground: var(--vscode-editor-foreground);
+  --accent: var(--vscode-textLink-foreground);
+  --border: var(--vscode-editorWidget-border);
+  --section-bg: var(--vscode-sideBar-background);
+  --section-border: var(--vscode-editorWidget-border);
+  --code-bg: var(--vscode-editorGutter-background);
+  --term: var(--vscode-terminal-ansiBlue);
+  --type: var(--vscode-terminal-ansiGreen);
+  --highlight: var(--vscode-editor-selectionHighlightBackground);
+  --muted: #cccccc;
+}
 body {
   background: var(--background);
   color: var(--foreground);
@@ -17,51 +57,8 @@ body {
   padding: 0;
 }
 
-body.vscode-light {
-  --background: var(--vscode-editor-background, #fff);
-  --foreground: var(--vscode-editor-foreground, #161b22);
-  --accent: var(--vscode-textLink-foreground, #2383e2);
-  --border: var(--vscode-editorWidget-border, #d0d7de);
-  --section-bg: var(--vscode-sideBar-background, #f6f8fa);
-  --section-border: var(--vscode-editorWidget-border, #eaeef2);
-  --code-bg: var(--vscode-editorGutter-background, #f6f8fa);
-  --term: var(--vscode-terminal-ansiBlue, #0969da);
-  --type: var(--vscode-terminal-ansiGreen, #1a7f37);
-  --highlight: var(--vscode-editor-selectionHighlightBackground, #e8eef6);
-  --muted: #637381;
-}
-
-body.vscode-dark {
-  --background: var(--vscode-editor-background, #1e1e1e);
-  --foreground: var(--vscode-editor-foreground, #d4d4d4);
-  --accent: var(--vscode-textLink-foreground, #4ea1ff);
-  --border: var(--vscode-editorWidget-border, #3c3c3c);
-  --section-bg: var(--vscode-sideBar-background, #252526);
-  --section-border: var(--vscode-editorWidget-border, #3c3c3c);
-  --code-bg: var(--vscode-editorGutter-background, #2c2c2c);
-  --term: var(--vscode-terminal-ansiBlue, #4ea1ff);
-  --type: var(--vscode-terminal-ansiGreen, #6bbf59);
-  --highlight: var(--vscode-editor-selectionHighlightBackground, #444d56);
-  --muted: #9ca3af;
-}
-
-body.vscode-high-contrast {
-  --background: var(--vscode-editor-background, black);
-  --foreground: var(--vscode-editor-foreground, white);
-  --accent: var(--vscode-textLink-foreground, yellow);
-  --border: var(--vscode-editorWidget-border, white);
-  --section-bg: var(--vscode-sideBar-background, black);
-  --section-border: var(--vscode-editorWidget-border, white);
-  --code-bg: var(--vscode-editorGutter-background, black);
-  --term: var(--vscode-terminal-ansiBlue, cyan);
-  --type: var(--vscode-terminal-ansiGreen, lime);
-  --highlight: var(--vscode-editor-selectionHighlightBackground, #333);
-  --muted: #cccccc;
-}
-
 code,
-pre,
-.font-mono {
+pre {
   font-family: var(--font-mono);
 }
 
@@ -175,43 +172,6 @@ code {
   font-size: 0.98em;
 }
 
-details summary {
-  cursor: pointer;
-  color: var(--accent);
-  font-weight: 600;
-  margin-top: 0.3em;
-  margin-bottom: 0.18em;
-  font-size: 1em;
-  outline: none;
-  user-select: none;
-}
-
-summary::-webkit-details-marker {
-  color: var(--accent);
-}
-
-.section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: var(--code-bg);
-  padding: 0.48em 0.93em;
-  border-bottom: 1px solid var(--section-border);
-  cursor: pointer;
-  font-weight: 700;
-  border-radius: 7px 7px 0 0;
-  font-size: 1em;
-}
-
-.section-toggle {
-  margin-right: 0.5em;
-  transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.section-toggle.collapsed {
-  transform: rotate(-90deg);
-}
-
 .filter-box {
   width: 100%;
   padding: 0.36em 0.64em;
@@ -227,57 +187,6 @@ summary::-webkit-details-marker {
 .filter-box:focus {
   outline: none;
   border-color: var(--accent);
-}
-
-.suggestion-list {
-  margin-top: 1.15em;
-}
-
-.suggestion {
-  background: var(--highlight);
-  border: 1.5px solid var(--border);
-  border-radius: 7px;
-  padding: 0.82em 0.8em 0.82em 1em;
-  margin-bottom: 0.6em;
-  cursor: pointer;
-  position: relative;
-  transition:
-    border 0.13s,
-    background 0.13s;
-  font-size: 0.98em;
-}
-
-.suggestion.selected {
-  border-color: var(--accent);
-  background: var(--highlight);
-}
-
-.suggestion-status {
-  position: absolute;
-  top: 0.68em;
-  right: 1em;
-  display: flex;
-  align-items: center;
-  font-size: 0.88em;
-  font-weight: 600;
-  letter-spacing: 0.01em;
-  opacity: 0.93;
-  background: var(--background);
-  border-radius: 12px;
-  padding: 0.11em 0.8em;
-  box-shadow: 0 1px 4px rgba(27, 31, 35, 0.05);
-}
-
-.suggestion-status.works {
-  color: var(--type);
-  background: #e6f9ed;
-  border: 1px solid #b2e2c5;
-}
-
-.suggestion-status.error {
-  color: #cf222e;
-  background: #fff0f0;
-  border: 1px solid #f7c1c1;
 }
 
 .expected-type-alert {
