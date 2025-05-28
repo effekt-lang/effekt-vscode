@@ -18,7 +18,6 @@ import * as net from 'net';
 let client: EffektLanguageClient;
 let effektManager: EffektManager;
 const outputChannel = vscode.window.createOutputChannel('Effekt Extension');
-const holeRegex = /<>|<{|}>/g;
 
 function logMessage(level: 'INFO' | 'ERROR', message: string) {
   outputChannel.appendLine(
@@ -129,6 +128,8 @@ export async function activate(context: vscode.ExtensionContext) {
     }
   }
   vscode.window.onDidChangeTextEditorSelection((event) => {
+    const holeRegex = /<>|<{|}>/g;
+
     console.log('on did change');
     const editor = event.textEditor;
     const pos = editor.selection.active;
@@ -354,6 +355,7 @@ function initializeHoleDecorations(context: vscode.ExtensionContext) {
     timeout = setTimeout(updateHoles, 50);
   }
 
+  const holeRegex = /<>|<{|}>/g;
   /**
    * TODO clean this up -- ideally move it to the language server
    */
