@@ -18,6 +18,7 @@ import * as net from 'net';
 let client: EffektLanguageClient;
 let effektManager: EffektManager;
 const outputChannel = vscode.window.createOutputChannel('Effekt Extension');
+const holeRegex = /<>|<{|}>/g;
 
 function logMessage(level: 'INFO' | 'ERROR', message: string) {
   outputChannel.appendLine(
@@ -127,6 +128,22 @@ export async function activate(context: vscode.ExtensionContext) {
       );
     }
   }
+  vscode.window.onDidChangeTextEditorSelection((event) => {
+    console.log('on did change');
+    const editor = event.textEditor;
+    const pos = editor.selection.active;
+    const text = editor.document.getText();
+    let match;
+    while ((match = holeRegex.exec(text))) {
+      const from = editor.document.positionAt(match.index);
+      const to = editor.document.positionAt(match.index + 2);
+      const range = new vscode.Range(from, to);
+      if (range.contains(pos)) {
+        console.log('in a hole');
+        break;
+      }
+    }
+  });
 }
 
 async function ensureEffektIsAvailable() {
@@ -337,7 +354,6 @@ function initializeHoleDecorations(context: vscode.ExtensionContext) {
     timeout = setTimeout(updateHoles, 50);
   }
 
-  const holeRegex = /<>|<{|}>/g;
   /**
    * TODO clean this up -- ideally move it to the language server
    */

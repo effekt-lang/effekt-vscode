@@ -9,6 +9,7 @@ export interface EffektHoleInfo {
   importedTypes: TypeBinding[];
   terms: TermBinding[];
   types: TypeBinding[];
+  highlighted?: boolean;
 }
 
 export interface TermBinding {
