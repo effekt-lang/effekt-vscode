@@ -11,6 +11,8 @@ import { EffektManager, EffektExecutableNotFoundError } from './effektManager';
 import { EffektIRContentProvider } from './irProvider';
 import { InlayHintProvider } from './inlayHintsProvider';
 import { EffektLanguageClient } from './effektLanguageClient';
+import { EffektHoleInfo } from './holesPanel/effektHoleInfo';
+import { HolesViewProvider } from './holesPanel/holesViewProvider';
 import * as net from 'net';
 
 let client: EffektLanguageClient;
@@ -106,7 +108,6 @@ class EffektRunCodeLensProvider implements vscode.CodeLensProvider {
 
 export async function activate(context: vscode.ExtensionContext) {
   effektManager = new EffektManager();
-
   try {
     // If Effekt is installed (no matter which version), start the language server
     await ensureEffektIsAvailable();
@@ -139,6 +140,7 @@ async function initializeLSPAndProviders(context: vscode.ExtensionContext) {
   registerIRProvider(context);
   registerInlayProvider();
   initializeHoleDecorations(context);
+  initializeHolesView(context);
 }
 
 async function handleEffektUpdates() {
@@ -256,6 +258,49 @@ function registerIRProvider(context: vscode.ExtensionContext) {
         });
       });
     },
+  );
+}
+
+function initializeHolesView(context: vscode.ExtensionContext) {
+  const holesViewProvider = new HolesViewProvider(context);
+  context.subscriptions.push(
+    vscode.window.registerWebviewViewProvider(
+      HolesViewProvider.viewType,
+      holesViewProvider,
+    ),
+  );
+
+  const holesByUri = new Map<string, EffektHoleInfo[]>();
+
+  client.onNotification(
+    '$/effekt/publishHoles',
+    (params: { uri: string; holes: EffektHoleInfo[] }) => {
+      holesByUri.set(params.uri, params.holes);
+      const activeEditor = vscode.window.activeTextEditor;
+      if (activeEditor && activeEditor.document.uri.toString() === params.uri) {
+        holesViewProvider.updateHoles(params.holes);
+      }
+    },
+  );
+
+  // Clear holes when switching away from the file and load saved holes if available
+  vscode.window.onDidChangeActiveTextEditor(
+    (editor) => {
+      if (!editor) {
+        holesViewProvider.updateHoles([]);
+      } else {
+        const uri = editor.document.uri.toString();
+        holesViewProvider.updateHoles(holesByUri.get(uri) ?? []);
+      }
+    },
+    null,
+    context.subscriptions,
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand('effekt.openHolesPanel', () => {
+      vscode.commands.executeCommand('effekt.holesView.focus');
+    }),
   );
 }
 
