@@ -1,28 +1,9 @@
 import * as vscode from 'vscode';
 import { EffektHoleInfo } from './effektHoleInfo';
-
 export function generateWebView(
   holes: EffektHoleInfo[],
   cssUri: vscode.Uri,
 ): string {
-  function escapeHtml(str: string): string {
-    return String(str).replace(
-      /[&<>"']/g,
-      (c) =>
-        ({
-          '&': '&amp;',
-          '<': '&lt;',
-          '>': '&gt;',
-          '"': '&quot;',
-          "'": '&#39;',
-        })[c]!,
-    );
-  }
-
-  function uniqueByName<T extends { name: string }>(arr: T[]): T[] {
-    return Array.from(new Map(arr.map((x) => [x.name, x])).values());
-  }
-
   // Helper for dropdown section
   function renderExpDropdown({
     title,
@@ -149,12 +130,12 @@ export function generateWebView(
             })}
             ${renderExpDropdown({
               title: 'Imported Terms',
-              count: uniqueByName(hole.importedTerms).length,
+              count: hole.importedTerms.length,
               idx,
               kind: 'imported-terms',
               placeholder: 'Search imported terms...',
               itemsHtml:
-                uniqueByName(hole.importedTerms)
+                hole.importedTerms
                   .map(
                     (t) =>
                       `<div class="binding"><span class="binding-term">${escapeHtml(t.name)}</span>: <span class="binding-type">${escapeHtml(t.type)}</span></div>`,
@@ -163,12 +144,12 @@ export function generateWebView(
             })}
             ${renderExpDropdown({
               title: 'Imported Types',
-              count: uniqueByName(hole.importedTypes).length,
+              count: hole.importedTypes.length,
               idx,
               kind: 'imported-types',
               placeholder: 'Search imported types...',
               itemsHtml:
-                uniqueByName(hole.importedTypes)
+                hole.importedTypes
                   .map(
                     (t) =>
                       `<div class="binding"><span class="binding-term">${escapeHtml(t.name)}</span>: <span class="binding-type">${escapeHtml(t.kind)}</span></div>`,
