@@ -131,8 +131,8 @@ pre,
 
 .bindings-list {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.25em 1.15em;
+  flex-direction: column;
+  gap: 0.25em;
   margin: 0.2em 0 0.55em 0;
 }
 
