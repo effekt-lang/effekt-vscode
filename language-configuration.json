@@ -1,42 +1,42 @@
 {
-    "comments": {
-        "lineComment": "//"
+  "comments": {
+    "lineComment": "//"
+  },
+  "brackets": [
+    ["{", "}"],
+    ["[", "]"],
+    ["(", ")"],
+    ["<{", "}>"]
+  ],
+  "autoClosingPairs": [
+    ["{", "}"],
+    ["[", "]"],
+    ["(", ")"]
+  ],
+  "surroundingPairs": [
+    ["{", "}"],
+    ["[", "]"],
+    ["(", ")"],
+    ["<{", "}>"]
+  ],
+  "folding": {
+    "offSide": false
+  },
+  "wordPattern": "([a-zA-Z][a-zA-Z0-9_]*)",
+  "onEnterRules": [
+    {
+      "beforeText": "^\\s*//[^/].*$",
+      "action": {
+        "appendText": "// ",
+        "indent": "none"
+      }
     },
-    "brackets": [
-        ["{", "}"],
-        ["[", "]"],
-        ["(", ")"],
-        ["<{", "}>"]
-    ],
-    "autoClosingPairs": [
-        ["{", "}"],
-        ["[", "]"],
-        ["(", ")"]
-    ],
-    "surroundingPairs": [
-        ["{", "}"],
-        ["[", "]"],
-        ["(", ")"],
-        ["<{", "}>"]
-    ],
-    "folding": {
-        "offSide": false
-    },
-    "wordPattern": "([a-zA-Z][a-zA-Z0-9_]*)",
-    "onEnterRules": [
-        {
-            "beforeText": "^\\s*//[^/].*$",
-            "action": {
-                "appendText": "// ",
-				"indent": "none"
-            }
-        },
-        {
-            "beforeText": "^\\s*///.*$",
-            "action": {
-                "appendText": "/// ",
-				"indent": "none"
-            }
-        }
-    ]
+    {
+      "beforeText": "^\\s*///.*$",
+      "action": {
+        "appendText": "/// ",
+        "indent": "none"
+      }
+    }
+  ]
 }
