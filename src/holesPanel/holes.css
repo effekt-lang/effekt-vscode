@@ -353,3 +353,13 @@ summary::-webkit-details-marker {
 .exp-dropdown-body.hidden {
   display: none;
 }
+
+.warning {
+  background: #fffae6;
+  color: #a67c00;
+  border: 1px solid #ffe58f;
+  padding: 0.7em 1em;
+  border-radius: 4px;
+  margin-bottom: 1em;
+  font-size: 1em;
+}

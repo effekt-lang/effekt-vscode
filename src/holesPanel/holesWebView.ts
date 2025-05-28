@@ -54,6 +54,9 @@ export function generateWebView(
       </div>
     `;
   }
+  const showHoles = vscode.workspace
+    .getConfiguration('effekt')
+    .get<boolean>('showHoles');
 
   return /*html*/ `
     <!DOCTYPE html>
@@ -67,23 +70,38 @@ export function generateWebView(
     <body>
       <div class="container">
         <h1>Effekt Holes</h1>
-         ${
-           holes.length === 0
-             ? /*html*/ `<div class="empty">
-    There are no holes in this file.<br/><br/>
-    <div class="desc">
-      This panel shows information about the types and terms in scope for each typed hole.
-      Holes are placeholders for missing code used for type-driven development.
-      You can create a hole using the <code>&lt;&gt;</code> syntax.
-      For example, you can write a definition without a right-hand side as follows:
-      <pre>def foo() = &lt;&gt;</pre><br/>
-      Use <code>&lt;{ x }&gt;</code> in order to fill in a hole with a statement or expression <code>x</code>, for example:
-      <pre>def foo() = &lt;{ println("foo"); 42 }&gt;</pre>
-    </div>
-   </div>`
-             : holes
-                 .map(
-                   (hole, idx) => `
+     ${
+       !showHoles
+         ? `<div class="empty">
+        <div class="warning">
+          <b>Warning:</b> The Holes Panel requires the setting <b>Extension &gt; Effekt &gt; Show Holes</b> to be enabled to function.
+        </div>
+        <div class="desc">
+          This panel shows information about the types and terms in scope for each typed hole.
+          Holes are placeholders for missing code used for type-driven development.
+          You can create a hole using the <code>&lt;&gt;</code> syntax.
+          For example, you can write a definition without a right-hand side as follows:
+          <pre>def foo() = &lt;&gt;</pre><br/>
+          Use <code>&lt;{ x }&gt;</code> in order to fill in a hole with a statement or expression <code>x</code>, for example:
+          <pre>def foo() = &lt;{ println("foo"); 42 }&gt;</pre>
+        </div>
+      </div>`
+         : holes.length === 0
+           ? `<div class="empty">
+          There are no holes in this file.
+          <div class="desc">
+            This panel shows information about the types and terms in scope for each typed hole.
+            Holes are placeholders for missing code used for type-driven development.
+            You can create a hole using the <code>&lt;&gt;</code> syntax.
+            For example, you can write a definition without a right-hand side as follows:
+            <pre>def foo() = &lt;&gt;</pre><br/>
+            Use <code>&lt;{ x }&gt;</code> in order to fill in a hole with a statement or expression <code>x</code>, for example:
+            <pre>def foo() = &lt;{ println("foo"); 42 }&gt;</pre>
+          </div>
+        </div>`
+           : holes
+               .map(
+                 (hole, idx) => `
           <section class="hole-card">
             <div class="hole-header">
               <span class="hole-id">Hole: ${escapeHtml(hole.id)}</span>
@@ -159,9 +177,9 @@ export function generateWebView(
             })}
           </section>
         `,
-                 )
-                 .join('')
-         }
+               )
+               .join('')
+     }
       </div>
       <script>
         function filterDropdownList(event, listId) {
