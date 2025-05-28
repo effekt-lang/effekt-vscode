@@ -20,7 +20,7 @@ export function generateWebView(
     placeholder: string;
     itemsHtml: string;
   }) {
-    return `
+    return /*html*/ `
       <div class="exp-dropdown-section">
         <div class="exp-dropdown-header collapsed" onclick="toggleDropdown(this)">
           <span class="exp-dropdown-toggle">&#9660;</span>
@@ -53,7 +53,7 @@ export function generateWebView(
         <h1>Effekt Holes</h1>
      ${
        !showHoles
-         ? `<div class="empty">
+         ? /*html*/ `<div class="empty">
         <div class="warning">
           <b>Warning:</b> The Holes Panel requires the setting <b>Extension &gt; Effekt &gt; Show Holes</b> to be enabled to function.
         </div>
@@ -68,7 +68,7 @@ export function generateWebView(
         </div>
       </div>`
          : holes.length === 0
-           ? `<div class="empty">
+           ? /*html*/ `<div class="empty">
           There are no holes in this file.
           <div class="desc">
             This panel shows information about the types and terms in scope for each typed hole.
@@ -82,7 +82,7 @@ export function generateWebView(
         </div>`
            : holes
                .map(
-                 (hole, idx) => `
+                 (hole, idx) => /*html*/ `
           <section class="hole-card">
             <div class="hole-header">
               <span class="hole-id">Hole: ${escapeHtml(hole.id)}</span>
