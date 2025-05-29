@@ -284,9 +284,8 @@ export async function activate(context: vscode.ExtensionContext) {
 
     scheduleDecorations();
 
-    // Notebook
+    // Notebook registration
     context.subscriptions.push(
-        //Notebook registration
         vscode.workspace.registerNotebookSerializer('effekt-notebook', new NotebookSerializer()),
         new Controller(client),
     );

@@ -5,11 +5,6 @@ import { LanguageClient, /*ExecuteCommandRequest*/ } from 'vscode-languageclient
 let replSession: ChildProcessWithoutNullStreams | null = null;
 
 function startREPL(): Promise<void>{
-    if(replSession) {
-        console.log("REPL session already started");
-        return Promise.resolve();
-    }
-
     // spawn new repl
     replSession = spawn('effekt.sh', [], { stdio:'pipe', shell: true });
     console.log("REPL session started");
@@ -43,17 +38,23 @@ function stopREPL(){
     }
 }
 
-function execCellREPL(cellCode: string): Promise<string> {
+function exeCellREPL(cellCode: string): Promise<string> {
     return new Promise((resolve, reject) => {
         if (!replSession) {
             reject("REPL session not started");
             return;
         }
 
+        // flat out the cell code
+        const flatCode = cellCode
+         .split('\n')
+         .map(line => line.trim())
+         .filter(line => line)
+         .join(' ');
+
         // Buffer the output until we see ">"
         let outputBuffer = '';
-    
-        // listen for data once
+       
         const onData = (chunk: Buffer) => {
             const text = chunk.toString();
             outputBuffer += text;
@@ -67,11 +68,11 @@ function execCellREPL(cellCode: string): Promise<string> {
                     .filter(l => {
                     const t = l.trim();
                     
-                    // ignore promt line
+                    // ignore next promt line
                     if (t === ">" || t.startsWith(">")) return false;
 
                     //ignore input content , so it will not be shown in output cell
-                    if (t === cellCode.trim()) return false;
+                    if (t === flatCode.trim()) return false;
 
                     // keep non-empty lines
                     return t.length > 0;
@@ -112,12 +113,6 @@ function execCellREPL(cellCode: string): Promise<string> {
             }
             console.error("stderr:" + text);
         });
-         // flat out the cell code
-        const flatCode = cellCode
-            .split('\n')
-            .map(line => line.trim())
-            .filter(line => line)
-            .join(' ');
         
         // Send cell content to REPL
         replSession.stdin.write(flatCode + '\n');
@@ -184,7 +179,7 @@ export class Controller {
             } 
 
             //send cell content to REPL
-            result = (await execCellREPL(cellContent)).toString();
+            result = (await exeCellREPL(cellContent)).toString();
 
             execution.replaceOutput(new vscode.NotebookCellOutput([
                 vscode.NotebookCellOutputItem.text(result)
