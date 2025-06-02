@@ -1,4 +1,5 @@
 const esbuild = require('esbuild');
+const copyPlugin = require('esbuild-plugin-copy').default;
 
 const watch = process.argv.includes('--watch');
 
@@ -20,7 +21,13 @@ async function main() {
     logLevel: 'silent',
     plugins: [
       /* add to the end of plugins array */
-      esbuildProblemMatcherPlugin
+      esbuildProblemMatcherPlugin,
+      copyPlugin({
+        assets: {
+          from: ['./src/holesPanel/holes.css'],
+          to: ['./holesPanel']
+        }
+      })
     ]
   });
   if (watch) {
