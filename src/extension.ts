@@ -18,6 +18,8 @@ import * as net from 'net';
 let client: EffektLanguageClient;
 let effektManager: EffektManager;
 const outputChannel = vscode.window.createOutputChannel('Effekt Extension');
+export const LANG_ID_EFFEKT = 'effekt';
+export const LANG_ID_LITERATE_EFFEKT = 'literate effekt';
 
 function logMessage(level: 'INFO' | 'ERROR', message: string) {
   outputChannel.appendLine(
@@ -191,8 +193,8 @@ async function startEffektLanguageServer(context: vscode.ExtensionContext) {
   const clientOptions: LanguageClientOptions = {
     initializationOptions: vscode.workspace.getConfiguration('effekt'),
     documentSelector: [
-      { scheme: 'file', language: 'effekt' },
-      { scheme: 'file', language: 'literate effekt' },
+      { scheme: 'file', language: LANG_ID_EFFEKT },
+      { scheme: 'file', language: LANG_ID_LITERATE_EFFEKT },
     ],
     diagnosticCollectionName: 'effekt',
     synchronize: {
@@ -225,11 +227,11 @@ async function startEffektLanguageServer(context: vscode.ExtensionContext) {
 function registerCodeLensProviders(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     vscode.languages.registerCodeLensProvider(
-      { language: 'effekt', scheme: 'file' },
+      { language: LANG_ID_EFFEKT, scheme: 'file' },
       new EffektRunCodeLensProvider(),
     ),
     vscode.languages.registerCodeLensProvider(
-      { language: 'literate effekt', scheme: 'file' },
+      { language: LANG_ID_LITERATE_EFFEKT, scheme: 'file' },
       new EffektRunCodeLensProvider(),
     ),
   );
@@ -306,12 +308,12 @@ function initializeHolesView(context: vscode.ExtensionContext) {
 
 function registerInlayProvider() {
   vscode.languages.registerInlayHintsProvider(
-    { scheme: 'file', language: 'effekt' },
+    { scheme: 'file', language: LANG_ID_EFFEKT },
     new InlayHintProvider(client),
   );
 
   vscode.languages.registerInlayHintsProvider(
-    { scheme: 'file', language: 'literate effekt' },
+    { scheme: 'file', language: LANG_ID_LITERATE_EFFEKT },
     new InlayHintProvider(client),
   );
 }
@@ -347,7 +349,11 @@ function initializeHoleDecorations(context: vscode.ExtensionContext) {
     }
 
     // Only highlight holes in Effekt files
-    if (!['effekt', 'literate effekt'].includes(editor.document.languageId)) {
+    if (
+      ![LANG_ID_EFFEKT, LANG_ID_LITERATE_EFFEKT].includes(
+        editor.document.languageId,
+      )
+    ) {
       return;
     }
 
