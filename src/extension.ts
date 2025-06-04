@@ -127,24 +127,6 @@ export async function activate(context: vscode.ExtensionContext) {
       );
     }
   }
-  vscode.window.onDidChangeTextEditorSelection((event) => {
-    const holeRegex = /<>|<{|}>/g;
-
-    console.log('on did change');
-    const editor = event.textEditor;
-    const pos = editor.selection.active;
-    const text = editor.document.getText();
-    let match;
-    while ((match = holeRegex.exec(text))) {
-      const from = editor.document.positionAt(match.index);
-      const to = editor.document.positionAt(match.index + 2);
-      const range = new vscode.Range(from, to);
-      if (range.contains(pos)) {
-        console.log('in a hole');
-        break;
-      }
-    }
-  });
 }
 
 async function ensureEffektIsAvailable() {
@@ -291,7 +273,7 @@ function initializeHolesView(context: vscode.ExtensionContext) {
   const holesByUri = new Map<string, EffektHoleInfo[]>();
 
   client.onNotification(
-    '$/effekt/publishHoles',
+    '$/effekt/publishHoles', // FIXME, hole positions are 0-based (lsp), but we send 1-based information
     (params: { uri: string; holes: EffektHoleInfo[] }) => {
       holesByUri.set(params.uri, params.holes);
       const activeEditor = vscode.window.activeTextEditor;
@@ -320,6 +302,22 @@ function initializeHolesView(context: vscode.ExtensionContext) {
       vscode.commands.executeCommand('effekt.holesView.focus');
     }),
   );
+  vscode.window.onDidChangeTextEditorSelection((event) => {
+    const holeRegex = /<>|<{|}>/g;
+    const editor = event.textEditor;
+    const pos = editor.selection.active;
+    const text = editor.document.getText();
+    let match;
+    while ((match = holeRegex.exec(text))) {
+      const from = editor.document.positionAt(match.index);
+      const to = editor.document.positionAt(match.index + 2);
+      const range = new vscode.Range(from, to);
+      if (range.contains(pos)) {
+        console.log(holesViewProvider.focusHoles(pos));
+        break;
+      }
+    }
+  });
 }
 
 function registerInlayProvider() {

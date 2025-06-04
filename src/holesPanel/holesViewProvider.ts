@@ -5,6 +5,7 @@ import { EffektHoleInfo } from './effektHoleInfo';
 export class HolesViewProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = 'effekt.holesView';
   private webviewView?: vscode.WebviewView;
+  private holes: EffektHoleInfo[] = [];
 
   constructor(private readonly context: vscode.ExtensionContext) {}
 
@@ -42,5 +43,29 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
     );
 
     this.webviewView.webview.html = generateWebView(holes, cssUri);
+  }
+  public focusHoles(pos: vscode.Position): string | undefined {
+    const found = this.holes.find((hole) => {
+      const start = hole.range.start;
+      const end = hole.range.end;
+
+      // Compare line and character
+      const afterStart =
+        pos.line > start.line ||
+        (pos.line === start.line && pos.character >= start.character);
+      const beforeEnd =
+        pos.line < end.line ||
+        (pos.line === end.line && pos.character <= end.character);
+      return afterStart && beforeEnd;
+    });
+
+    if (found) {
+      const id = found.id;
+      if (this.webviewView) {
+        this.webviewView.webview.postMessage({ type: 'focusHole', id });
+      }
+      return id;
+    }
+    return undefined;
   }
 }
