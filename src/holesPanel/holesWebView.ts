@@ -1,6 +1,13 @@
 import * as vscode from 'vscode';
-import { EffektHoleInfo } from './effektHoleInfo';
+import {
+  EffektHoleInfo,
+  ScopeInfo,
+  TermBinding,
+  TypeBinding,
+  BindingInfo,
+} from './effektHoleInfo';
 import { escapeHtml } from './htmlUtil';
+
 export function generateWebView(
   holes: EffektHoleInfo[],
   cssUri: vscode.Uri,
@@ -36,6 +43,72 @@ export function generateWebView(
       </div>
     `;
   }
+
+  // Collect scopes from innermost to outermost
+  function collectScopes(scope: ScopeInfo | undefined): ScopeInfo[] {
+    const scopes: ScopeInfo[] = [];
+    let current = scope;
+    while (current) {
+      scopes.push(current);
+      current = current.outer;
+    }
+    return scopes;
+  }
+
+  // Render bindings grouped by scope, sorted by proximity (innermost first)
+  function renderBindingsByScope<T extends BindingInfo>(
+    scopes: ScopeInfo[],
+    type: 'term' | 'type',
+  ): string {
+    return scopes
+      .map((scope, _scopeIdx) => {
+        // Filter bindings by type
+        const bindings = scope.bindings.filter((b) =>
+          type === 'term' ? 'type' in b : 'definition' in b,
+        ) as T[];
+
+        if (bindings.length === 0) {
+          return '';
+        }
+
+        // Group imports last
+        const defined = bindings.filter((b) => b.origin === 'Defined');
+        const imported = bindings.filter((b) => b.origin === 'Imported');
+
+        let html = '';
+        if (defined.length > 0) {
+          html += `<div class="scope-group"><div class="scope-label">${escapeHtml(scope.name ?? scope.kind)} (local)</div>`;
+          html += defined
+            .map(
+              (b) =>
+                `<div class="binding"><span class="binding-term">${escapeHtml(b.name)}</span>: <span class="binding-type">${
+                  type === 'term'
+                    ? escapeHtml((b as TermBinding).type ?? '')
+                    : escapeHtml((b as unknown as TypeBinding).definition)
+                }</span></div>`,
+            )
+            .join('');
+          html += '</div>';
+        }
+        if (imported.length > 0) {
+          html += `<div class="scope-group"><div class="scope-label">${escapeHtml(scope.name ?? scope.kind)} (imported)</div>`;
+          html += imported
+            .map(
+              (b) =>
+                `<div class="binding"><span class="binding-term">${escapeHtml(b.name)}</span>: <span class="binding-type">${
+                  type === 'term'
+                    ? escapeHtml((b as TermBinding).type ?? '')
+                    : escapeHtml((b as unknown as TypeBinding).definition)
+                }</span></div>`,
+            )
+            .join('');
+          html += '</div>';
+        }
+        return html;
+      })
+      .join('');
+  }
+
   const showHoles = vscode.workspace
     .getConfiguration('effekt')
     .get<boolean>('showHoles');
@@ -51,6 +124,7 @@ export function generateWebView(
       <pre>def foo() = &lt;{ println("foo"); 42 }&gt;</pre>
     </div>
   `;
+
   return /*html*/ `
     <!DOCTYPE html>
     <html lang="en">
@@ -70,18 +144,18 @@ export function generateWebView(
           <b>Warning:</b> The Holes Panel requires the setting <b>Extension &gt; Effekt &gt; Show Holes</b> to be enabled to function.
         </div>
         ${holesPanelDesc}
-
       </div>`
          : holes.length === 0
            ? /*html*/ `<div class="empty">
           There are no holes in this file.
           ${holesPanelDesc}
-
         </div>`
            : holes
-               .map(
-                 (hole, idx) => /*html*/ `
-          <section class="hole-card">
+               .map((hole, idx) => {
+                 const scopes = collectScopes(hole.scope);
+
+                 return /*html*/ `
+          <section class="hole-card" id="hole-${escapeHtml(hole.id)}">
             <div class="hole-header">
               <span class="hole-id">Hole: ${escapeHtml(hole.id)}</span>
               <span class="hole-range">[${hole.range.start.line + 1}:${hole.range.start.character + 1} - ${hole.range.end.line + 1}:${hole.range.end.character + 1}]</span>
@@ -100,63 +174,41 @@ export function generateWebView(
 
             ${renderExpDropdown({
               title: 'Terms',
-              count: hole.terms.length,
+              count: scopes.reduce(
+                (acc, s) =>
+                  acc +
+                  s.bindings.filter(
+                    (b) => 'type' in b && b.origin === 'Defined',
+                  ).length,
+                0,
+              ),
               idx,
               kind: 'terms',
               placeholder: 'Search terms...',
               itemsHtml:
-                hole.terms
-                  .map(
-                    (t) =>
-                      `<div class="binding"><span class="binding-term">${escapeHtml(t.name)}</span>: <span class="binding-type">${escapeHtml(t.type)}</span></div>`,
-                  )
-                  .join('') || '<span class="empty">None</span>',
+                renderBindingsByScope<TermBinding>(scopes, 'term') ||
+                '<span class="empty">None</span>',
             })}
             ${renderExpDropdown({
               title: 'Types',
-              count: hole.types.length,
+              count: scopes.reduce(
+                (acc, s) =>
+                  acc +
+                  s.bindings.filter(
+                    (b) => 'definition' in b && b.origin === 'Defined',
+                  ).length,
+                0,
+              ),
               idx,
               kind: 'types',
               placeholder: 'Search types...',
               itemsHtml:
-                hole.types
-                  .map(
-                    (t) =>
-                      `<div class="binding"><span class="binding-term">${escapeHtml(t.name)}</span>: <span class="binding-type">${escapeHtml(t.kind)}</span></div>`,
-                  )
-                  .join('') || '<span class="empty">None</span>',
-            })}
-            ${renderExpDropdown({
-              title: 'Imported Terms',
-              count: hole.importedTerms.length,
-              idx,
-              kind: 'imported-terms',
-              placeholder: 'Search imported terms...',
-              itemsHtml:
-                hole.importedTerms
-                  .map(
-                    (t) =>
-                      `<div class="binding"><span class="binding-term">${escapeHtml(t.name)}</span>: <span class="binding-type">${escapeHtml(t.type)}</span></div>`,
-                  )
-                  .join('') || '<span class="empty">None</span>',
-            })}
-            ${renderExpDropdown({
-              title: 'Imported Types',
-              count: hole.importedTypes.length,
-              idx,
-              kind: 'imported-types',
-              placeholder: 'Search imported types...',
-              itemsHtml:
-                hole.importedTypes
-                  .map(
-                    (t) =>
-                      `<div class="binding"><span class="binding-term">${escapeHtml(t.name)}</span>: <span class="binding-type">${escapeHtml(t.kind)}</span></div>`,
-                  )
-                  .join('') || '<span class="empty">None</span>',
+                renderBindingsByScope<TypeBinding>(scopes, 'type') ||
+                '<span class="empty">None</span>',
             })}
           </section>
-        `,
-               )
+        `;
+               })
                .join('')
      }
       </div>
