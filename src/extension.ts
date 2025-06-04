@@ -346,6 +346,11 @@ function initializeHoleDecorations(context: vscode.ExtensionContext) {
       return;
     }
 
+    // Only highlight holes in Effekt files
+    if (!['effekt', 'literate effekt'].includes(editor.document.languageId)) {
+      return;
+    }
+
     const text = editor.document.getText();
     const positionAt = editor.document.positionAt;
 
