@@ -30,6 +30,7 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
   }
 
   public updateHoles(holes: EffektHoleInfo[]) {
+    this.holes = holes;
     if (!this.webviewView) {
       return;
     }
@@ -44,11 +45,11 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
 
     this.webviewView.webview.html = generateWebView(holes, cssUri);
   }
+
   public focusHoles(pos: vscode.Position): string | undefined {
     const found = this.holes.find((hole) => {
       const start = hole.range.start;
       const end = hole.range.end;
-
       // Compare line and character
       const afterStart =
         pos.line > start.line ||
@@ -60,11 +61,7 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
     });
 
     if (found) {
-      const id = found.id;
-      if (this.webviewView) {
-        this.webviewView.webview.postMessage({ type: 'focusHole', id });
-      }
-      return id;
+      return found.id;
     }
     return undefined;
   }
