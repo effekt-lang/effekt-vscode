@@ -5,18 +5,26 @@ export interface EffektHoleInfo {
   range: LSPRange;
   innerType?: string;
   expectedType?: string;
-  importedTerms: TermBinding[];
-  importedTypes: TypeBinding[];
-  terms: TermBinding[];
-  types: TypeBinding[];
+  scope: ScopeInfo;
 }
 
-export interface TermBinding {
+export interface BindingInfo {
+  qualifier: string[];
   name: string;
-  type: string;
+  origin: string; // "Defined" | "Imported"
 }
 
-export interface TypeBinding {
-  name: string;
-  kind: string;
+export interface TermBinding extends BindingInfo {
+  type?: string;
+}
+
+export interface TypeBinding extends BindingInfo {
+  definition: string;
+}
+
+export interface ScopeInfo {
+  name?: string;
+  kind: string; // "Namespace" | "Local" | "Global"
+  bindings: BindingInfo[];
+  outer?: ScopeInfo;
 }
