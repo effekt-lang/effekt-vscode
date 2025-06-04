@@ -60,7 +60,11 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
       return afterStart && beforeEnd;
     });
 
-    if (found) {
+    if (found && this.webviewView) {
+      this.webviewView.webview.postMessage({
+        command: 'highlightHole',
+        holeId: found.id,
+      });
       return found.id;
     }
     return undefined;

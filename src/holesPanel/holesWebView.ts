@@ -104,7 +104,7 @@ function renderHolesList(holes: EffektHoleInfo[]): string {
  */
 function renderHoleCard(hole: EffektHoleInfo, idx: number): string {
   return /*html*/ `
-    <section class="hole-card">
+    <section class="hole-card" id="hole-${escapeHtml(hole.id)}">
       <div class="hole-header">
         <span class="hole-id">Hole: ${escapeHtml(hole.id)}</span>
         <span class="hole-range">[${hole.range.start.line + 1}:${hole.range.start.character + 1} - ${hole.range.end.line + 1}:${hole.range.end.character + 1}]</span>
@@ -196,6 +196,18 @@ function getClientScript(): string {
         const body = header.nextElementSibling;
         body.classList.toggle('hidden');
       }
+      window.addEventListener('message', event => {
+        const message = event.data;
+        if (message.command === 'highlightHole') {
+          const holeId = message.holeId;
+          const el = document.getElementById('hole-' + holeId);
+          if (el) {
+            document.querySelectorAll('.hole-card').forEach(e => e.classList.remove('highlighted'));
+            el.classList.add('highlighted');
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        }
+      });
     </script>
   `;
 }
