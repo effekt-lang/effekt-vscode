@@ -66,10 +66,10 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
     if (containing.length > 0) {
       found = containing.reduce((closest, curr) => {
         const currDist =
-          Math.abs(curr.range.start.line - pos.line) * 1000 +
+          Math.abs(curr.range.start.line - pos.line) +
           Math.abs(curr.range.start.character - pos.character);
         const closestDist =
-          Math.abs(closest.range.start.line - pos.line) * 1000 +
+          Math.abs(closest.range.start.line - pos.line) +
           Math.abs(closest.range.start.character - pos.character);
         return currDist < closestDist ? curr : closest;
       });
