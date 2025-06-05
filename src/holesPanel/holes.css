@@ -22,8 +22,8 @@ body {
   --section-bg: var(--vscode-sideBar-background);
   --section-border: var(--vscode-editorWidget-border);
   --code-bg: var(--vscode-editorGutter-background);
-  --term: var(--vscode-terminal-ansiBlue);
-  --type: var(--vscode-terminal-ansiGreen);
+  --term: var(--vscode-editor-foreground);
+  --type: var(--vscode-editor-foreground);
   --highlight: var(--vscode-editor-selectionHighlightBackground);
   --muted: var(--vscode-editor-foreground);
 }
@@ -115,6 +115,7 @@ pre {
 
 .binding-term {
   color: var(--term);
+  font-weight: bold;
 }
 
 .binding-type {

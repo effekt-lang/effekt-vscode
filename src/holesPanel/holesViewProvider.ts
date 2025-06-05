@@ -13,15 +13,15 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
     webviewView.webview.options = {
       enableScripts: true,
       localResourceRoots: [
-        vscode.Uri.joinPath(this.context.extensionUri, 'src/holesPanel'),
+        vscode.Uri.joinPath(this.context.extensionUri, 'dist', 'holesPanel'),
       ],
     };
 
     const cssUri = webviewView.webview.asWebviewUri(
       vscode.Uri.joinPath(
         this.context.extensionUri,
-        'src/holesPanel',
-        'holes.css',
+        'dist',
+        'holesPanel/holes.css',
       ),
     );
 
@@ -38,8 +38,8 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
     const cssUri = this.webviewView.webview.asWebviewUri(
       vscode.Uri.joinPath(
         this.context.extensionUri,
-        'src/holesPanel',
-        'holes.css',
+        'dist',
+        'holesPanel/holes.css',
       ),
     );
 
