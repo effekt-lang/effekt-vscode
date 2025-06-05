@@ -273,7 +273,7 @@ function initializeHolesView(context: vscode.ExtensionContext) {
   const holesByUri = new Map<string, EffektHoleInfo[]>();
 
   client.onNotification(
-    '$/effekt/publishHoles', // FIXME, hole positions are 0-based (lsp), but we send 1-based information
+    '$/effekt/publishHoles',
     (params: { uri: string; holes: EffektHoleInfo[] }) => {
       holesByUri.set(params.uri, params.holes);
       const activeEditor = vscode.window.activeTextEditor;
@@ -310,10 +310,10 @@ function initializeHolesView(context: vscode.ExtensionContext) {
     let match;
     while ((match = holeRegex.exec(text))) {
       const from = editor.document.positionAt(match.index);
-      const to = editor.document.positionAt(match.index + 2);
+      const to = editor.document.positionAt(match.index + 2); // the matched delimeter will be two characters long
       const range = new vscode.Range(from, to);
       if (range.contains(pos)) {
-        console.log(holesViewProvider.focusHoles(pos));
+        holesViewProvider.focusHoles(pos);
         break;
       }
     }

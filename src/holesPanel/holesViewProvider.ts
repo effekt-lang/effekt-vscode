@@ -46,11 +46,11 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
     this.webviewView.webview.html = generateWebView(holes, cssUri);
   }
 
-  public focusHoles(pos: vscode.Position): string | undefined {
+  public focusHoles(pos: vscode.Position) {
     const found = this.holes.find((hole) => {
       const start = hole.range.start;
       const end = hole.range.end;
-      // Compare line and character
+      // Check if the cursor position is within the hole
       const afterStart =
         pos.line > start.line ||
         (pos.line === start.line && pos.character >= start.character);
@@ -65,8 +65,6 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
         command: 'highlightHole',
         holeId: found.id,
       });
-      return found.id;
     }
-    return undefined;
   }
 }
