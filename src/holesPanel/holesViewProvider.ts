@@ -47,10 +47,11 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
   }
 
   public focusHoles(pos: vscode.Position) {
-    const found = this.holes.find((hole) => {
+    // Find all holes that contain the cursor position (to support nested holes)
+    const containing = this.holes.filter((hole) => {
       const start = hole.range.start;
       const end = hole.range.end;
-      // Check if the cursor position is within the hole
+
       const afterStart =
         pos.line > start.line ||
         (pos.line === start.line && pos.character >= start.character);
@@ -59,6 +60,20 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
         (pos.line === end.line && pos.character <= end.character);
       return afterStart && beforeEnd;
     });
+
+    // If multiple holes contain the cursor (nested), pick the one whose start is closest to the cursor
+    let found = undefined;
+    if (containing.length > 0) {
+      found = containing.reduce((closest, curr) => {
+        const currDist =
+          Math.abs(curr.range.start.line - pos.line) * 1000 +
+          Math.abs(curr.range.start.character - pos.character);
+        const closestDist =
+          Math.abs(closest.range.start.line - pos.line) * 1000 +
+          Math.abs(closest.range.start.character - pos.character);
+        return currDist < closestDist ? curr : closest;
+      });
+    }
 
     if (found && this.webviewView) {
       this.webviewView.webview.postMessage({

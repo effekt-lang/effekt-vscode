@@ -303,20 +303,9 @@ function initializeHolesView(context: vscode.ExtensionContext) {
     }),
   );
   vscode.window.onDidChangeTextEditorSelection((event) => {
-    const holeRegex = /<>|<{|}>/g;
     const editor = event.textEditor;
     const pos = editor.selection.active;
-    const text = editor.document.getText();
-    let match;
-    while ((match = holeRegex.exec(text))) {
-      const from = editor.document.positionAt(match.index);
-      const to = editor.document.positionAt(match.index + 2); // the matched delimeter will be two characters long
-      const range = new vscode.Range(from, to);
-      if (range.contains(pos)) {
-        holesViewProvider.focusHoles(pos);
-        break;
-      }
-    }
+    holesViewProvider.focusHoles(pos);
   });
 }
 
