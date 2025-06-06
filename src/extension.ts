@@ -281,6 +281,7 @@ function initializeHolesView(context: vscode.ExtensionContext) {
       const activeEditor = vscode.window.activeTextEditor;
       if (activeEditor && activeEditor.document.uri.toString() === params.uri) {
         holesViewProvider.updateHoles(params.holes);
+        holesViewProvider.focusHoles(activeEditor.selection.active);
       }
     },
   );
