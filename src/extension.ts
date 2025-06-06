@@ -281,6 +281,7 @@ function initializeHolesView(context: vscode.ExtensionContext) {
       const activeEditor = vscode.window.activeTextEditor;
       if (activeEditor && activeEditor.document.uri.toString() === params.uri) {
         holesViewProvider.updateHoles(params.holes);
+        holesViewProvider.focusHoles(activeEditor.selection.active);
       }
     },
   );
@@ -304,6 +305,11 @@ function initializeHolesView(context: vscode.ExtensionContext) {
       vscode.commands.executeCommand('effekt.holesView.focus');
     }),
   );
+  vscode.window.onDidChangeTextEditorSelection((event) => {
+    const editor = event.textEditor;
+    const pos = editor.selection.active;
+    holesViewProvider.focusHoles(pos);
+  });
 }
 
 function registerInlayProvider() {

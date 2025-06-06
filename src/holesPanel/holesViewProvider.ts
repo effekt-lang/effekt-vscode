@@ -5,6 +5,7 @@ import { EffektHoleInfo } from './effektHoleInfo';
 export class HolesViewProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = 'effekt.holesView';
   private webviewView?: vscode.WebviewView;
+  private holes: EffektHoleInfo[] = [];
 
   constructor(private readonly context: vscode.ExtensionContext) {}
 
@@ -29,6 +30,7 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
   }
 
   public updateHoles(holes: EffektHoleInfo[]) {
+    this.holes = holes;
     if (!this.webviewView) {
       return;
     }
@@ -42,5 +44,43 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
     );
 
     this.webviewView.webview.html = generateWebView(holes, cssUri);
+  }
+
+  public focusHoles(pos: vscode.Position) {
+    // Find the innermost hole that contains the cursor position.
+    let found = null;
+    for (const hole of this.holes) {
+      const holeStart = new vscode.Position(
+        hole.range.start.line,
+        hole.range.start.character,
+      );
+      const holeEnd = new vscode.Position(
+        hole.range.end.line,
+        hole.range.end.character,
+      );
+      const containing =
+        pos.isAfterOrEqual(holeStart) && pos.isBeforeOrEqual(holeEnd);
+      if (!containing) {
+        continue;
+      }
+      if (!found) {
+        found = hole;
+        continue;
+      }
+      const foundStart = new vscode.Position(
+        found.range.start.line,
+        found.range.start.character,
+      );
+      if (holeStart.isAfter(foundStart)) {
+        found = hole;
+      }
+    }
+
+    if (found && this.webviewView) {
+      this.webviewView.webview.postMessage({
+        command: 'highlightHole',
+        holeId: found.id,
+      });
+    }
   }
 }
