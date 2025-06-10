@@ -139,9 +139,9 @@ export class EffektManager {
           if (error) {
             reject(error);
           } else {
-            const out =
+            const output =
               stdout.trim() + (resolveWithStderr ? stderr.trim() : '');
-            resolve(out);
+            resolve(output);
           }
         },
       );
