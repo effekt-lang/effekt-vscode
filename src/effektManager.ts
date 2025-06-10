@@ -6,6 +6,7 @@ import { URL } from 'url';
 import * as path from 'path';
 import * as fs from 'fs/promises';
 import { EffektLanguageClient } from './effektLanguageClient';
+import which from 'which';
 
 interface InstallationResult {
   success: boolean;
@@ -67,7 +68,7 @@ export class EffektManager {
   }
 
   /**
-   * Get the Effekt version of the (assumed) Effekt binary in the `path` parameter.
+   * Get the Effekt version of the (assumed) Effekt JAR in the `path` parameter.
    * Doesn't handle any errors, the *caller* is expected to do so.
    *
    * @returns a version number like '0.2.2' or '0.25.2.13' or '0.99.99+nightly.rev.abcdef', etc.
@@ -79,7 +80,7 @@ export class EffektManager {
 
     try {
       // First, try `effekt --version`:
-      const versionOutput = await this.execCommand(`"${path}" --version`);
+      const versionOutput = await this.execEffekt(['--version']);
 
       const version = removePrefix(versionOutput.trim(), 'Effekt '); // NOTE: the space is important here
       if (!version) {
@@ -91,7 +92,7 @@ export class EffektManager {
     } catch (versionError) {
       // Otherwise try `effekt --help`:
       try {
-        const helpOutput = await this.execCommand(`"${path}" --help`);
+        const helpOutput = await this.execEffekt(['--help']);
 
         // Check if the output contains the word "Effekt" anywhere
         if (/\bEffekt\b/i.test(helpOutput)) {
@@ -111,8 +112,8 @@ export class EffektManager {
 
   public async getEffektVersion(): Promise<string> {
     if (!this.effektVersion) {
-      const effektPath = await this.locateEffektExecutable();
-      const currentVersion = await this.fetchEffektVersion(effektPath.path);
+      const effektPath = await this.locateEffektJAR();
+      const currentVersion = await this.fetchEffektVersion(effektPath);
       this.effektVersion = currentVersion;
     }
     return this.effektVersion || '';
@@ -126,23 +127,40 @@ export class EffektManager {
    */
   private async execCommand(
     command: string,
-    resolveWithStderr?: boolean,
+    args: string[],
+    resolveWithStderr = false,
   ): Promise<string> {
     return new Promise<string>((resolve, reject) => {
-      cp.exec(
+      cp.execFile(
         command,
+        args,
         { encoding: 'utf8', maxBuffer: 1024 * 1024 },
         (error, stdout, stderr) => {
           if (error) {
             reject(error);
           } else {
-            const output =
+            const out =
               stdout.trim() + (resolveWithStderr ? stderr.trim() : '');
-            resolve(output);
+            resolve(out);
           }
         },
       );
     });
+  }
+
+  /**
+   * Executes Effekt via `java -jar effekt.jar ...args`
+   * and returns its combined stdout (and stderr if requested).
+   */
+  private async execEffekt(
+    args: string[],
+    resolveWithStderr = false,
+  ): Promise<string> {
+    const config = vscode.workspace.getConfiguration('effekt');
+    const javaExe = config.get<string>('javaExecutable') || 'java';
+    const effektJAR = await this.locateEffektJAR();
+    const allArgs = ['-jar', effektJAR, ...args, ...this.getEffektArgs()];
+    return this.execCommand(javaExe, allArgs, resolveWithStderr);
   }
 
   /**
@@ -222,6 +240,47 @@ export class EffektManager {
   }
 
   /**
+   * Locates the Effekt JAR: tries to look into a user-given path first
+   * Previously, we would start the language server via npm-installed shell wrappers rather than invoking the JAR directly.
+   * Therefore, the user setting `executable` may point to shell wrappers like `effekt.sh` or `effekt.cmd`.
+   * We strip the extension from the user-given path if it is not `.jar` or empty.
+   * Finally, we fall back to looking for 'effekt.jar' or 'effekt' in PATH.
+   *
+   * @returns absolute path to the JAR
+   * @throws EffektExecutableNotFoundError
+   */
+  public async locateEffektJAR(): Promise<string> {
+    const customPath = this.config.get<string>('executable');
+    const candidates: string[] = [];
+
+    if (customPath) {
+      const ext = path.extname(customPath).toLowerCase();
+      // accept .jar or no extension
+      if (ext === '.jar' || ext === '') {
+        candidates.push(customPath);
+      } else {
+        // strip unsupported extension, e.g. .sh or .cmd
+        const withoutExt = customPath.slice(0, -ext.length);
+        candidates.push(customPath, withoutExt);
+      }
+    }
+
+    // fallback names to search for in PATH
+    candidates.push('effekt.jar', 'effekt');
+
+    for (const name of candidates) {
+      try {
+        // which() will resolve against PATH or throw an untyped JavaScript error if the executable is not found.
+        return await which(name);
+      } catch {
+        // try next candidate
+      }
+    }
+
+    throw new EffektExecutableNotFoundError('Effekt JAR not found');
+  }
+
+  /**
    * Installs or updates Effekt.
    * @param action The action being performed ('install' or 'update').
    * @returns A promise that resolves with the installed/updated version or an empty string.
@@ -278,7 +337,7 @@ export class EffektManager {
 
   private async runNpmInstall(): Promise<void> {
     // 1) Check if the npm root is managed by Nix in order to produce a better error
-    const npmRoot = await this.execCommand('npm root -g');
+    const npmRoot = await this.execCommand('npm', ['root', '-g']);
     if (npmRoot.startsWith('/nix/store')) {
       this.logMessage(
         'ERROR',
@@ -291,9 +350,16 @@ export class EffektManager {
 
     // 2) Actually run `npm install -g ...`
     const npmInstallCommand = `npm install -g ${this.effektNPMPackage}@latest`;
-    const npmOutput = await this.execCommand(npmInstallCommand);
+    const npmOutput = await this.execCommand('npm', [
+      'install',
+      '-g',
+      `${this.effektNPMPackage}@latest`,
+    ]);
 
-    this.logMessage('INFO', `Ran '${npmInstallCommand}'; stdout: ${npmOutput}`);
+    this.logMessage(
+      'INFO',
+      `Ran '${npmInstallCommand}'; stdout: ${npmOutput} `,
+    );
   }
 
   private async verifyEffektInstallation(): Promise<InstallationResult> {
@@ -307,7 +373,7 @@ export class EffektManager {
       };
     } catch {
       // If locateEffektExecutable fails, try to locate in global npm directory
-      const npmRoot = await this.execCommand('npm root -g');
+      const npmRoot = await this.execCommand('npm', ['root', '-g']);
 
       for (const execName of this.possibleEffektExecutables) {
         const fullPath = path.join(npmRoot, execName);
@@ -490,8 +556,8 @@ export class EffektManager {
    */
   private async checkNodeAndNpm(): Promise<boolean> {
     try {
-      const nodeVersion = await this.execCommand('node --version');
-      await this.execCommand('npm --version'); // Note: if needed, we could also check npm version.
+      const nodeVersion = await this.execCommand('node', ['--version']);
+      await this.execCommand('npm', ['--version']); // Note: if needed, we could also check npm version.
 
       const minNodeVersion = 'v16.0.0'; // Minimum supported Node.js version
 
@@ -545,14 +611,21 @@ export class EffektManager {
   }
 
   /**
-   * Extracts the Java version from the output of 'java -version' command.
+   * Extracts the Java version from the output of the 'java -version' command,
+   * using the configured javaExecutable if set.
    * @returns A promise that resolves with the Java version string.
    */
   private async getJavaVersion(): Promise<string> {
-    try {
-      const output = await this.execCommand('java -version', true);
+    const config = vscode.workspace.getConfiguration('effekt');
+    const javaExecutable = config.get<string>('javaExecutable') || 'java';
 
-      this.logMessage('INFO', `Got ${output} from 'java -version'`);
+    try {
+      const output = await this.execCommand(javaExecutable, ['-version'], true);
+
+      this.logMessage(
+        'INFO',
+        `Got ${output} from '${javaExecutable} -version'`,
+      );
 
       // Regular expressions to match different Java version formats
       const versionRegexes = [
@@ -584,7 +657,9 @@ export class EffektManager {
 
       return version;
     } catch (error) {
-      throw new Error(`Failed to execute 'java -version': ${error}`);
+      throw new Error(
+        `Failed to execute '${javaExecutable} -version': ${error}`,
+      );
     }
   }
 

@@ -172,9 +172,14 @@ async function startEffektLanguageServer(context: vscode.ExtensionContext) {
       return Promise.resolve(result);
     };
   } else {
-    const effektExecutable = await effektManager.locateEffektExecutable();
-
-    const args = ['--server', ...effektManager.getEffektArgs()];
+    const effektJAR = await effektManager.locateEffektJAR();
+    const javaExecutable = config.get<string>('javaExecutable') || 'java';
+    const args = [
+      '-jar',
+      effektJAR,
+      '--server',
+      ...effektManager.getEffektArgs(),
+    ];
 
     /* > Node.js will now error with EINVAL if a .bat or .cmd file is passed to child_process.spawn and child_process.spawnSync without the shell option set.
      * > If the input to spawn/spawnSync is sanitized, users can now pass { shell: true } as an option to prevent the occurrence of EINVALs errors.
@@ -185,8 +190,8 @@ async function startEffektLanguageServer(context: vscode.ExtensionContext) {
     const execOptions = { shell: isWindows };
 
     serverOptions = {
-      run: { command: effektExecutable.path, args, options: execOptions },
-      debug: { command: effektExecutable.path, args, options: execOptions },
+      run: { command: javaExecutable, args, options: execOptions },
+      debug: { command: javaExecutable, args, options: execOptions },
     };
   }
 

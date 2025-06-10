@@ -163,6 +163,11 @@
           "type": "boolean",
           "default": false,
           "description": "Show a panel with information about all typed holes in the program"
+        },
+        "effekt.javaExecutable": {
+          "type": "string",
+          "default": "java",
+          "markdownDescription": "Path to the Java executable used to run the Effekt LSP server. This is relevant if you have multiple Java versions installed and want to use a specific one."
         }
       }
     },
@@ -237,13 +242,15 @@
   "dependencies": {
     "compare-versions": "^6.1.1",
     "esbuild-plugin-copy": "^2.1.1",
-    "vscode-languageclient": "^8.1.0"
+    "vscode-languageclient": "^8.1.0",
+    "which": "^5.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.26.0",
     "@types/mocha": "^10.0.6",
     "@types/node": "^20.11.25",
     "@types/vscode": "^1.80.0",
+    "@types/which": "^3.0.4",
     "@typescript-eslint/eslint-plugin": "^7.1.0",
     "@typescript-eslint/parser": "^7.1.0",
     "esbuild": "^0.25.4",

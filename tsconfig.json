@@ -9,7 +9,9 @@
     /* Strict Type-Checking Option */
     "strict": true,
     /* Additional Checks */
-    "noUnusedLocals": true
+    "noUnusedLocals": true,
+    /* Allow importing ES modules */
+    "esModuleInterop": true,
   },
   "exclude": ["node_modules", ".vscode-test"]
 }
