@@ -134,7 +134,11 @@ export class EffektManager {
       cp.execFile(
         command,
         args,
-        { encoding: 'utf8', maxBuffer: 1024 * 1024 },
+        // For Windows, it is important we use `shell: true` here.
+        // If not, running `execCommand('npm', ...)` doesn't work because the actual executable is called 'npm.cmd'.
+        // There may be other issues with EINVAL errors if `shell: true` is not set (see https://nodejs.org/en/blog/vulnerability/april-2024-security-releases-2).
+        // This also preserves the previous behaivor where we used `cp.exec` here.
+        { encoding: 'utf8', maxBuffer: 1024 * 1024, shell: true },
         (error, stdout, stderr) => {
           if (error) {
             reject(error);
