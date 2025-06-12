@@ -191,7 +191,9 @@ async function startEffektLanguageServer(context: vscode.ExtensionContext) {
   }
 
   const clientOptions: LanguageClientOptions = {
-    initializationOptions: vscode.workspace.getConfiguration('effekt'),
+    initializationOptions: {
+      effekt: vscode.workspace.getConfiguration('effekt'),
+    },
     documentSelector: [
       { scheme: 'file', language: LANG_ID_EFFEKT },
       { scheme: 'file', language: LANG_ID_LITERATE_EFFEKT },
