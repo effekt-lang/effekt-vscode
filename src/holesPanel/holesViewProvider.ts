@@ -20,12 +20,18 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
     const cssUri = webviewView.webview.asWebviewUri(
       vscode.Uri.joinPath(
         this.context.extensionUri,
-        'dist',
-        'holesPanel/holes.css',
+        'dist/holesPanel/holes.css',
       ),
     );
 
-    webviewView.webview.html = generateWebView([], cssUri); // initially empty
+    const jsUri = webviewView.webview.asWebviewUri(
+      vscode.Uri.joinPath(
+        this.context.extensionUri,
+        'dist/holesPanel/holes.js',
+      ),
+    );
+
+    webviewView.webview.html = generateWebView([], cssUri, jsUri); // initially empty
     this.webviewView = webviewView;
   }
 
@@ -43,7 +49,14 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
       ),
     );
 
-    this.webviewView.webview.html = generateWebView(holes, cssUri);
+    const jsUri = this.webviewView.webview.asWebviewUri(
+      vscode.Uri.joinPath(
+        this.context.extensionUri,
+        'dist/holesPanel/holes.js',
+      ),
+    );
+
+    this.webviewView.webview.html = generateWebView(holes, cssUri, jsUri);
   }
 
   public focusHoles(pos: vscode.Position) {

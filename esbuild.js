@@ -4,7 +4,8 @@ const copyPlugin = require('esbuild-plugin-copy').default;
 const watch = process.argv.includes('--watch');
 
 async function main() {
-  const ctx = await esbuild.context({
+  // Build the extension for Node.js
+  const extCtx = await esbuild.context({
     entryPoints: ['src/extension.ts'],
     bundle: true,
     format: 'cjs',
@@ -30,11 +31,25 @@ async function main() {
       })
     ]
   });
+
+  // Compile scripts that run in the webview
+  const webCtx = await esbuild.context({
+    entryPoints: ['src/holesPanel/holesWebViewScript.ts'],
+    bundle: true,
+    format: 'iife',
+    platform: 'browser',
+    target: ['es2020'],
+    outfile: 'dist/holesPanel/holes.js',
+    minify: false,
+    sourcemap: false,
+    logLevel: 'silent',
+  });
+
   if (watch) {
-    await ctx.watch();
+    await Promise.all([extCtx.watch(), webCtx.watch()]);
   } else {
-    await ctx.rebuild();
-    await ctx.dispose();
+    await Promise.all([extCtx.rebuild(), webCtx.rebuild()]);
+    await Promise.all([extCtx.dispose(), webCtx.dispose()]);
   }
 }
 
@@ -55,7 +70,7 @@ const esbuildProblemMatcherPlugin = {
       });
       console.log('[watch] build finished');
     });
-  }
+  },
 };
 
 main().catch(e => {
