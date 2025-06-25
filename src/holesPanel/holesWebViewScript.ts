@@ -190,7 +190,6 @@ document
       const body = checkbox.closest('.exp-dropdown-body') as Element;
       const filterBox = body.querySelector('.filter-box') as HTMLInputElement;
       const listId = (body.querySelector('.bindings-list') as HTMLElement).id;
-      const _section = body.closest('.exp-dropdown-section') as Element;
       const idx = body.id.match(/bindings-dropdown-body-(\d+)/)![1];
       const headerId = 'bindings-dropdown-header-' + idx;
       filterDropdownList(filterBox, listId, headerId);

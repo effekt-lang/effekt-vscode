@@ -3,5 +3,10 @@
   "compilerOptions": {
     "composite": true
   },
-  "include": ["src/extension.ts", "src/otherExtensionFiles/**/*.ts"]
+  "include": [
+    "src/extension.ts",
+    "src/otherExtensionFiles/**/*.ts",
+    "src/holesPanel/htmlUtil.ts",
+    "src/holesPanel/holesWebView.ts"
+  ]
 }
