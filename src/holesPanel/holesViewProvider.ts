@@ -9,6 +9,30 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
 
   constructor(private readonly context: vscode.ExtensionContext) {}
 
+  private getCssUri(): vscode.Uri | undefined {
+    if (!this.webviewView) {
+      return undefined;
+    }
+    return this.webviewView.webview.asWebviewUri(
+      vscode.Uri.joinPath(
+        this.context.extensionUri,
+        'dist/holesPanel/holes.css',
+      ),
+    );
+  }
+
+  private getJsUri(): vscode.Uri | undefined {
+    if (!this.webviewView) {
+      return undefined;
+    }
+    return this.webviewView.webview.asWebviewUri(
+      vscode.Uri.joinPath(
+        this.context.extensionUri,
+        'dist/holesPanel/holes.js',
+      ),
+    );
+  }
+
   resolveWebviewView(webviewView: vscode.WebviewView) {
     webviewView.webview.options = {
       enableScripts: true,
@@ -17,21 +41,13 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
       ],
     };
 
-    const cssUri = webviewView.webview.asWebviewUri(
-      vscode.Uri.joinPath(
-        this.context.extensionUri,
-        'dist/holesPanel/holes.css',
-      ),
-    );
+    const cssUri = this.getCssUri();
+    const jsUri = this.getJsUri();
 
-    const jsUri = webviewView.webview.asWebviewUri(
-      vscode.Uri.joinPath(
-        this.context.extensionUri,
-        'dist/holesPanel/holes.js',
-      ),
-    );
+    if (cssUri && jsUri) {
+      webviewView.webview.html = generateWebView([], cssUri, jsUri); // initially empty
+    }
 
-    webviewView.webview.html = generateWebView([], cssUri, jsUri); // initially empty
     this.webviewView = webviewView;
   }
 
@@ -40,28 +56,17 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
     if (!this.webviewView) {
       return;
     }
+    const cssUri = this.getCssUri();
+    const jsUri = this.getJsUri();
 
-    const cssUri = this.webviewView.webview.asWebviewUri(
-      vscode.Uri.joinPath(
-        this.context.extensionUri,
-        'dist',
-        'holesPanel/holes.css',
-      ),
-    );
-
-    const jsUri = this.webviewView.webview.asWebviewUri(
-      vscode.Uri.joinPath(
-        this.context.extensionUri,
-        'dist/holesPanel/holes.js',
-      ),
-    );
-
-    this.webviewView.webview.html = generateWebView(holes, cssUri, jsUri);
+    if (cssUri && jsUri) {
+      this.webviewView.webview.html = generateWebView(holes, cssUri, jsUri);
+    }
   }
 
   public focusHoles(pos: vscode.Position) {
     // Find the innermost hole that contains the cursor position.
-    let found = null;
+    let found: EffektHoleInfo | null = null;
     for (const hole of this.holes) {
       const holeStart = new vscode.Position(
         hole.range.start.line,
