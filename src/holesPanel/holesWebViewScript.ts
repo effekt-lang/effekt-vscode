@@ -1,4 +1,4 @@
-export function updateFilteredCount(
+function updateFilteredCount(
   listId: string,
   headerId: string,
   totalCount: number,
@@ -23,7 +23,7 @@ export function updateFilteredCount(
   }
 }
 
-export function filterDropdownList(
+function filterDropdownList(
   input: HTMLInputElement,
   listId: string,
   headerId: string,
@@ -61,7 +61,7 @@ export function filterDropdownList(
   updateFilteredCount(listId, headerId, totalCountNumber);
 }
 
-export function toggleDropdown(header: Element): void {
+function toggleDropdown(header: Element): void {
   header.classList.toggle('collapsed');
   const body: Element | null = header.nextElementSibling as Element;
   if (body) {
@@ -70,14 +70,14 @@ export function toggleDropdown(header: Element): void {
 }
 
 // always extend the dropdown if it's collapsed
-export function extendDropdownIfCollapsed(btn: HTMLElement): void {
+function extendDropdownIfCollapsed(btn: HTMLElement): void {
   const header: Element | null = btn.closest('.exp-dropdown-header');
   if (header && header.classList.contains('collapsed')) {
     toggleDropdown(header);
   }
 }
 
-export function toggleFilterBox(btn: HTMLElement): void {
+function toggleFilterBox(btn: HTMLElement): void {
   const body: Element = btn
     .closest('.exp-dropdown-section')!
     .querySelector('.exp-dropdown-body') as Element;
@@ -90,7 +90,7 @@ export function toggleFilterBox(btn: HTMLElement): void {
   }
 }
 
-export function toggleFilterMenu(btn: HTMLElement): void {
+function toggleFilterMenu(btn: HTMLElement): void {
   const body: Element = btn
     .closest('.exp-dropdown-section')!
     .querySelector('.exp-dropdown-body') as Element;
