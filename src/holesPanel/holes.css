@@ -122,6 +122,10 @@ pre {
   color: var(--type);
 }
 
+.codicon {
+  color: var(--term, inherit);
+}
+
 .empty {
   color: var(--foreground);
   font-style: normal;
@@ -244,6 +248,31 @@ code {
   margin-bottom: 1em;
   font-size: 1em;
 }
+
+.filter-toggle-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1em;
+  margin-left: 0.5em;
+}
+
+.filter-box {
+  margin-bottom: 0.5em;
+}
+
+.filter-menu {
+  background: var(--code-bg, #eee);
+  border-radius: 4px;
+  padding: 0.25em 0.5em;
+  font-size: 0.95em;
+}
+
+.filter-menu label {
+  margin-right: 1em;
+  user-select: none;
+}
+
 .hole-card.highlighted {
   border: 2px solid
     var(--vscode-editorSuggestWidget-highlightForeground, #007acc);
