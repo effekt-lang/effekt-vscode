@@ -43,8 +43,8 @@ export function generateWebView(
         </div>
         <div class="exp-dropdown-body ${hiddenClass}" id="${kind}-dropdown-body-${idx}">
           <div class="filter-menu" style="display:none; margin-bottom: 0.5em;">
-            <label><input type="checkbox" class="filter-origin" value="Defined" checked> Defined</label>
-            <label><input type="checkbox" class="filter-origin" value="Imported"> Imported</label>
+            <label><input type="checkbox" class="filter-origin" data-filter-origin value="Defined" checked> Defined</label>
+            <label><input type="checkbox" class="filter-origin" data-filter-origin value="Imported"> Imported</label>
           </div>
           <input class="filter-box" style="display:none" placeholder="${escapeHtml(placeholder)}"
             data-filter-box

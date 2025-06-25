@@ -103,26 +103,6 @@ export function toggleFilterMenu(btn: HTMLElement): void {
 
 // Listen for filter checkbox changes to update the list and count
 
-document.addEventListener('change', function (e: Event): void {
-  const target = e.target as HTMLElement;
-  if (target.classList.contains('filter-origin')) {
-    const body: Element = target.closest('.exp-dropdown-body') as Element;
-    const filterBox: HTMLInputElement = body.querySelector(
-      '.filter-box',
-    ) as HTMLInputElement;
-    const listId: string = (body.querySelector('.bindings-list') as HTMLElement)
-      .id;
-    // Find header id by traversing up to .exp-dropdown-section and finding the id of the header container
-    const section: Element = body.closest('.exp-dropdown-section') as Element;
-    const idx: string = section
-      .querySelector('.exp-dropdown-body')!
-      .id.match(/bindings-dropdown-body-(\d+)/)![1];
-    const headerId: string = 'bindings-dropdown-header-' + idx;
-
-    filterDropdownList(filterBox, listId, headerId);
-  }
-});
-
 // Patch: on open, set imports off by default and update counts
 document.addEventListener('DOMContentLoaded', function (): void {
   document.querySelectorAll('.filter-menu').forEach((menu) => {
@@ -200,5 +180,19 @@ document
     const headerId = input.dataset.headerId!;
     input.addEventListener('input', () => {
       filterDropdownList(input, listId, headerId);
+    });
+  });
+
+document
+  .querySelectorAll<HTMLInputElement>('[data-filter-origin]')
+  .forEach((checkbox) => {
+    checkbox.addEventListener('change', () => {
+      const body = checkbox.closest('.exp-dropdown-body') as Element;
+      const filterBox = body.querySelector('.filter-box') as HTMLInputElement;
+      const listId = (body.querySelector('.bindings-list') as HTMLElement).id;
+      const _section = body.closest('.exp-dropdown-section') as Element;
+      const idx = body.id.match(/bindings-dropdown-body-(\d+)/)![1];
+      const headerId = 'bindings-dropdown-header-' + idx;
+      filterDropdownList(filterBox, listId, headerId);
     });
   });
