@@ -14,6 +14,7 @@ export function generateWebView(
   holes: EffektHoleInfo[],
   cssUri: vscode.Uri,
   jsUri: vscode.Uri,
+  codiconUri: vscode.Uri,
 ): string {
   function renderExpDropdown({
     title,
@@ -169,7 +170,7 @@ export function generateWebView(
       <meta charset="UTF-8" />
       <title>Effekt Holes</title>
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <link href="https://microsoft.github.io/vscode-codicons/dist/codicon.css" rel="stylesheet" />
+      <link href="${codiconUri}" rel="stylesheet" />
       <link href="${cssUri}" rel="stylesheet">
     </head>
     <body>

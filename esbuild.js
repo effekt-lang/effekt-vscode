@@ -26,10 +26,22 @@ async function main() {
       copyPlugin({
         assets: {
           from: ['./src/holesPanel/holes.css'],
-          to: ['./holesPanel']
-        }
-      })
-    ]
+          to: ['./holesPanel'],
+        },
+      }),
+      copyPlugin({
+        assets: {
+          from: ['./node_modules/@vscode/codicons/dist/codicon.css'],
+          to: ['./holesPanel'],
+        },
+      }),
+      copyPlugin({
+        assets: {
+          from: ['./node_modules/@vscode/codicons/dist/codicon.ttf'],
+          to: ['./holesPanel'],
+        },
+      }),
+    ],
   });
 
   // Compile scripts that run in the webview
@@ -63,17 +75,19 @@ const esbuildProblemMatcherPlugin = {
     build.onStart(() => {
       console.log('[watch] build started');
     });
-    build.onEnd(result => {
+    build.onEnd((result) => {
       result.errors.forEach(({ text, location }) => {
         console.error(`✘ [ERROR] ${text}`);
-        console.error(`    ${location.file}:${location.line}:${location.column}:`);
+        console.error(
+          `    ${location.file}:${location.line}:${location.column}:`,
+        );
       });
       console.log('[watch] build finished');
     });
   },
 };
 
-main().catch(e => {
+main().catch((e) => {
   console.error(e);
   process.exit(1);
 });

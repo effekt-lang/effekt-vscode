@@ -32,6 +32,17 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
       ),
     );
   }
+  private getCodiconUri(): vscode.Uri | undefined {
+    if (!this.webviewView) {
+      return undefined;
+    }
+    return this.webviewView.webview.asWebviewUri(
+      vscode.Uri.joinPath(
+        this.context.extensionUri,
+        'dist/holesPanel/codicon.css',
+      ),
+    );
+  }
 
   resolveWebviewView(webviewView: vscode.WebviewView) {
     webviewView.webview.options = {
@@ -43,9 +54,10 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
 
     const cssUri = this.getCssUri();
     const jsUri = this.getJsUri();
+    const codiconUri = this.getCodiconUri();
 
-    if (cssUri && jsUri) {
-      webviewView.webview.html = generateWebView([], cssUri, jsUri); // initially empty
+    if (cssUri && jsUri && codiconUri) {
+      webviewView.webview.html = generateWebView([], cssUri, jsUri, codiconUri); // initially empty
     }
 
     this.webviewView = webviewView;
@@ -58,9 +70,15 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
     }
     const cssUri = this.getCssUri();
     const jsUri = this.getJsUri();
+    const codiconUri = this.getCodiconUri();
 
-    if (cssUri && jsUri) {
-      this.webviewView.webview.html = generateWebView(holes, cssUri, jsUri);
+    if (cssUri && jsUri && codiconUri) {
+      this.webviewView.webview.html = generateWebView(
+        holes,
+        cssUri,
+        jsUri,
+        codiconUri,
+      );
     }
   }
 

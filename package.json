@@ -235,6 +235,7 @@
     "format:check": "prettier --config .prettierrc \"**/*.{ts,json,css}\" --check"
   },
   "dependencies": {
+    "@vscode/codicons": "^0.0.36",
     "compare-versions": "^6.1.1",
     "esbuild-plugin-copy": "^2.1.1",
     "vscode-languageclient": "^8.1.0"
