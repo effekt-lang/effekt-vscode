@@ -12,23 +12,13 @@ export function updateFilteredCount(
   ).length;
   const header: HTMLElement | null = document.getElementById(headerId);
   if (header) {
-    const titleSpan: HTMLElement | null = header.querySelector(
-      '.exp-dropdown-title',
-    );
-    if (titleSpan) {
-      // Extract X / Y from text and replace it
-      const match: RegExpMatchArray | null = titleSpan.textContent!.match(
-        /\((\d+)\s*\/\s*(\d+)\)/,
-      );
-      if (match) {
-        titleSpan.textContent = titleSpan.textContent!.replace(
-          /\((\d+)\s*\/\s*(\d+)\)/,
-          '(' + visible + ' / ' + totalCount + ')',
-        );
-      } else {
-        // fallback: just append
-        titleSpan.textContent += ' (' + visible + ' / ' + totalCount + ')';
-      }
+    const filteredSpan = header.querySelector('.filtered-count');
+    const totalSpan = header.querySelector('.total-count');
+    if (filteredSpan) {
+      filteredSpan.textContent = String(visible);
+    }
+    if (totalSpan) {
+      totalSpan.textContent = String(totalCount);
     }
   }
 }

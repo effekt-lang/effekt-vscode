@@ -34,9 +34,11 @@ export function generateWebView(
       <div class="exp-dropdown-section">
         <div class="exp-dropdown-header ${collapsedClass}" data-dropdown-toggle>
           <span class="exp-dropdown-toggle">&#9660;</span>
-          <span class="exp-dropdown-title">${escapeHtml(title)} (${filteredCount} / ${totalCount})</span>
-          <button class="filter-toggle-btn" title="Search" data-search><i class="codicon codicon-search"></i>
-          </button>
+          <span class="exp-dropdown-title">
+            ${escapeHtml(title)}
+            (<span class="filtered-count">${filteredCount}</span> / <span class="total-count">${totalCount}</span>)
+          </span>
+          <button class="filter-toggle-btn" title="Search" data-search><i class="codicon codicon-search"></i></button>
           <button class="filter-toggle-btn" title="Filter" data-filter><i class="codicon codicon-filter"></i></button>
         </div>
         <div class="exp-dropdown-body ${hiddenClass}" id="${kind}-dropdown-body-${idx}">
