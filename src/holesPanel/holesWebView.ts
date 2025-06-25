@@ -146,7 +146,7 @@ export function generateWebView(
     .getConfiguration('effekt')
     .get<boolean>('showHoles');
 
-  const holesPanelDesc = `
+  const holesPanelDesc = /* html */ `
     <div class="desc">
       This panel shows information about the types and terms in scope for each typed hole.
       Holes are placeholders for missing code used for type-driven development.
