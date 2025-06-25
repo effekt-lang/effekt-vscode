@@ -3,24 +3,16 @@ function updateFilteredCount(
   headerId: string,
   totalCount: number,
 ): void {
-  const list: HTMLElement | null = document.getElementById(listId);
-  if (!list) {
-    return;
-  }
+  const list = document.getElementById(listId)!;
+
   const visible: number = list.querySelectorAll(
     '.binding:not([style*="display: none"])',
   ).length;
-  const header: HTMLElement | null = document.getElementById(headerId);
-  if (header) {
-    const filteredSpan = header.querySelector('[data-filtered-count]');
-    const totalSpan = header.querySelector('[data-total-count]');
-    if (filteredSpan) {
-      filteredSpan.textContent = String(visible);
-    }
-    if (totalSpan) {
-      totalSpan.textContent = String(totalCount);
-    }
-  }
+  const header = document.getElementById(headerId)!;
+  const filteredSpan = header.querySelector('[data-filtered-count]')!;
+  const totalSpan = header.querySelector('[data-total-count]')!;
+  filteredSpan.textContent = String(visible);
+  totalSpan.textContent = String(totalCount);
 }
 
 function filterDropdownList(
@@ -29,7 +21,7 @@ function filterDropdownList(
   headerId: string,
 ): void {
   const filter: string = input.value.toLowerCase();
-  const parent: Element = input.closest('.exp-dropdown-body') as Element;
+  const parent = input.closest('.exp-dropdown-body') as Element;
   const origins: string[] = Array.from(
     parent.querySelectorAll('.filter-origin:checked'),
   ).map((cb) => (cb as HTMLInputElement).value);
@@ -38,9 +30,8 @@ function filterDropdownList(
   );
   items.forEach((item) => {
     const text: string = item.textContent!.toLowerCase();
-    const origin: string | null = item.getAttribute('data-origin');
-    const show: boolean =
-      text.includes(filter) && origin !== null && origins.includes(origin);
+    const origin: string = item.getAttribute('data-origin')!;
+    const show: boolean = text.includes(filter) && origins.includes(origin);
     item.style.display = show ? '' : 'none';
   });
 
@@ -63,27 +54,23 @@ function filterDropdownList(
 
 function toggleDropdown(header: Element): void {
   header.classList.toggle('collapsed');
-  const body: Element | null = header.nextElementSibling as Element;
-  if (body) {
-    body.classList.toggle('hidden');
-  }
+  const body = header.nextElementSibling as Element;
+  body!.classList.toggle('hidden');
 }
 
 // always extend the dropdown if it's collapsed
 function extendDropdownIfCollapsed(btn: HTMLElement): void {
-  const header: Element | null = btn.closest('.exp-dropdown-header');
-  if (header && header.classList.contains('collapsed')) {
+  const header = btn.closest('.exp-dropdown-header')!;
+  if (header.classList.contains('collapsed')) {
     toggleDropdown(header);
   }
 }
 
 function toggleFilterBox(btn: HTMLElement): void {
-  const body: Element = btn
+  const body = btn
     .closest('.exp-dropdown-section')!
     .querySelector('.exp-dropdown-body') as Element;
-  const filterBox: HTMLElement = body.querySelector(
-    '.filter-box',
-  ) as HTMLElement;
+  const filterBox = body.querySelector('.filter-box') as HTMLElement;
   filterBox.style.display = filterBox.style.display === 'none' ? '' : 'none';
   if (filterBox.style.display !== 'none') {
     filterBox.focus();
@@ -91,26 +78,21 @@ function toggleFilterBox(btn: HTMLElement): void {
 }
 
 function toggleFilterMenu(btn: HTMLElement): void {
-  const body: Element = btn
+  const body = btn
     .closest('.exp-dropdown-section')!
     .querySelector('.exp-dropdown-body') as Element;
-  const filterMenu: HTMLElement = body.querySelector(
-    '.filter-menu',
-  ) as HTMLElement;
+  const filterMenu = body.querySelector('.filter-menu') as HTMLElement;
   filterMenu.style.display = filterMenu.style.display === 'none' ? '' : 'none';
 }
 
 document.addEventListener('DOMContentLoaded', function (): void {
   // Trigger initial filter to update counts and hide imported
   document.querySelectorAll('.exp-dropdown-body').forEach((body) => {
-    const filterBox: HTMLInputElement = body.querySelector(
-      '.filter-box',
-    ) as HTMLInputElement;
-    const listId: string = (body.querySelector('.bindings-list') as HTMLElement)
-      .id;
+    const filterBox = body.querySelector('.filter-box') as HTMLInputElement;
+    const listId = (body.querySelector('.bindings-list') as HTMLElement).id;
     // Find header id by traversing up to .exp-dropdown-section and finding the id of the header container
-    const idx: string = body.id.match(/bindings-dropdown-body-(\d+)/)![1];
-    const headerId: string = 'bindings-dropdown-header-' + idx;
+    const idx = body.id.match(/bindings-dropdown-body-(\d+)/)![1];
+    const headerId = 'bindings-dropdown-header-' + idx;
     filterDropdownList(filterBox, listId, headerId);
   });
 });
@@ -122,20 +104,18 @@ window.addEventListener(
     const message = event.data;
     if (message.command === 'highlightHole') {
       const holeId: string = message.holeId;
-      const el: HTMLElement | null = document.getElementById('hole-' + holeId);
-      if (el) {
-        document
-          .querySelectorAll('.hole-card')
-          .forEach((e) => e.classList.remove('highlighted'));
-        el.classList.add('highlighted');
-        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        // Expand bindings dropdown if collapsed
-        const bindingsHeader: Element | null = el.querySelector(
-          '.exp-dropdown-header',
-        );
-        if (bindingsHeader && bindingsHeader.classList.contains('collapsed')) {
-          toggleDropdown(bindingsHeader);
-        }
+      const el = document.getElementById('hole-' + holeId)!;
+      document
+        .querySelectorAll('.hole-card')
+        .forEach((e) => e.classList.remove('highlighted'));
+      el.classList.add('highlighted');
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      // Expand bindings dropdown if collapsed
+      const bindingsHeader = el.querySelector(
+        '.exp-dropdown-header',
+      ) as Element;
+      if (bindingsHeader.classList.contains('collapsed')) {
+        toggleDropdown(bindingsHeader);
       }
     }
   },
