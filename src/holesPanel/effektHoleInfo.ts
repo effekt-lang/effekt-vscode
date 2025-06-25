@@ -22,3 +22,8 @@ export interface ScopeInfo {
   bindings: BindingInfo[];
   outer?: ScopeInfo;
 }
+export const ORIGIN_DEFINED = 'Defined';
+export const ORIGIN_IMPORTED = 'Imported';
+export const KIND_NAMESPACE = 'Namespace';
+export const KIND_LOCAL = 'Local';
+export const KIND_GLOBAL = 'Global';

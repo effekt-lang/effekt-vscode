@@ -12,8 +12,8 @@ export function updateFilteredCount(
   ).length;
   const header: HTMLElement | null = document.getElementById(headerId);
   if (header) {
-    const filteredSpan = header.querySelector('.filtered-count');
-    const totalSpan = header.querySelector('.total-count');
+    const filteredSpan = header.querySelector('[data-filtered-count]');
+    const totalSpan = header.querySelector('[data-total-count]');
     if (filteredSpan) {
       filteredSpan.textContent = String(visible);
     }

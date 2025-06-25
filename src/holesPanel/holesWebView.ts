@@ -1,5 +1,13 @@
 import * as vscode from 'vscode';
-import { EffektHoleInfo, ScopeInfo, BindingInfo } from './effektHoleInfo';
+import {
+  EffektHoleInfo,
+  ScopeInfo,
+  BindingInfo,
+  KIND_LOCAL,
+  KIND_GLOBAL,
+  ORIGIN_DEFINED,
+  ORIGIN_IMPORTED,
+} from './effektHoleInfo';
 import { escapeHtml } from './htmlUtil';
 
 export function generateWebView(
@@ -35,7 +43,9 @@ export function generateWebView(
           <span class="exp-dropdown-toggle">&#9660;</span>
           <span class="exp-dropdown-title">
             ${escapeHtml(title)}
-            (<span class="filtered-count">${filteredCount}</span> / <span class="total-count">${totalCount}</span>)
+            (  <span data-filtered-count>${filteredCount}</span>
+        /
+        <span data-total-count>${totalCount}</span>)
           </span>
           <button class="filter-toggle-btn" title="Search" data-search><i class="codicon codicon-search"></i></button>
           <button class="filter-toggle-btn" title="Filter" data-filter><i class="codicon codicon-filter"></i></button>
@@ -57,7 +67,7 @@ export function generateWebView(
     `;
   }
 
-  // Collect scopes from innermost to outermost
+  // Flattens the nested scope structure into an array from innermost to outermost.
   function collectScopes(scope: ScopeInfo | undefined): ScopeInfo[] {
     const scopes: ScopeInfo[] = [];
     let current = scope;
@@ -71,11 +81,11 @@ export function generateWebView(
   // Map scope label for display, with optional name in parentheses
   function scopeLabel(scope: ScopeInfo, imported: boolean): string {
     let label: string;
-    if (scope.kind === 'Local') {
+    if (scope.kind === KIND_LOCAL) {
       label = 'local';
-    } else if (scope.kind === 'Global' && !imported) {
+    } else if (scope.kind === KIND_GLOBAL && !imported) {
       label = 'module';
-    } else if (scope.kind === 'Global' && imported) {
+    } else if (scope.kind === KIND_GLOBAL && imported) {
       label = 'imports';
     } else {
       label = escapeHtml(scope.kind);
@@ -100,8 +110,8 @@ export function generateWebView(
           return '';
         }
         // Group imports last
-        const defined = bindings.filter((b) => b.origin === 'Defined');
-        const imported = bindings.filter((b) => b.origin === 'Imported');
+        const defined = bindings.filter((b) => b.origin === ORIGIN_DEFINED);
+        const imported = bindings.filter((b) => b.origin === ORIGIN_IMPORTED);
         allBindings = allBindings.concat(defined, imported);
         let html = '';
         const renderBinding = (b: BindingInfo) =>
