@@ -3,8 +3,5 @@
   "compilerOptions": {
     "composite": true
   },
-  "include": [
-    "src/extension.ts",
-    "src/**/*.ts",
-  ]
+  "include": ["src/extension.ts", "src/**/*.ts"]
 }

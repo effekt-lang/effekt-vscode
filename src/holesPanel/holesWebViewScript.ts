@@ -57,7 +57,6 @@ export function filterDropdownList(
     group.style.display = anyVisible ? '' : 'none';
   });
 
-  // Update filtered count in the header
   const totalCountNumber: number = items.length;
   updateFilteredCount(listId, headerId, totalCountNumber);
 }
@@ -70,7 +69,7 @@ export function toggleDropdown(header: Element): void {
   }
 }
 
-// Helper to always extend the dropdown if it's collapsed
+// always extend the dropdown if it's collapsed
 export function extendDropdownIfCollapsed(btn: HTMLElement): void {
   const header: Element | null = btn.closest('.exp-dropdown-header');
   if (header && header.classList.contains('collapsed')) {
@@ -100,8 +99,6 @@ export function toggleFilterMenu(btn: HTMLElement): void {
   ) as HTMLElement;
   filterMenu.style.display = filterMenu.style.display === 'none' ? '' : 'none';
 }
-
-// Listen for filter checkbox changes to update the list and count
 
 // Patch: on open, set imports off by default and update counts
 document.addEventListener('DOMContentLoaded', function (): void {

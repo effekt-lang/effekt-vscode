@@ -7,7 +7,6 @@ export function generateWebView(
   cssUri: vscode.Uri,
   jsUri: vscode.Uri,
 ): string {
-  // Helper for dropdown section
   function renderExpDropdown({
     title,
     totalCount,
@@ -148,7 +147,7 @@ export function generateWebView(
     </div>
   `;
 
-  // Helper to generate a unique header id for each dropdown for updating counts
+  // generate a unique header id for each dropdown for updating counts
   function headerId(kind: string, idx: number): string {
     return `${kind}-dropdown-header-${idx}`;
   }
