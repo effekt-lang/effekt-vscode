@@ -100,16 +100,7 @@ export function toggleFilterMenu(btn: HTMLElement): void {
   filterMenu.style.display = filterMenu.style.display === 'none' ? '' : 'none';
 }
 
-// Patch: on open, set imports off by default and update counts
 document.addEventListener('DOMContentLoaded', function (): void {
-  document.querySelectorAll('.filter-menu').forEach((menu) => {
-    const importedBox: HTMLInputElement | null = menu.querySelector(
-      'input.filter-origin[value="Imported"]',
-    );
-    if (importedBox) {
-      importedBox.checked = false;
-    }
-  });
   // Trigger initial filter to update counts and hide imported
   document.querySelectorAll('.exp-dropdown-body').forEach((body) => {
     const filterBox: HTMLInputElement = body.querySelector(
