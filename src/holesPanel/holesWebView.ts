@@ -207,9 +207,8 @@ export function generateWebView(
                  // Allow expanded for focused holes
                  return /*html*/ `
           <section class="hole-card" id="hole-${escapeHtml(hole.id)}">
-            <div class="hole-header">
+          <div class="hole-header" data-jump-hole-id="${escapeHtml(hole.id)}" style="cursor: pointer;">
               <span class="hole-id">Hole: ${escapeHtml(hole.id)}</span>
-              <span class="hole-range">[${hole.range.start.line + 1}:${hole.range.start.character + 1} - ${hole.range.end.line + 1}:${hole.range.end.character + 1}]</span>
             </div>
 
       <div class="expected-type-alert">
