@@ -63,7 +63,7 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
     this.webviewView = webviewView;
 
     webviewView.webview.onDidReceiveMessage((message) => {
-      if (message.command === 'notify') {
+      if (message.command === 'jumpToHole') {
         const hole = this.holes.find((h) => h.id === message.holeId);
         if (hole) {
           const start = new vscode.Position(

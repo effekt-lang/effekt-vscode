@@ -3,7 +3,7 @@ declare function acquireVsCodeApi<T>(): {
 };
 
 interface NotifyMessage {
-  command: 'notify';
+  command: 'jumpToHole';
   holeId: string;
 }
 const vscode = acquireVsCodeApi<NotifyMessage>();
@@ -179,7 +179,7 @@ document.querySelectorAll('[data-jump-hole-id]').forEach((btn) => {
     const holeId = (btn as HTMLElement).getAttribute('data-jump-hole-id');
     if (holeId && vscode) {
       vscode.postMessage({
-        command: 'notify',
+        command: 'jumpToHole',
         holeId,
       });
     }
