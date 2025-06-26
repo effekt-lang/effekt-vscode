@@ -1,10 +1,154 @@
+export {};
+
+interface HoleState {
+  expanded: boolean;
+  pinned: boolean;
+}
+
+declare global {
+  interface Window {
+    holeStates: Map<string, HoleState>;
+    vscode: any;
+  }
+}
+
+window.holeStates = window.holeStates || new Map<string, HoleState>();
+
+function getHoleState(holeId: string): HoleState {
+  if (!window.holeStates.has(holeId)) {
+    window.holeStates.set(holeId, { expanded: false, pinned: false });
+  }
+  return window.holeStates.get(holeId)!;
+}
+
+function saveHoleState(holeId: string, state: HoleState): void {
+  window.holeStates.set(holeId, state);
+  if (window.vscode) {
+    window.vscode.postMessage({
+      command: 'saveHoleState',
+      holeId: holeId,
+      state: state,
+    });
+  }
+}
+
+function closeNonPinnedHoles(exceptHoleId: string): void {
+  window.holeStates.forEach((state, holeId) => {
+    if (holeId !== exceptHoleId && !state.pinned && state.expanded) {
+      const header = document.querySelector(
+        `[data-hole-id="${holeId}"].exp-dropdown-header`,
+      ) as HTMLElement;
+      if (header && !header.classList.contains('collapsed')) {
+        header.classList.add('collapsed');
+        const body = header.nextElementSibling as HTMLElement;
+        body.classList.add('hidden');
+        state.expanded = false;
+        saveHoleState(holeId, state);
+
+        const holeCard = document.getElementById(`hole-${holeId}`);
+        if (holeCard) {
+          holeCard.classList.remove('pinned');
+        }
+      }
+    }
+  });
+}
+
+function toggleDropdown(header: HTMLElement): void {
+  const holeId = header.dataset.holeId!;
+  const state = getHoleState(holeId);
+  const wasCollapsed = header.classList.contains('collapsed');
+
+  if (wasCollapsed && !state.pinned) {
+    closeNonPinnedHoles(holeId);
+  }
+
+  header.classList.toggle('collapsed');
+  const body = header.nextElementSibling as HTMLElement;
+  body.classList.toggle('hidden');
+
+  state.expanded = !wasCollapsed;
+  saveHoleState(holeId, state);
+}
+
+function togglePinState(btn: HTMLElement): void {
+  const holeId = btn.dataset.holeId!;
+  const state = getHoleState(holeId);
+
+  state.pinned = !state.pinned;
+  saveHoleState(holeId, state);
+
+  const pinIcon = btn.querySelector('[data-pin-icon]') as HTMLElement;
+  const holeCard = document.getElementById(`hole-${holeId}`);
+
+  if (state.pinned) {
+    btn.classList.add('pinned');
+    pinIcon.classList.remove('codicon-pin');
+    pinIcon.classList.add('codicon-pinned');
+    btn.title = 'Unpin - Allow auto-close';
+    if (holeCard) {
+      holeCard.classList.add('pinned');
+    }
+  } else {
+    btn.classList.remove('pinned');
+    pinIcon.classList.remove('codicon-pinned');
+    pinIcon.classList.add('codicon-pin');
+    btn.title = 'Pin - Keep expanded';
+    if (holeCard) {
+      holeCard.classList.remove('pinned');
+    }
+
+    const hasOtherExpandedNonPinned = Array.from(
+      window.holeStates.entries(),
+    ).some(
+      ([otherId, otherState]) =>
+        otherId !== holeId && otherState.expanded && !otherState.pinned,
+    );
+
+    if (hasOtherExpandedNonPinned && state.expanded) {
+      const header = document.querySelector(
+        `[data-hole-id="${holeId}"].exp-dropdown-header`,
+      ) as HTMLElement;
+      if (header) {
+        header.classList.add('collapsed');
+        const body = header.nextElementSibling as HTMLElement;
+        body.classList.add('hidden');
+        state.expanded = false;
+        saveHoleState(holeId, state);
+      }
+    }
+  }
+}
+
+function expandHole(holeId: string): void {
+  const state = getHoleState(holeId);
+  const header = document.querySelector(
+    `[data-hole-id="${holeId}"].exp-dropdown-header`,
+  ) as HTMLElement;
+
+  if (!header) {
+    return;
+  }
+
+  if (!state.pinned) {
+    closeNonPinnedHoles(holeId);
+  }
+
+  if (header.classList.contains('collapsed')) {
+    header.classList.remove('collapsed');
+    const body = header.nextElementSibling as HTMLElement;
+    body.classList.remove('hidden');
+    state.expanded = true;
+    saveHoleState(holeId, state);
+  }
+}
+
 function updateFilteredCount(
   listId: string,
   headerId: string,
   totalCount: number,
 ): void {
   const list = document.getElementById(listId)!;
-
   const visible: number = list.querySelectorAll(
     '.binding:not([style*="display: none"])',
   ).length;
@@ -35,7 +179,6 @@ function filterDropdownList(
     item.style.display = show ? '' : 'none';
   });
 
-  // Hide scope-group if all its .binding children are hidden
   const scopeGroups: NodeListOf<HTMLElement> = document.querySelectorAll(
     '#' + listId + ' .scope-group',
   );
@@ -52,17 +195,10 @@ function filterDropdownList(
   updateFilteredCount(listId, headerId, totalCountNumber);
 }
 
-function toggleDropdown(header: Element): void {
-  header.classList.toggle('collapsed');
-  const body = header.nextElementSibling as Element;
-  body!.classList.toggle('hidden');
-}
-
-// always extend the dropdown if it's collapsed
 function extendDropdownIfCollapsed(btn: HTMLElement): void {
   const header = btn.closest('.exp-dropdown-header')!;
   if (header.classList.contains('collapsed')) {
-    toggleDropdown(header);
+    toggleDropdown(header as HTMLElement);
   }
 }
 
@@ -86,43 +222,111 @@ function toggleFilterMenu(btn: HTMLElement): void {
 }
 
 document.addEventListener('DOMContentLoaded', function (): void {
-  // Trigger initial filter to update counts and hide imported
+  document.querySelectorAll('[data-hole-id]').forEach((element) => {
+    const holeId = (element as HTMLElement).dataset.holeId!;
+    const state = getHoleState(holeId);
+
+    const pinBtn = element.querySelector('[data-pin]') as HTMLElement;
+    if (pinBtn) {
+      pinBtn.title = 'Pin - Keep expanded';
+      if (state.pinned) {
+        pinBtn.classList.add('pinned');
+        const pinIcon = pinBtn.querySelector('[data-pin-icon]') as HTMLElement;
+        pinIcon.classList.remove('codicon-pin');
+        pinIcon.classList.add('codicon-pinned');
+        pinBtn.title = 'Unpin - Allow auto-close';
+
+        const holeCard = document.getElementById(`hole-${holeId}`);
+        if (holeCard) {
+          holeCard.classList.add('pinned');
+        }
+      }
+    }
+
+    if (element.classList.contains('exp-dropdown-header') && state.expanded) {
+      element.classList.remove('collapsed');
+      const body = element.nextElementSibling as HTMLElement;
+      body.classList.remove('hidden');
+    }
+  });
+
   document.querySelectorAll('.exp-dropdown-body').forEach((body) => {
     const filterBox = body.querySelector('.filter-box') as HTMLInputElement;
     const listId = (body.querySelector('.bindings-list') as HTMLElement).id;
-    // Find header id by traversing up to .exp-dropdown-section and finding the id of the header container
     const idx = body.id.match(/bindings-dropdown-body-(\d+)/)![1];
     const headerId = 'bindings-dropdown-header-' + idx;
     filterDropdownList(filterBox, listId, headerId);
   });
 });
 
-// Focus hole support: highlight and scroll to requested hole, and expand bindings
 window.addEventListener(
   'message',
-  function (event: MessageEvent<{ command: string; holeId: string }>): void {
+  function (
+    event: MessageEvent<{ command: string; holeId?: string; states?: any }>,
+  ): void {
     const message = event.data;
     if (message.command === 'highlightHole') {
-      const holeId: string = message.holeId;
+      const holeId: string = message.holeId!;
       const el = document.getElementById('hole-' + holeId)!;
       document
         .querySelectorAll('.hole-card')
         .forEach((e) => e.classList.remove('highlighted'));
       el.classList.add('highlighted');
       el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      // Expand bindings dropdown if collapsed
-      const bindingsHeader = el.querySelector(
-        '.exp-dropdown-header',
-      ) as Element;
-      if (bindingsHeader.classList.contains('collapsed')) {
-        toggleDropdown(bindingsHeader);
+      expandHole(holeId);
+    } else if (message.command === 'restoreHoleStates') {
+      if (message.states) {
+        window.holeStates = new Map(Object.entries(message.states));
+
+        document.querySelectorAll('[data-hole-id]').forEach((element) => {
+          const holeId = (element as HTMLElement).dataset.holeId!;
+          const state = getHoleState(holeId);
+
+          const pinBtn = element.querySelector('[data-pin]') as HTMLElement;
+          if (pinBtn && state.pinned) {
+            pinBtn.classList.add('pinned');
+            const pinIcon = pinBtn.querySelector(
+              '[data-pin-icon]',
+            ) as HTMLElement;
+            pinIcon.classList.remove('codicon-pin');
+            pinIcon.classList.add('codicon-pinned');
+            pinBtn.title = 'Unpin - Allow auto-close';
+
+            const holeCard = document.getElementById(`hole-${holeId}`);
+            if (holeCard) {
+              holeCard.classList.add('pinned');
+            }
+          }
+
+          if (
+            element.classList.contains('exp-dropdown-header') &&
+            state.expanded
+          ) {
+            element.classList.remove('collapsed');
+            const body = element.nextElementSibling as HTMLElement;
+            body.classList.remove('hidden');
+          }
+        });
       }
     }
   },
 );
 
 document.querySelectorAll('[data-dropdown-toggle]').forEach((btn) => {
-  btn.addEventListener('click', () => toggleDropdown(btn as HTMLElement));
+  btn.addEventListener('click', (event) => {
+    const target = event.target as HTMLElement;
+    if (target.closest('.exp-dropdown-actions')) {
+      return;
+    }
+    toggleDropdown(btn as HTMLElement);
+  });
+});
+
+document.querySelectorAll('[data-pin]').forEach((btn) => {
+  btn.addEventListener('click', (event) => {
+    togglePinState(btn as HTMLElement);
+    event.stopPropagation();
+  });
 });
 
 document.querySelectorAll('[data-search]').forEach((btn) => {
