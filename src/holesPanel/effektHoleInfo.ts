@@ -8,22 +8,44 @@ export interface EffektHoleInfo {
   scope: ScopeInfo;
 }
 
-export interface BindingInfo {
+export type BindingOrigin =
+  | typeof BINDING_ORIGIN_DEFINED
+  | typeof BINDING_ORIGIN_IMPORTED;
+
+export type BindingInfo = TermBinding | TypeBinding;
+
+export interface TermBinding {
   qualifier: string[];
   name: string;
-  origin: string; // "Defined" | "Imported"
+  origin: BindingOrigin;
   type?: string;
-  definition?: string;
+  kind: typeof BINDING_KIND_TERM;
 }
+
+export interface TypeBinding {
+  qualifier: string[];
+  name: string;
+  origin: BindingOrigin;
+  definition: string;
+  kind: typeof BINDING_KIND_TYPE;
+}
+
+export type ScopeKind =
+  | typeof SCOPE_KIND_NAMESPACE
+  | typeof SCOPE_KIND_LOCAL
+  | typeof SCOPE_KIND_GLOBAL;
 
 export interface ScopeInfo {
   name?: string;
-  kind: string; // "Namespace" | "Local" | "Global"
+  kind: ScopeKind;
   bindings: BindingInfo[];
   outer?: ScopeInfo;
 }
-export const ORIGIN_DEFINED = 'Defined';
-export const ORIGIN_IMPORTED = 'Imported';
-export const KIND_NAMESPACE = 'Namespace';
-export const KIND_LOCAL = 'Local';
-export const KIND_GLOBAL = 'Global';
+
+export const BINDING_ORIGIN_DEFINED = 'Defined';
+export const BINDING_ORIGIN_IMPORTED = 'Imported';
+export const SCOPE_KIND_NAMESPACE = 'Namespace';
+export const SCOPE_KIND_LOCAL = 'Local';
+export const SCOPE_KIND_GLOBAL = 'Global';
+export const BINDING_KIND_TERM = 'Term';
+export const BINDING_KIND_TYPE = 'Type';
