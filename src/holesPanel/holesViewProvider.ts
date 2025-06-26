@@ -61,6 +61,30 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
     }
 
     this.webviewView = webviewView;
+
+    webviewView.webview.onDidReceiveMessage((message) => {
+      if (message.command === 'notify') {
+        const hole = this.holes.find((h) => h.id === message.holeId);
+        if (hole) {
+          const start = new vscode.Position(
+            hole.range.start.line,
+            hole.range.start.character,
+          );
+          const end = new vscode.Position(
+            hole.range.end.line,
+            hole.range.end.character,
+          );
+          const editor = vscode.window.activeTextEditor;
+          if (editor) {
+            editor.selection = new vscode.Selection(start, end);
+            editor.revealRange(
+              new vscode.Range(start, end),
+              vscode.TextEditorRevealType.InCenter,
+            );
+          }
+        }
+      }
+    });
   }
 
   public updateHoles(holes: EffektHoleInfo[]) {

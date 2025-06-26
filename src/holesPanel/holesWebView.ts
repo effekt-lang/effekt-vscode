@@ -204,6 +204,7 @@ export function generateWebView(
             <div class="hole-header">
               <span class="hole-id">Hole: ${escapeHtml(hole.id)}</span>
               <span class="hole-range">[${hole.range.start.line + 1}:${hole.range.start.character + 1} - ${hole.range.end.line + 1}:${hole.range.end.character + 1}]</span>
+              <button class="jump-to-hole-btn" data-jump-hole-id="..."><i class="codicon codicon-arrow-right"></i></button>
             </div>
 
       <div class="expected-type-alert">
