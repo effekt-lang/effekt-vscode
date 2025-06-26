@@ -25,6 +25,7 @@ export function generateWebView(
     placeholder,
     itemsHtml,
     expanded = false,
+    holeId,
   }: {
     title: string;
     totalCount: number;
@@ -34,22 +35,27 @@ export function generateWebView(
     placeholder: string;
     itemsHtml: string;
     expanded?: boolean;
+    holeId: string;
   }) {
-    // Set expanded by default for focused holes
     const collapsedClass = expanded ? '' : 'collapsed';
     const hiddenClass = expanded ? '' : 'hidden';
     return /*html*/ `
       <div class="exp-dropdown-section">
-        <div class="exp-dropdown-header ${collapsedClass}" data-dropdown-toggle>
-          <span class="exp-dropdown-toggle">&#9660;</span>
-          <span class="exp-dropdown-title">
-            ${escapeHtml(title)}
-            (  <span data-filtered-count>${filteredCount}</span>
-        /
-        <span data-total-count>${totalCount}</span>)
-          </span>
-          <button class="filter-toggle-btn" title="Search" data-search><i class="codicon codicon-search"></i></button>
-          <button class="filter-toggle-btn" title="Filter" data-filter><i class="codicon codicon-filter"></i></button>
+        <div class="exp-dropdown-header ${collapsedClass}" data-dropdown-toggle data-hole-id="${holeId}">
+          <div class="exp-dropdown-header-content">
+            <span class="exp-dropdown-toggle">&#9660;</span>
+            <span class="exp-dropdown-title">
+              ${escapeHtml(title)}
+              (<span data-filtered-count>${filteredCount}</span>/<span data-total-count>${totalCount}</span>)
+            </span>
+          </div>
+          <div class="exp-dropdown-actions">
+            <button class="filter-toggle-btn" title="Search" data-search><i class="codicon codicon-search"></i></button>
+            <button class="filter-toggle-btn" title="Filter" data-filter><i class="codicon codicon-filter"></i></button>
+            <button class="pin-toggle-btn" title="Pin - Keep expanded" data-pin data-hole-id="${holeId}">
+              <i class="codicon codicon-pin" data-pin-icon></i>
+            </button>
+          </div>
         </div>
         <div class="exp-dropdown-body ${hiddenClass}" id="${kind}-dropdown-body-${idx}">
           <div class="filter-menu" style="display:none; margin-bottom: 0.5em;">
@@ -198,9 +204,9 @@ export function generateWebView(
                  const filteredBindings = allBindings.filter(
                    (b) => b.origin === 'Defined',
                  );
-                 // Allow expanded for focused holes
+
                  return /*html*/ `
-          <section class="hole-card" id="hole-${escapeHtml(hole.id)}">
+          <section class="hole-card" id="hole-${escapeHtml(hole.id)}" data-hole-id="${escapeHtml(hole.id)}">
             <div class="hole-header">
               <span class="hole-id">Hole: ${escapeHtml(hole.id)}</span>
               <span class="hole-range">[${hole.range.start.line + 1}:${hole.range.start.character + 1} - ${hole.range.end.line + 1}:${hole.range.end.character + 1}]</span>
@@ -227,7 +233,8 @@ export function generateWebView(
               kind: 'bindings',
               placeholder: 'Search bindings...',
               itemsHtml: bindingsHtml || '<span class="empty">None</span>',
-              expanded: false, // Will be toggled by focus event
+              expanded: false,
+              holeId: hole.id,
             })}
             </div>
           </section>

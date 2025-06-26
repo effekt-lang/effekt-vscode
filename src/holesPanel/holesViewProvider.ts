@@ -2,10 +2,16 @@ import * as vscode from 'vscode';
 import { generateWebView } from './holesWebView';
 import { EffektHoleInfo } from './effektHoleInfo';
 
+interface HoleState {
+  expanded: boolean;
+  pinned: boolean;
+}
+
 export class HolesViewProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = 'effekt.holesView';
   private webviewView?: vscode.WebviewView;
   private holes: EffektHoleInfo[] = [];
+  private holeStates = new Map<string, HoleState>();
 
   constructor(private readonly context: vscode.ExtensionContext) {}
 
@@ -32,6 +38,7 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
       ),
     );
   }
+
   private getCodiconUri(): vscode.Uri | undefined {
     if (!this.webviewView) {
       return undefined;
@@ -52,6 +59,18 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
       ],
     };
 
+    webviewView.webview.onDidReceiveMessage(
+      (message) => {
+        switch (message.command) {
+          case 'saveHoleState':
+            this.holeStates.set(message.holeId, message.state);
+            break;
+        }
+      },
+      undefined,
+      this.context.subscriptions,
+    );
+
     const cssUri = this.getCssUri();
     const jsUri = this.getJsUri();
     const codiconUri = this.getCodiconUri();
@@ -61,6 +80,14 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
     }
 
     this.webviewView = webviewView;
+
+    // Restore hole states if any exist
+    if (this.holeStates.size > 0) {
+      this.webviewView.webview.postMessage({
+        command: 'restoreHoleStates',
+        states: Object.fromEntries(this.holeStates),
+      });
+    }
   }
 
   public updateHoles(holes: EffektHoleInfo[]) {
@@ -79,6 +106,16 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
         jsUri,
         codiconUri,
       );
+
+      // Restore hole states after updating
+      if (this.holeStates.size > 0) {
+        setTimeout(() => {
+          this.webviewView?.webview.postMessage({
+            command: 'restoreHoleStates',
+            states: Object.fromEntries(this.holeStates),
+          });
+        }, 100);
+      }
     }
   }
 
