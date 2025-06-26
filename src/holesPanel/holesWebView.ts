@@ -3,10 +3,10 @@ import {
   EffektHoleInfo,
   ScopeInfo,
   BindingInfo,
-  KIND_LOCAL,
-  KIND_GLOBAL,
-  ORIGIN_DEFINED,
-  ORIGIN_IMPORTED,
+  SCOPE_KIND_LOCAL,
+  SCOPE_KIND_GLOBAL,
+  BINDING_ORIGIN_DEFINED,
+  BINDING_ORIGIN_IMPORTED,
 } from './effektHoleInfo';
 import { escapeHtml } from './htmlUtil';
 
@@ -82,11 +82,11 @@ export function generateWebView(
   // Map scope label for display, with optional name in parentheses
   function scopeLabel(scope: ScopeInfo, imported: boolean): string {
     let label: string;
-    if (scope.kind === KIND_LOCAL) {
+    if (scope.kind === SCOPE_KIND_LOCAL) {
       label = 'local';
-    } else if (scope.kind === KIND_GLOBAL && !imported) {
+    } else if (scope.kind === SCOPE_KIND_GLOBAL && !imported) {
       label = 'module';
-    } else if (scope.kind === KIND_GLOBAL && imported) {
+    } else if (scope.kind === SCOPE_KIND_GLOBAL && imported) {
       label = 'imports';
     } else {
       label = escapeHtml(scope.kind);
@@ -111,21 +111,27 @@ export function generateWebView(
           return '';
         }
         // Group imports last
-        const defined = bindings.filter((b) => b.origin === ORIGIN_DEFINED);
-        const imported = bindings.filter((b) => b.origin === ORIGIN_IMPORTED);
+        const defined = bindings.filter(
+          (b) => b.origin === BINDING_ORIGIN_DEFINED,
+        );
+        const imported = bindings.filter(
+          (b) => b.origin === BINDING_ORIGIN_IMPORTED,
+        );
         allBindings = allBindings.concat(defined, imported);
         let html = '';
-        const renderBinding = (b: BindingInfo) =>
-          `<div class="binding" data-origin="${escapeHtml(b.origin)}">
-            <span class="binding-term">${escapeHtml(b.name)}</span>
-            <span class="binding-type">${
-              b.type
-                ? `: ${escapeHtml(b.type)}`
-                : b.definition
-                  ? ` = ${escapeHtml(b.definition)}`
-                  : ''
-            }</span>
-          </div>`;
+        const renderBinding = (b: BindingInfo) => {
+          switch (b.kind) {
+            case 'Term':
+              return /* html */ `<div class="binding" data-origin="${escapeHtml(b.origin)}">
+                <span class="binding-term">${escapeHtml(b.name)}</span>
+                <span class="binding-type">${b.type ? `: ${escapeHtml(b.type)}` : ''}</span>
+              </div>`;
+            case 'Type':
+              return /* html */ `<div class="binding" data-origin="${escapeHtml(b.origin)}">
+                <span class="binding-term">${b.definition ? escapeHtml(b.definition) : escapeHtml(b.name)}</span>
+              </div>`;
+          }
+        };
         if (defined.length > 0) {
           html += `<div class="scope-group"><div class="scope-label">${scopeLabel(scope, false)}</div>`;
           html += defined.map(renderBinding).join('');
@@ -196,7 +202,7 @@ export function generateWebView(
                    renderBindingsByScope(scopes);
                  // Default filter: only Defined (not Imported)
                  const filteredBindings = allBindings.filter(
-                   (b) => b.origin === 'Defined',
+                   (b) => b.origin === BINDING_ORIGIN_DEFINED,
                  );
                  // Allow expanded for focused holes
                  return /*html*/ `
