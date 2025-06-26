@@ -4,9 +4,10 @@ declare function acquireVsCodeApi<T>(): {
 
 interface NotifyMessage {
   command: 'notify';
-  text: string;
+  holeId: string;
 }
 const vscode = acquireVsCodeApi<NotifyMessage>();
+
 function updateFilteredCount(
   listId: string,
   headerId: string,
@@ -179,7 +180,7 @@ document.querySelectorAll('[data-jump-hole-id]').forEach((btn) => {
     if (holeId && vscode) {
       vscode.postMessage({
         command: 'notify',
-        text: holeId,
+        holeId,
       });
     }
   });
