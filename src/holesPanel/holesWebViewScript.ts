@@ -130,9 +130,7 @@ function expandHole(holeId: string): void {
     return;
   }
 
-  if (!state.pinned) {
-    closeNonPinnedHoles(holeId);
-  }
+  closeNonPinnedHoles(holeId);
 
   if (header.classList.contains('collapsed')) {
     header.classList.remove('collapsed');
