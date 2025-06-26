@@ -141,6 +141,16 @@ function expandHole(holeId: string): void {
   }
 }
 
+declare function acquireVsCodeApi<T>(): {
+  postMessage(msg: T): void;
+};
+
+interface NotifyMessage {
+  command: 'jumpToHole';
+  holeId: string;
+}
+const vscode = acquireVsCodeApi<NotifyMessage>();
+
 function updateFilteredCount(
   listId: string,
   headerId: string,
@@ -365,3 +375,15 @@ document
       filterDropdownList(filterBox, listId, headerId);
     });
   });
+
+document.querySelectorAll('[data-jump-hole-id]').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    const holeId = (btn as HTMLElement).getAttribute('data-jump-hole-id');
+    if (holeId && vscode) {
+      vscode.postMessage({
+        command: 'jumpToHole',
+        holeId,
+      });
+    }
+  });
+});
