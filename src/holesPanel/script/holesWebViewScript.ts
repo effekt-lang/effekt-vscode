@@ -51,6 +51,7 @@ function filterDropdownList(
     item.style.display = show ? '' : 'none';
   });
 
+  // Hide scope-group if all its .binding children are hidden
   const scopeGroups: NodeListOf<HTMLElement> = document.querySelectorAll(
     '#' + listId + ' .scope-group',
   );
