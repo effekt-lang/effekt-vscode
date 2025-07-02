@@ -52,7 +52,7 @@ export function generateWebView(
           <div class="exp-dropdown-actions">
             <button class="filter-toggle-btn" title="Search" data-search><i class="codicon codicon-search"></i></button>
             <button class="filter-toggle-btn" title="Filter" data-filter><i class="codicon codicon-filter"></i></button>
-            <button class="pin-toggle-btn" title="Pin - Keep expanded" data-pin data-hole-id="${holeId}">
+            <button class="filter-toggle-btn" title="Pin - Keep expanded" data-pin data-hole-id="${holeId}">
               <i class="codicon codicon-pin" data-pin-icon></i>
             </button>
           </div>
