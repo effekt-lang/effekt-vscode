@@ -137,3 +137,63 @@ export function expandHole(holeId: string): void {
     saveHoleState(holeId, state);
   }
 }
+
+export function updateAllHolesFromState() {
+  document.querySelectorAll('[data-hole-id]').forEach((element) => {
+    const holeId = (element as HTMLElement).dataset.holeId!;
+    const state = getHoleState(holeId);
+
+    // Update pin button state
+    const pinBtn = element.querySelector('[data-pin]') as HTMLElement | null;
+    if (pinBtn) {
+      // Set default pin title
+      pinBtn.title = 'Pin - Keep expanded';
+      if (state.pinned) {
+        pinBtn.classList.add('pinned');
+        const pinIcon = pinBtn.querySelector(
+          '[data-pin-icon]',
+        ) as HTMLElement | null;
+        if (pinIcon) {
+          pinIcon.classList.remove('codicon-pin');
+          pinIcon.classList.add('codicon-pinned');
+        }
+        pinBtn.title = 'Unpin - Allow auto-close';
+
+        const holeCard = document.getElementById(`hole-${holeId}`);
+        if (holeCard) {
+          holeCard.classList.add('pinned');
+        }
+      } else {
+        pinBtn.classList.remove('pinned');
+        const pinIcon = pinBtn.querySelector(
+          '[data-pin-icon]',
+        ) as HTMLElement | null;
+        if (pinIcon) {
+          pinIcon.classList.remove('codicon-pinned');
+          pinIcon.classList.add('codicon-pin');
+        }
+        const holeCard = document.getElementById(`hole-${holeId}`);
+        if (holeCard) {
+          holeCard.classList.remove('pinned');
+        }
+      }
+    }
+
+    // Update expanded/collapsed state
+    if (element.classList.contains('exp-dropdown-header')) {
+      const header = element as HTMLElement;
+      const body = header.nextElementSibling as HTMLElement | null;
+      if (state.expanded) {
+        header.classList.remove('collapsed');
+        if (body) {
+          body.classList.remove('hidden');
+        }
+      } else {
+        header.classList.add('collapsed');
+        if (body) {
+          body.classList.add('hidden');
+        }
+      }
+    }
+  });
+}

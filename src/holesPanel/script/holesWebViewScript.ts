@@ -1,8 +1,8 @@
 import {
   toggleDropdown,
-  getHoleState,
   expandHole,
   togglePinState,
+  updateAllHolesFromState,
 } from './holeStateManagement';
 
 declare function acquireVsCodeApi<T>(): {
@@ -94,33 +94,7 @@ function toggleFilterMenu(btn: HTMLElement): void {
 }
 
 document.addEventListener('DOMContentLoaded', function (): void {
-  document.querySelectorAll('[data-hole-id]').forEach((element) => {
-    const holeId = (element as HTMLElement).dataset.holeId!;
-    const state = getHoleState(holeId);
-
-    const pinBtn = element.querySelector('[data-pin]') as HTMLElement;
-    if (pinBtn) {
-      pinBtn.title = 'Pin - Keep expanded';
-      if (state.pinned) {
-        pinBtn.classList.add('pinned');
-        const pinIcon = pinBtn.querySelector('[data-pin-icon]') as HTMLElement;
-        pinIcon.classList.remove('codicon-pin');
-        pinIcon.classList.add('codicon-pinned');
-        pinBtn.title = 'Unpin - Allow auto-close';
-
-        const holeCard = document.getElementById(`hole-${holeId}`);
-        if (holeCard) {
-          holeCard.classList.add('pinned');
-        }
-      }
-    }
-
-    if (element.classList.contains('exp-dropdown-header') && state.expanded) {
-      element.classList.remove('collapsed');
-      const body = element.nextElementSibling as HTMLElement;
-      body.classList.remove('hidden');
-    }
-  });
+  updateAllHolesFromState();
 
   document.querySelectorAll('.exp-dropdown-body').forEach((body) => {
     const filterBox = body.querySelector('.filter-box') as HTMLInputElement;
@@ -150,35 +124,7 @@ window.addEventListener(
       if (message.states) {
         window.holeStates = new Map(Object.entries(message.states));
 
-        document.querySelectorAll('[data-hole-id]').forEach((element) => {
-          const holeId = (element as HTMLElement).dataset.holeId!;
-          const state = getHoleState(holeId);
-
-          const pinBtn = element.querySelector('[data-pin]') as HTMLElement;
-          if (pinBtn && state.pinned) {
-            pinBtn.classList.add('pinned');
-            const pinIcon = pinBtn.querySelector(
-              '[data-pin-icon]',
-            ) as HTMLElement;
-            pinIcon.classList.remove('codicon-pin');
-            pinIcon.classList.add('codicon-pinned');
-            pinBtn.title = 'Unpin - Allow auto-close';
-
-            const holeCard = document.getElementById(`hole-${holeId}`);
-            if (holeCard) {
-              holeCard.classList.add('pinned');
-            }
-          }
-
-          if (
-            element.classList.contains('exp-dropdown-header') &&
-            state.expanded
-          ) {
-            element.classList.remove('collapsed');
-            const body = element.nextElementSibling as HTMLElement;
-            body.classList.remove('hidden');
-          }
-        });
+        updateAllHolesFromState();
       }
     }
   },
