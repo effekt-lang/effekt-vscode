@@ -223,8 +223,6 @@ code {
   transform: rotate(-90deg);
 }
 
-
-
 .exp-dropdown-body {
   padding: 1em;
   background: var(--background);
@@ -283,7 +281,7 @@ code {
 }
 
 .exp-dropdown-title {
-  flex: 1 1 auto; 
+  flex: 1 1 auto;
   color: var(--accent);
   font-size: 1em;
   letter-spacing: 0.01em;
@@ -295,7 +293,7 @@ code {
 .exp-dropdown-actions {
   display: flex;
   align-items: center;
-  gap: 0.05em;    
+  gap: 0.05em;
   margin-left: 0.5em;
 }
 
