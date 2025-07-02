@@ -183,7 +183,8 @@ export function updateAllHolesFromState() {
     if (element.classList.contains('exp-dropdown-header')) {
       const header = element as HTMLElement;
       const body = header.nextElementSibling as HTMLElement | null;
-      if (state.expanded) {
+      // Collapse if not pinned, regardless of state.expanded!
+      if (state.pinned && state.expanded) {
         header.classList.remove('collapsed');
         if (body) {
           body.classList.remove('hidden');
@@ -193,6 +194,8 @@ export function updateAllHolesFromState() {
         if (body) {
           body.classList.add('hidden');
         }
+        state.expanded = false; // Sync state
+        saveHoleState(holeId, state);
       }
     }
   });
