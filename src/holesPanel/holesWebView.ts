@@ -41,17 +41,19 @@ export function generateWebView(
     const hiddenClass = expanded ? '' : 'hidden';
     return /*html*/ `
       <div class="exp-dropdown-section">
-        <div class="exp-dropdown-header ${collapsedClass}" data-dropdown-toggle data-hole-id="${holeId}">
-          <div class="exp-dropdown-header-content">
-            <span class="exp-dropdown-toggle">&#9660;</span>
-            <span class="exp-dropdown-title">
-              ${escapeHtml(title)}
-              (<span data-filtered-count>${filteredCount}</span>/<span data-total-count>${totalCount}</span>)
-            </span>
-          </div>
+       <div class="exp-dropdown-header ${collapsedClass}" data-dropdown-toggle data-hole-id="${holeId}">
+          <span class="exp-dropdown-toggle">&#9660;</span>
+          <span class="exp-dropdown-title">
+            ${escapeHtml(title)}
+            (<span data-filtered-count>${filteredCount}</span>/<span data-total-count>${totalCount}</span>)
+          </span>
           <div class="exp-dropdown-actions">
-            <button class="filter-toggle-btn" title="Search" data-search><i class="codicon codicon-search"></i></button>
-            <button class="filter-toggle-btn" title="Filter" data-filter><i class="codicon codicon-filter"></i></button>
+            <button class="filter-toggle-btn" title="Search" data-search>
+              <i class="codicon codicon-search"></i>
+            </button>
+            <button class="filter-toggle-btn" title="Filter" data-filter>
+              <i class="codicon codicon-filter"></i>
+            </button>
             <button class="filter-toggle-btn" title="Pin - Keep expanded" data-pin data-hole-id="${holeId}">
               <i class="codicon codicon-pin" data-pin-icon></i>
             </button>

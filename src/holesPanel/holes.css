@@ -223,12 +223,7 @@ code {
   transform: rotate(-90deg);
 }
 
-.exp-dropdown-title {
-  flex: 1 1 auto;
-  color: var(--accent);
-  font-size: 1em;
-  letter-spacing: 0.01em;
-}
+
 
 .exp-dropdown-body {
   padding: 1em;
@@ -247,14 +242,6 @@ code {
   border-radius: 4px;
   margin-bottom: 1em;
   font-size: 1em;
-}
-
-.filter-toggle-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 1em;
-  margin-left: 0.5em;
 }
 
 .filter-box {
@@ -277,4 +264,48 @@ code {
   border: 2px solid
     var(--vscode-editorSuggestWidget-highlightForeground, #007acc);
   background-color: rgba(0, 122, 204, 0.05);
+}
+
+.exp-dropdown-header {
+  display: flex;
+  align-items: center;
+  background: var(--code-bg);
+  font-weight: 600;
+  padding: 0.65em 1em;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.exp-dropdown-toggle {
+  margin-right: 0.55em;
+  font-size: 1.07em;
+  color: var(--accent);
+}
+
+.exp-dropdown-title {
+  flex: 1 1 auto; 
+  color: var(--accent);
+  font-size: 1em;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.exp-dropdown-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.05em;    
+  margin-left: 0.5em;
+}
+
+.filter-toggle-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1em;
+  margin-left: 0.05em;
+  padding: 0.1em 0.1em;
+  display: flex;
+  align-items: center;
 }
