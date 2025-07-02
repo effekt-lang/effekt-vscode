@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { generateWebView } from './holesWebView';
 import { EffektHoleInfo } from './effektHoleInfo';
 
-interface HoleState {
+export interface HoleState {
   expanded: boolean;
   pinned: boolean;
 }

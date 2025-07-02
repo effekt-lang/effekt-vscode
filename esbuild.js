@@ -46,7 +46,7 @@ async function main() {
 
   // Compile scripts that run in the webview
   const webCtx = await esbuild.context({
-    entryPoints: ['src/holesPanel/holesWebViewScript.ts'],
+    entryPoints: ['src/holesPanel/script/holesWebViewScript.ts'],
     bundle: true,
     format: 'iife',
     platform: 'browser',
