@@ -65,6 +65,14 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
           case 'saveHoleState':
             this.holeStates.set(message.holeId, message.state);
             break;
+          case 'requestHoleStates':
+            if (this.holeStates.size > 0) {
+              webviewView.webview.postMessage({
+                command: 'restoreHoleStates',
+                states: Object.fromEntries(this.holeStates),
+              });
+            }
+            break;
         }
       },
       undefined,

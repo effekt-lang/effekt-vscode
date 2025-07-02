@@ -10,8 +10,8 @@ declare function acquireVsCodeApi<T>(): {
 };
 
 interface NotifyMessage {
-  command: 'jumpToHole';
-  holeId: string;
+  command: 'jumpToHole' | 'requestHoleStates';
+  holeId?: string;
 }
 const vscode = acquireVsCodeApi<NotifyMessage>();
 
@@ -95,6 +95,8 @@ function toggleFilterMenu(btn: HTMLElement): void {
 }
 
 document.addEventListener('DOMContentLoaded', function (): void {
+  vscode.postMessage({ command: 'requestHoleStates' });
+
   updateAllHolesFromState();
 
   document.querySelectorAll('.exp-dropdown-body').forEach((body) => {
