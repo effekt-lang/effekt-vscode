@@ -18,17 +18,6 @@ export function getHoleState(holeId: string): HoleState {
   return window.holeStates.get(holeId)!;
 }
 
-function saveHoleState(holeId: string, state: HoleState): void {
-  window.holeStates.set(holeId, state);
-  if (window.vscode) {
-    window.vscode.postMessage({
-      command: 'saveHoleState',
-      holeId: holeId,
-      state: state,
-    });
-  }
-}
-
 function closeNonPinnedHoles(exceptHoleId: string): void {
   window.holeStates.forEach((state, holeId) => {
     if (holeId !== exceptHoleId && !state.pinned && state.expanded) {
@@ -40,7 +29,6 @@ function closeNonPinnedHoles(exceptHoleId: string): void {
         const body = header.nextElementSibling as HTMLElement;
         body.classList.add('hidden');
         state.expanded = false;
-        saveHoleState(holeId, state);
 
         const holeCard = document.getElementById(`hole-${holeId}`);
         if (holeCard) {
@@ -65,7 +53,6 @@ export function toggleDropdown(header: HTMLElement): void {
   body.classList.toggle('hidden');
 
   state.expanded = !wasCollapsed;
-  saveHoleState(holeId, state);
 }
 
 export function togglePinState(btn: HTMLElement): void {
@@ -73,7 +60,6 @@ export function togglePinState(btn: HTMLElement): void {
   const state = getHoleState(holeId);
 
   state.pinned = !state.pinned;
-  saveHoleState(holeId, state);
 
   const pinIcon = btn.querySelector('[data-pin-icon]') as HTMLElement;
   const holeCard = document.getElementById(`hole-${holeId}`);
@@ -111,7 +97,6 @@ export function togglePinState(btn: HTMLElement): void {
         const body = header.nextElementSibling as HTMLElement;
         body.classList.add('hidden');
         state.expanded = false;
-        saveHoleState(holeId, state);
       }
     }
   }
@@ -134,7 +119,6 @@ export function expandHole(holeId: string): void {
     const body = header.nextElementSibling as HTMLElement;
     body.classList.remove('hidden');
     state.expanded = true;
-    saveHoleState(holeId, state);
   }
 }
 
@@ -195,7 +179,6 @@ export function updateAllHolesFromState() {
           body.classList.add('hidden');
         }
         state.expanded = false; // Sync state
-        saveHoleState(holeId, state);
       }
     }
   });
