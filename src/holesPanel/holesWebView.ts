@@ -7,6 +7,7 @@ import {
   SCOPE_KIND_GLOBAL,
   BINDING_ORIGIN_DEFINED,
   BINDING_ORIGIN_IMPORTED,
+  TermBinding,
 } from './effektHoleInfo';
 import { escapeHtml } from './htmlUtil';
 
@@ -104,6 +105,12 @@ export function generateWebView(
     allBindings: BindingInfo[];
   } {
     let allBindings: BindingInfo[] = [];
+    const renderQualifiedName = (b: TermBinding): string => {
+      return [...b.qualifier, b.name]
+        .flatMap((x, i) => (i > 0 ? ['::', x] : [x]))
+        .join('');
+    };
+
     const html = scopes
       .map((scope, _scopeIdx) => {
         const bindings = scope.bindings;
@@ -123,7 +130,7 @@ export function generateWebView(
           switch (b.kind) {
             case 'Term':
               return /* html */ `<div class="binding" data-origin="${escapeHtml(b.origin)}">
-                <span class="binding-term">${escapeHtml(b.name)}</span>
+                <span class="binding-term">${escapeHtml(renderQualifiedName(b))}</span>
                 <span class="binding-type">${b.type ? `: ${escapeHtml(b.type)}` : ''}</span>
               </div>`;
             case 'Type':
