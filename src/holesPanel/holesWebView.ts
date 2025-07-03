@@ -24,7 +24,6 @@ export function generateWebView(
     kind,
     placeholder,
     itemsHtml,
-    expanded = false,
     holeId,
   }: {
     title: string;
@@ -37,8 +36,8 @@ export function generateWebView(
     expanded?: boolean;
     holeId: string;
   }) {
-    const collapsedClass = expanded ? '' : 'collapsed';
-    const hiddenClass = expanded ? '' : 'hidden';
+    const collapsedClass = 'collapsed';
+    const hiddenClass = 'hidden';
     return /*html*/ `
       <div class="exp-dropdown-section">
        <div class="exp-dropdown-header ${collapsedClass}" data-dropdown-toggle data-hole-id="${holeId}">
@@ -239,7 +238,6 @@ export function generateWebView(
               kind: 'bindings',
               placeholder: 'Search bindings...',
               itemsHtml: bindingsHtml || '<span class="empty">None</span>',
-              expanded: false,
               holeId: hole.id,
             })}
             </div>
