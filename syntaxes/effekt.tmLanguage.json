@@ -18,6 +18,14 @@
     "comments": {
       "patterns": [
         {
+          "begin": "///",
+          "end": "\\n",
+          "beginCaptures": {
+            "0": { "name": "punctuation.definition.comment.effekt" }
+          },
+          "name": "comment.line.documentation.effekt"
+        },
+        {
           "begin": "//",
           "end": "\\n",
           "beginCaptures": {
