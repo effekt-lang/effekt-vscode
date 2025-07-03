@@ -211,8 +211,6 @@ code {
   background: var(--highlight);
 }
 
-
-
 .exp-dropdown-body {
   padding: 1em;
   background: var(--background);
@@ -263,8 +261,6 @@ code {
   cursor: pointer;
   transition: background 0.15s;
 }
-
-
 
 .exp-dropdown-title {
   flex: 1 1 auto;
