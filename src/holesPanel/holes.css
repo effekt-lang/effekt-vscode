@@ -211,17 +211,7 @@ code {
   background: var(--highlight);
 }
 
-.exp-dropdown-toggle {
-  display: inline-block;
-  margin-right: 0.55em;
-  transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1);
-  font-size: 1.07em;
-  color: var(--accent);
-}
 
-.exp-dropdown-header.collapsed .exp-dropdown-toggle {
-  transform: rotate(-90deg);
-}
 
 .exp-dropdown-body {
   padding: 1em;
@@ -274,11 +264,7 @@ code {
   transition: background 0.15s;
 }
 
-.exp-dropdown-toggle {
-  margin-right: 0.55em;
-  font-size: 1.07em;
-  color: var(--accent);
-}
+
 
 .exp-dropdown-title {
   flex: 1 1 auto;

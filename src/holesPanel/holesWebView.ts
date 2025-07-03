@@ -42,7 +42,6 @@ export function generateWebView(
     return /*html*/ `
       <div class="exp-dropdown-section">
        <div class="exp-dropdown-header ${collapsedClass}" data-dropdown-toggle data-hole-id="${holeId}">
-          <span class="exp-dropdown-toggle">&#9660;</span>
           <span class="exp-dropdown-title">
             ${escapeHtml(title)}
             (<span data-filtered-count>${filteredCount}</span>/<span data-total-count>${totalCount}</span>)

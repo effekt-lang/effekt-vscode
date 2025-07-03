@@ -1,5 +1,4 @@
 import {
-  toggleDropdown,
   expandHole,
   togglePinState,
   updateAllHolesFromState,
@@ -68,13 +67,6 @@ function filterDropdownList(
   updateFilteredCount(listId, headerId, totalCountNumber);
 }
 
-function extendDropdownIfCollapsed(btn: HTMLElement): void {
-  const header = btn.closest('.exp-dropdown-header')!;
-  if (header.classList.contains('collapsed')) {
-    toggleDropdown(header as HTMLElement);
-  }
-}
-
 function toggleFilterBox(btn: HTMLElement): void {
   const body = btn
     .closest('.exp-dropdown-section')!
@@ -126,22 +118,16 @@ window.addEventListener(
     } else if (message.command === 'restoreHoleStates') {
       if (message.states) {
         window.holeStates = new Map(Object.entries(message.states));
+        console.log(
+          'restoreHoleStates',
+          Array.from(window.holeStates.entries()),
+        );
 
         updateAllHolesFromState();
       }
     }
   },
 );
-
-document.querySelectorAll('[data-dropdown-toggle]').forEach((btn) => {
-  btn.addEventListener('click', (event) => {
-    const target = event.target as HTMLElement;
-    if (target.closest('.exp-dropdown-actions')) {
-      return;
-    }
-    toggleDropdown(btn as HTMLElement);
-  });
-});
 
 document.querySelectorAll('[data-pin]').forEach((btn) => {
   btn.addEventListener('click', (event) => {
@@ -152,7 +138,7 @@ document.querySelectorAll('[data-pin]').forEach((btn) => {
 
 document.querySelectorAll('[data-search]').forEach((btn) => {
   btn.addEventListener('click', (event) => {
-    extendDropdownIfCollapsed(btn as HTMLElement);
+    //extendDropdownIfCollapsed(btn as HTMLElement);
     toggleFilterBox(btn as HTMLElement);
     event.stopPropagation();
   });
@@ -160,7 +146,7 @@ document.querySelectorAll('[data-search]').forEach((btn) => {
 
 document.querySelectorAll('[data-filter]').forEach((btn) => {
   btn.addEventListener('click', (event) => {
-    extendDropdownIfCollapsed(btn as HTMLElement);
+    //extendDropdownIfCollapsed(btn as HTMLElement);
     toggleFilterMenu(btn as HTMLElement);
     event.stopPropagation();
   });
