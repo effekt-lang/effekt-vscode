@@ -237,7 +237,8 @@ code {
 }
 
 .hole-card.highlighted {
-  border: 2px solid var(--vscode-editorSuggestWidget-highlightForeground, #007acc);
+  border: 2px solid
+    var(--vscode-editorSuggestWidget-highlightForeground, #007acc);
   background-color: rgba(0, 122, 204, 0.05);
 }
 
