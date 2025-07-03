@@ -8,6 +8,7 @@ import {
   BINDING_ORIGIN_DEFINED,
   BINDING_ORIGIN_IMPORTED,
   TermBinding,
+  SCOPE_KIND_NAMESPACE,
 } from './effektHoleInfo';
 import { escapeHtml } from './htmlUtil';
 
@@ -83,14 +84,16 @@ export function generateWebView(
   // Map scope label for display, with optional name in parentheses
   function scopeLabel(scope: ScopeInfo, imported: boolean): string {
     let label: string;
-    if (scope.kind === SCOPE_KIND_LOCAL) {
-      label = 'local';
-    } else if (scope.kind === SCOPE_KIND_GLOBAL && !imported) {
-      label = 'module';
-    } else if (scope.kind === SCOPE_KIND_GLOBAL && imported) {
-      label = 'imports';
-    } else {
-      label = escapeHtml(scope.kind);
+    switch (scope.kind) {
+      case SCOPE_KIND_GLOBAL:
+        label = imported ? 'imports' : 'module';
+        break;
+      case SCOPE_KIND_NAMESPACE:
+        label = 'namespace';
+        break;
+      case SCOPE_KIND_LOCAL:
+        label = 'local';
+        break;
     }
 
     if (scope.name) {
