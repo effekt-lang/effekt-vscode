@@ -237,8 +237,7 @@ code {
 }
 
 .hole-card.highlighted {
-  border: 2px solid
-    var(--vscode-editorSuggestWidget-highlightForeground, #007acc);
+  border: 2px solid var(--vscode-editorSuggestWidget-highlightForeground, #007acc);
   background-color: rgba(0, 122, 204, 0.05);
 }
 
@@ -255,9 +254,6 @@ code {
 .exp-dropdown-title {
   flex: 1 1 auto;
   color: var(--accent);
-  font-size: 1em;
-  letter-spacing: 0.01em;
-  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
@@ -265,17 +261,13 @@ code {
 .exp-dropdown-actions {
   display: flex;
   align-items: center;
-  gap: 0.05em;
-  margin-left: 0.5em;
+  gap: 0.1em;
 }
 
-.filter-toggle-btn {
+.action-toggle-btn {
   background: none;
   border: none;
   cursor: pointer;
-  font-size: 1em;
-  margin-left: 0.05em;
-  padding: 0.1em 0.1em;
   display: flex;
   align-items: center;
 }
