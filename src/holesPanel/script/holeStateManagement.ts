@@ -39,22 +39,6 @@ function closeNonPinnedHoles(exceptHoleId: string): void {
   });
 }
 
-export function toggleDropdown(header: HTMLElement): void {
-  const holeId = header.dataset.holeId!;
-  const state = getHoleState(holeId);
-  const wasCollapsed = header.classList.contains('collapsed');
-
-  if (wasCollapsed && !state.pinned) {
-    closeNonPinnedHoles(holeId);
-  }
-
-  header.classList.toggle('collapsed');
-  const body = header.nextElementSibling as HTMLElement;
-  body.classList.toggle('hidden');
-
-  state.expanded = !wasCollapsed;
-}
-
 export function togglePinState(btn: HTMLElement): void {
   const holeId = btn.dataset.holeId!;
   const state = getHoleState(holeId);
