@@ -122,6 +122,17 @@ export function expandHole(holeId: string): void {
   }
 }
 
+export function expandHoleForButton(btn: HTMLElement): void {
+  const section = btn.closest('.exp-dropdown-section');
+  if (section) {
+    const holeId = section
+      .closest('[data-hole-id]')
+      ?.getAttribute('data-hole-id');
+    if (holeId) {
+      expandHole(holeId);
+    }
+  }
+}
 export function updateAllHolesFromState() {
   document.querySelectorAll('[data-hole-id]').forEach((element) => {
     const holeId = (element as HTMLElement).dataset.holeId!;

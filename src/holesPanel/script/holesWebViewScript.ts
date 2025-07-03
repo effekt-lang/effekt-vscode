@@ -2,6 +2,7 @@ import {
   expandHole,
   togglePinState,
   updateAllHolesFromState,
+  expandHoleForButton,
 } from './holeStateManagement';
 
 declare function acquireVsCodeApi<T>(): {
@@ -9,7 +10,7 @@ declare function acquireVsCodeApi<T>(): {
 };
 
 interface NotifyMessage {
-  command: 'jumpToHole' | 'requestHoleStates';
+  command: 'jumpToHole';
   holeId?: string;
 }
 const vscode = acquireVsCodeApi<NotifyMessage>();
@@ -87,8 +88,6 @@ function toggleFilterMenu(btn: HTMLElement): void {
 }
 
 document.addEventListener('DOMContentLoaded', function (): void {
-  vscode.postMessage({ command: 'requestHoleStates' });
-
   updateAllHolesFromState();
 
   document.querySelectorAll('.exp-dropdown-body').forEach((body) => {
@@ -115,22 +114,13 @@ window.addEventListener(
       el.classList.add('highlighted');
       el.scrollIntoView({ behavior: 'smooth', block: 'center' });
       expandHole(holeId);
-    } else if (message.command === 'restoreHoleStates') {
-      if (message.states) {
-        window.holeStates = new Map(Object.entries(message.states));
-        console.log(
-          'restoreHoleStates',
-          Array.from(window.holeStates.entries()),
-        );
-
-        updateAllHolesFromState();
-      }
     }
   },
 );
 
 document.querySelectorAll('[data-pin]').forEach((btn) => {
   btn.addEventListener('click', (event) => {
+    expandHoleForButton(btn as HTMLElement);
     togglePinState(btn as HTMLElement);
     event.stopPropagation();
   });
@@ -138,7 +128,7 @@ document.querySelectorAll('[data-pin]').forEach((btn) => {
 
 document.querySelectorAll('[data-search]').forEach((btn) => {
   btn.addEventListener('click', (event) => {
-    //extendDropdownIfCollapsed(btn as HTMLElement);
+    expandHoleForButton(btn as HTMLElement);
     toggleFilterBox(btn as HTMLElement);
     event.stopPropagation();
   });
@@ -146,7 +136,7 @@ document.querySelectorAll('[data-search]').forEach((btn) => {
 
 document.querySelectorAll('[data-filter]').forEach((btn) => {
   btn.addEventListener('click', (event) => {
-    //extendDropdownIfCollapsed(btn as HTMLElement);
+    expandHoleForButton(btn as HTMLElement);
     toggleFilterMenu(btn as HTMLElement);
     event.stopPropagation();
   });

@@ -197,16 +197,6 @@ code {
   overflow: hidden;
 }
 
-.exp-dropdown-header {
-  display: flex;
-  align-items: center;
-  background: var(--code-bg);
-  font-weight: 600;
-  padding: 0.65em 1em;
-  cursor: pointer;
-  transition: background 0.15s;
-}
-
 .exp-dropdown-header:hover {
   background: var(--highlight);
 }
