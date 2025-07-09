@@ -4,7 +4,7 @@ import { EffektHoleInfo } from './effektHoleInfo';
 
 export interface HoleState {
   expanded: boolean;
-  // later extend with pinned
+  highlighted: boolean;
 }
 
 export class HolesViewProvider implements vscode.WebviewViewProvider {
