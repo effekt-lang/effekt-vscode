@@ -89,8 +89,6 @@ function toggleFilterMenu(btn: HTMLElement): void {
 }
 
 document.addEventListener('DOMContentLoaded', function (): void {
-  updateAllHolesFromState();
-
   document.querySelectorAll('.exp-dropdown-body').forEach((body) => {
     const filterBox = body.querySelector('.filter-box') as HTMLInputElement;
     const listId = (body.querySelector('.bindings-list') as HTMLElement).id;

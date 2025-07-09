@@ -1,23 +1,16 @@
 import { HoleState } from './holesViewProvider';
 
-// declare global is used to safely extend the global Window interface with custom properties
-declare global {
-  interface Window {
-    holeStates: Map<string, HoleState>;
-  }
-}
-
-window.holeStates = window.holeStates || new Map<string, HoleState>();
+const holeStates = new Map<string, HoleState>();
 
 function getHoleState(holeId: string): HoleState {
-  if (!window.holeStates.has(holeId)) {
-    window.holeStates.set(holeId, { expanded: false });
+  if (!holeStates.has(holeId)) {
+    holeStates.set(holeId, { expanded: false });
   }
-  return window.holeStates.get(holeId)!;
+  return holeStates.get(holeId)!;
 }
 
 function setHoleState(holeId: string, state: HoleState): void {
-  window.holeStates.set(holeId, state);
+  holeStates.set(holeId, state);
 }
 
 export function expandHole(holeId: string): void {
