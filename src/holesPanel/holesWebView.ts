@@ -26,7 +26,7 @@ export function generateWebView(
     kind,
     placeholder,
     itemsHtml,
-    expanded = false,
+    holeId,
   }: {
     title: string;
     totalCount: number;
@@ -35,14 +35,13 @@ export function generateWebView(
     kind: string;
     placeholder: string;
     itemsHtml: string;
-    expanded?: boolean;
+    holeId: string;
   }) {
-    // Set expanded by default for focused holes
-    const collapsedClass = expanded ? '' : 'collapsed';
-    const hiddenClass = expanded ? '' : 'hidden';
+    const collapsedClass = 'collapsed';
+    const hiddenClass = 'hidden';
     return /*html*/ `
       <div class="exp-dropdown-section">
-        <div class="exp-dropdown-header ${collapsedClass}" data-dropdown-toggle>
+       <div class="exp-dropdown-header ${collapsedClass}" data-dropdown-toggle data-hole-id="${holeId}">
           <span class="exp-dropdown-toggle">&#9660;</span>
           <span class="exp-dropdown-title">
             ${escapeHtml(title)}
@@ -216,7 +215,7 @@ export function generateWebView(
                  );
                  // Allow expanded for focused holes
                  return /*html*/ `
-          <section class="hole-card" id="hole-${escapeHtml(hole.id)}">
+          <section class="hole-card" id="hole-${escapeHtml(hole.id)}" data-hole-id="${escapeHtml(hole.id)}">
           <div class="hole-header" data-jump-hole-id="${escapeHtml(hole.id)}" style="cursor: pointer;">
               <span class="hole-id">Hole: ${escapeHtml(hole.id)}</span>
             </div>
@@ -242,7 +241,7 @@ export function generateWebView(
               kind: 'bindings',
               placeholder: 'Search bindings...',
               itemsHtml: bindingsHtml || '<span class="empty">None</span>',
-              expanded: false, // Will be toggled by focus event
+              holeId: hole.id,
             })}
             </div>
           </section>
