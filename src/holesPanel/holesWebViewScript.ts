@@ -1,6 +1,5 @@
 import {
   expandHole,
-  updateAllHolesFromState,
   expandHoleForButton,
   toggleHole,
 } from './holeStateManagement';

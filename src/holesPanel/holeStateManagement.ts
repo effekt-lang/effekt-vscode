@@ -50,16 +50,3 @@ function collapseHole(holeId: string): void {
 
   setHoleState(holeId, { ...currentState, expanded: false });
 }
-
-export function updateAllHolesFromState() {
-  document.querySelectorAll('[data-hole-id]').forEach((element) => {
-    const holeId = (element as HTMLElement).dataset.holeId!;
-    const state = getHoleState(holeId);
-
-    if (state.expanded) {
-      expandHole(holeId);
-    } else {
-      collapseHole(holeId);
-    }
-  });
-}
