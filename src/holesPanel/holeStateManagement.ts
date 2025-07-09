@@ -27,8 +27,6 @@ export function expandHole(holeId: string): void {
   ) as HTMLElement;
 
   header.classList.remove('collapsed');
-  const body = header.nextElementSibling as HTMLElement;
-  body.classList.remove('hidden');
   setHoleState(holeId, { ...currentState, expanded: true });
 }
 
@@ -56,8 +54,7 @@ function collapseHole(holeId: string): void {
   ) as HTMLElement;
 
   header.classList.add('collapsed');
-  const body = header.nextElementSibling as HTMLElement;
-  body.classList.add('hidden');
+
   setHoleState(holeId, { ...currentState, expanded: false });
 }
 
