@@ -25,7 +25,7 @@ async function main() {
       esbuildProblemMatcherPlugin,
       copyPlugin({
         assets: {
-          from: ['./src/holesPanel/holes.css'],
+          from: ['./src/holesPanel/webview/holes.css'],
           to: ['./holesPanel'],
         },
       }),
@@ -46,7 +46,7 @@ async function main() {
 
   // Compile scripts that run in the webview
   const webCtx = await esbuild.context({
-    entryPoints: ['src/holesPanel/holesWebViewScript.ts'],
+    entryPoints: ['src/holesPanel/webview/index.ts'],
     bundle: true,
     format: 'iife',
     platform: 'browser',

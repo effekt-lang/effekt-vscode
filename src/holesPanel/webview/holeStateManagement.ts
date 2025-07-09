@@ -1,4 +1,4 @@
-import { HoleState } from './holesViewProvider';
+import { HoleState } from './holeState';
 
 const holeStates = new Map<string, HoleState>();
 
