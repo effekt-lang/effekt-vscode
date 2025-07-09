@@ -4,7 +4,6 @@ import { HoleState } from './holesViewProvider';
 declare global {
   interface Window {
     holeStates: Map<string, HoleState>;
-    vscode: any;
   }
 }
 
