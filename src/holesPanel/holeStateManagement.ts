@@ -1,0 +1,52 @@
+import { HoleState } from './holesViewProvider';
+
+const holeStates = new Map<string, HoleState>();
+
+function getHoleState(holeId: string): HoleState {
+  if (!holeStates.has(holeId)) {
+    holeStates.set(holeId, { expanded: false });
+  }
+  return holeStates.get(holeId)!;
+}
+
+function setHoleState(holeId: string, state: HoleState): void {
+  holeStates.set(holeId, state);
+}
+
+export function expandHole(holeId: string): void {
+  const currentState = getHoleState(holeId);
+  const header = document.querySelector(
+    `[data-hole-id="${holeId}"].exp-dropdown-header`,
+  ) as HTMLElement;
+
+  header.classList.remove('collapsed');
+  setHoleState(holeId, { ...currentState, expanded: true });
+}
+
+export function expandHoleForButton(btn: HTMLElement): void {
+  const section = btn.closest('.exp-dropdown-section');
+  const holeId = section!
+    .closest('[data-hole-id]')!
+    .getAttribute('data-hole-id');
+  expandHole(holeId!);
+}
+
+export function toggleHole(holeId: string): void {
+  const state = getHoleState(holeId);
+  if (state.expanded) {
+    collapseHole(holeId);
+  } else {
+    expandHole(holeId);
+  }
+}
+
+function collapseHole(holeId: string): void {
+  const currentState = getHoleState(holeId);
+  const header = document.querySelector(
+    `[data-hole-id="${holeId}"].exp-dropdown-header`,
+  ) as HTMLElement;
+
+  header.classList.add('collapsed');
+
+  setHoleState(holeId, { ...currentState, expanded: false });
+}

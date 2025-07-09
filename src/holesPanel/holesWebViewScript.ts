@@ -1,10 +1,16 @@
+import {
+  expandHole,
+  expandHoleForButton,
+  toggleHole,
+} from './holeStateManagement';
+
 declare function acquireVsCodeApi<T>(): {
   postMessage(msg: T): void;
 };
 
 interface NotifyMessage {
   command: 'jumpToHole';
-  holeId: string;
+  holeId?: string;
 }
 const vscode = acquireVsCodeApi<NotifyMessage>();
 
@@ -62,20 +68,6 @@ function filterDropdownList(
   updateFilteredCount(listId, headerId, totalCountNumber);
 }
 
-function toggleDropdown(header: Element): void {
-  header.classList.toggle('collapsed');
-  const body = header.nextElementSibling as Element;
-  body!.classList.toggle('hidden');
-}
-
-// always extend the dropdown if it's collapsed
-function extendDropdownIfCollapsed(btn: HTMLElement): void {
-  const header = btn.closest('.exp-dropdown-header')!;
-  if (header.classList.contains('collapsed')) {
-    toggleDropdown(header);
-  }
-}
-
 function toggleFilterBox(btn: HTMLElement): void {
   const body = btn
     .closest('.exp-dropdown-section')!
@@ -96,7 +88,6 @@ function toggleFilterMenu(btn: HTMLElement): void {
 }
 
 document.addEventListener('DOMContentLoaded', function (): void {
-  // Trigger initial filter to update counts and hide imported
   document.querySelectorAll('.exp-dropdown-body').forEach((body) => {
     const filterBox = body.querySelector('.filter-box') as HTMLInputElement;
     const listId = (body.querySelector('.bindings-list') as HTMLElement).id;
@@ -110,34 +101,33 @@ document.addEventListener('DOMContentLoaded', function (): void {
 // Focus hole support: highlight and scroll to requested hole, and expand bindings
 window.addEventListener(
   'message',
-  function (event: MessageEvent<{ command: string; holeId: string }>): void {
+  function (
+    event: MessageEvent<{ command: string; holeId?: string; states?: any }>,
+  ): void {
     const message = event.data;
     if (message.command === 'highlightHole') {
-      const holeId: string = message.holeId;
+      const holeId: string = message.holeId!;
       const el = document.getElementById('hole-' + holeId)!;
       document
         .querySelectorAll('.hole-card')
         .forEach((e) => e.classList.remove('highlighted'));
       el.classList.add('highlighted');
       el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      // Expand bindings dropdown if collapsed
-      const bindingsHeader = el.querySelector(
-        '.exp-dropdown-header',
-      ) as Element;
-      if (bindingsHeader.classList.contains('collapsed')) {
-        toggleDropdown(bindingsHeader);
-      }
+      expandHole(holeId);
     }
   },
 );
 
 document.querySelectorAll('[data-dropdown-toggle]').forEach((btn) => {
-  btn.addEventListener('click', () => toggleDropdown(btn as HTMLElement));
+  btn.addEventListener('click', () => {
+    const holeId = (btn as HTMLElement).getAttribute('data-hole-id');
+    toggleHole(holeId!);
+  });
 });
 
 document.querySelectorAll('[data-search]').forEach((btn) => {
   btn.addEventListener('click', (event) => {
-    extendDropdownIfCollapsed(btn as HTMLElement);
+    expandHoleForButton(btn as HTMLElement);
     toggleFilterBox(btn as HTMLElement);
     event.stopPropagation();
   });
@@ -145,7 +135,7 @@ document.querySelectorAll('[data-search]').forEach((btn) => {
 
 document.querySelectorAll('[data-filter]').forEach((btn) => {
   btn.addEventListener('click', (event) => {
-    extendDropdownIfCollapsed(btn as HTMLElement);
+    expandHoleForButton(btn as HTMLElement);
     toggleFilterMenu(btn as HTMLElement);
     event.stopPropagation();
   });

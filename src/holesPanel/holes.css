@@ -207,6 +207,10 @@ code {
   transition: background 0.15s;
 }
 
+.exp-dropdown-header.collapsed ~ .exp-dropdown-body {
+  display: none;
+}
+
 .exp-dropdown-header:hover {
   background: var(--highlight);
 }
@@ -233,10 +237,6 @@ code {
 .exp-dropdown-body {
   padding: 1em;
   background: var(--background);
-}
-
-.exp-dropdown-body.hidden {
-  display: none;
 }
 
 .warning {
