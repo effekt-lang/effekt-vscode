@@ -22,7 +22,7 @@ export function setHoleState(holeId: string, state: HoleState): void {
 }
 
 export function expandHole(holeId: string): void {
-  const state = getHoleState(holeId);
+  const currentState = getHoleState(holeId);
   const header = document.querySelector(
     `[data-hole-id="${holeId}"].exp-dropdown-header`,
   ) as HTMLElement;
@@ -35,7 +35,7 @@ export function expandHole(holeId: string): void {
     header.classList.remove('collapsed');
     const body = header.nextElementSibling as HTMLElement;
     body.classList.remove('hidden');
-    state.expanded = true;
+    setHoleState(holeId, { ...currentState, expanded: true });
   }
 }
 
@@ -52,7 +52,7 @@ export function expandHoleForButton(btn: HTMLElement): void {
 }
 
 export function collapseHole(holeId: string): void {
-  const state = getHoleState(holeId);
+  const currentState = getHoleState(holeId);
   const header = document.querySelector(
     `[data-hole-id="${holeId}"].exp-dropdown-header`,
   ) as HTMLElement;
@@ -65,7 +65,7 @@ export function collapseHole(holeId: string): void {
     header.classList.add('collapsed');
     const body = header.nextElementSibling as HTMLElement;
     body.classList.add('hidden');
-    state.expanded = false;
+    setHoleState(holeId, { ...currentState, expanded: false });
   }
 }
 
@@ -78,7 +78,7 @@ export function updateAllHolesFromState() {
     if (element.classList.contains('exp-dropdown-header')) {
       const header = element as HTMLElement;
       const body = header.nextElementSibling as HTMLElement | null;
-      // Only expanded state is managed now
+
       if (state.expanded) {
         header.classList.remove('collapsed');
         if (body) {
@@ -89,7 +89,8 @@ export function updateAllHolesFromState() {
         if (body) {
           body.classList.add('hidden');
         }
-        state.expanded = false; // Sync state
+        // Ensure state is synced to false (if not already)
+        setHoleState(holeId, { ...state, expanded: false });
       }
     }
   });
