@@ -4,22 +4,35 @@ const holeStates = new Map<string, HoleState>();
 
 function getHoleState(holeId: string): HoleState {
   if (!holeStates.has(holeId)) {
-    holeStates.set(holeId, { expanded: false });
+    holeStates.set(holeId, { expanded: false, highlighted: false });
   }
   return holeStates.get(holeId)!;
 }
 
 function setHoleState(holeId: string, state: HoleState): void {
   holeStates.set(holeId, state);
+
+  const header = document.querySelector(
+    `[data-hole-id="${holeId}"].exp-dropdown-header`,
+  )! as HTMLElement;
+
+  if (state.expanded) {
+    header.classList.remove('collapsed');
+  } else {
+    header.classList.add('collapsed');
+  }
+
+  const card = document.getElementById('hole-' + holeId)!;
+  if (state.highlighted) {
+    card.classList.add('highlighted');
+    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  } else {
+    card.classList.remove('highlighted');
+  }
 }
 
 export function expandHole(holeId: string): void {
   const currentState = getHoleState(holeId);
-  const header = document.querySelector(
-    `[data-hole-id="${holeId}"].exp-dropdown-header`,
-  ) as HTMLElement;
-
-  header.classList.remove('collapsed');
   setHoleState(holeId, { ...currentState, expanded: true });
 }
 
@@ -42,11 +55,15 @@ export function toggleHole(holeId: string): void {
 
 function collapseHole(holeId: string): void {
   const currentState = getHoleState(holeId);
-  const header = document.querySelector(
-    `[data-hole-id="${holeId}"].exp-dropdown-header`,
-  ) as HTMLElement;
-
-  header.classList.add('collapsed');
-
   setHoleState(holeId, { ...currentState, expanded: false });
+}
+
+export function highlightHole(holeId: string): void {
+  holeStates.forEach((state, id) => {
+    if (state.highlighted) {
+      setHoleState(id, { ...state, highlighted: false });
+    }
+  });
+  const currentState = getHoleState(holeId);
+  setHoleState(holeId, { ...currentState, highlighted: true });
 }
