@@ -25,7 +25,7 @@ function setHoleState(holeId: string, state: HoleState): void {
   const card = document.getElementById('hole-' + holeId)!;
   if (state.highlighted) {
     card.classList.add('highlighted');
-    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    card.scrollIntoView({ behavior: 'smooth', block: 'start' });
   } else {
     card.classList.remove('highlighted');
   }
