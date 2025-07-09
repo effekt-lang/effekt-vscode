@@ -115,7 +115,7 @@ export async function activate(context: vscode.ExtensionContext) {
     await ensureEffektIsAvailable();
     await initializeLSPAndProviders(context);
 
-    await handleEffektUpdates();
+    handleEffektUpdates(); // Do not await handleEffektUpdates() so the holes panel and LSP features load immediately, even if the update prompt is open.
   } catch (error) {
     if (error instanceof EffektExecutableNotFoundError) {
       // If Effekt is not installed, we prompt the user to install it
