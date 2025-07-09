@@ -66,20 +66,10 @@ export function updateAllHolesFromState() {
     const holeId = (element as HTMLElement).dataset.holeId!;
     const state = getHoleState(holeId);
 
-    // Update expanded/collapsed state
-    if (element.classList.contains('exp-dropdown-header')) {
-      const header = element as HTMLElement;
-      const body = header.nextElementSibling as HTMLElement;
-
-      if (state.expanded) {
-        header.classList.remove('collapsed');
-        body.classList.remove('hidden');
-      } else {
-        header.classList.add('collapsed');
-        body.classList.add('hidden');
-        // Ensure state is synced to false (if not already)
-        setHoleState(holeId, { ...state, expanded: false });
-      }
+    if (state.expanded) {
+      expandHole(holeId);
+    } else {
+      collapseHole(holeId);
     }
   });
 }
