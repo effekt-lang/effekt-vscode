@@ -10,14 +10,14 @@ declare global {
 
 window.holeStates = window.holeStates || new Map<string, HoleState>();
 
-export function getHoleState(holeId: string): HoleState {
+function getHoleState(holeId: string): HoleState {
   if (!window.holeStates.has(holeId)) {
     window.holeStates.set(holeId, { expanded: false });
   }
   return window.holeStates.get(holeId)!;
 }
 
-export function setHoleState(holeId: string, state: HoleState): void {
+function setHoleState(holeId: string, state: HoleState): void {
   window.holeStates.set(holeId, state);
 }
 
@@ -51,7 +51,16 @@ export function expandHoleForButton(btn: HTMLElement): void {
   }
 }
 
-export function collapseHole(holeId: string): void {
+export function toggleHole(holeId: string): void {
+  const state = getHoleState(holeId);
+  if (state.expanded) {
+    collapseHole(holeId);
+  } else {
+    expandHole(holeId);
+  }
+}
+
+function collapseHole(holeId: string): void {
   const currentState = getHoleState(holeId);
   const header = document.querySelector(
     `[data-hole-id="${holeId}"].exp-dropdown-header`,
