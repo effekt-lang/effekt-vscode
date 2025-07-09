@@ -1,6 +1,7 @@
 import {
   expandHole,
   expandHoleForButton,
+  highlightHole,
   toggleHole,
 } from './holeStateManagement';
 
@@ -107,12 +108,7 @@ window.addEventListener(
     const message = event.data;
     if (message.command === 'highlightHole') {
       const holeId: string = message.holeId!;
-      const el = document.getElementById('hole-' + holeId)!;
-      document
-        .querySelectorAll('.hole-card')
-        .forEach((e) => e.classList.remove('highlighted'));
-      el.classList.add('highlighted');
-      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      highlightHole(holeId);
       expandHole(holeId);
     }
   },
