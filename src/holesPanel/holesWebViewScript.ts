@@ -121,9 +121,7 @@ window.addEventListener(
 document.querySelectorAll('[data-dropdown-toggle]').forEach((btn) => {
   btn.addEventListener('click', () => {
     const holeId = (btn as HTMLElement).getAttribute('data-hole-id');
-    if (holeId) {
-      toggleHole(holeId);
-    }
+    toggleHole(holeId!);
   });
 });
 
