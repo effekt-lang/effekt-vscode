@@ -26,12 +26,10 @@ export function expandHole(holeId: string): void {
     `[data-hole-id="${holeId}"].exp-dropdown-header`,
   ) as HTMLElement;
 
-  if (header.classList.contains('collapsed')) {
-    header.classList.remove('collapsed');
-    const body = header.nextElementSibling as HTMLElement;
-    body.classList.remove('hidden');
-    setHoleState(holeId, { ...currentState, expanded: true });
-  }
+  header.classList.remove('collapsed');
+  const body = header.nextElementSibling as HTMLElement;
+  body.classList.remove('hidden');
+  setHoleState(holeId, { ...currentState, expanded: true });
 }
 
 export function expandHoleForButton(btn: HTMLElement): void {
@@ -57,12 +55,10 @@ function collapseHole(holeId: string): void {
     `[data-hole-id="${holeId}"].exp-dropdown-header`,
   ) as HTMLElement;
 
-  if (!header.classList.contains('collapsed')) {
-    header.classList.add('collapsed');
-    const body = header.nextElementSibling as HTMLElement;
-    body.classList.add('hidden');
-    setHoleState(holeId, { ...currentState, expanded: false });
-  }
+  header.classList.add('collapsed');
+  const body = header.nextElementSibling as HTMLElement;
+  body.classList.add('hidden');
+  setHoleState(holeId, { ...currentState, expanded: false });
 }
 
 export function updateAllHolesFromState() {
