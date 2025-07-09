@@ -17,6 +17,10 @@ export function getHoleState(holeId: string): HoleState {
   return window.holeStates.get(holeId)!;
 }
 
+export function setHoleState(holeId: string, state: HoleState): void {
+  window.holeStates.set(holeId, state);
+}
+
 export function expandHole(holeId: string): void {
   const state = getHoleState(holeId);
   const header = document.querySelector(
@@ -46,6 +50,25 @@ export function expandHoleForButton(btn: HTMLElement): void {
     }
   }
 }
+
+export function collapseHole(holeId: string): void {
+  const state = getHoleState(holeId);
+  const header = document.querySelector(
+    `[data-hole-id="${holeId}"].exp-dropdown-header`,
+  ) as HTMLElement;
+
+  if (!header) {
+    return;
+  }
+
+  if (!header.classList.contains('collapsed')) {
+    header.classList.add('collapsed');
+    const body = header.nextElementSibling as HTMLElement;
+    body.classList.add('hidden');
+    state.expanded = false;
+  }
+}
+
 export function updateAllHolesFromState() {
   document.querySelectorAll('[data-hole-id]').forEach((element) => {
     const holeId = (element as HTMLElement).dataset.holeId!;
