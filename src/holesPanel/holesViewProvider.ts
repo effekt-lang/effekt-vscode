@@ -2,11 +2,6 @@ import * as vscode from 'vscode';
 import { generateWebView } from './holesWebView';
 import { EffektHoleInfo } from './effektHoleInfo';
 
-export interface HoleState {
-  expanded: boolean;
-  highlighted: boolean;
-}
-
 export class HolesViewProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = 'effekt.holesView';
   private webviewView?: vscode.WebviewView;
