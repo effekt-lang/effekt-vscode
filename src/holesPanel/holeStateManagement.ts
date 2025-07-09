@@ -27,10 +27,6 @@ export function expandHole(holeId: string): void {
     `[data-hole-id="${holeId}"].exp-dropdown-header`,
   ) as HTMLElement;
 
-  if (!header) {
-    return;
-  }
-
   if (header.classList.contains('collapsed')) {
     header.classList.remove('collapsed');
     const body = header.nextElementSibling as HTMLElement;
@@ -41,14 +37,10 @@ export function expandHole(holeId: string): void {
 
 export function expandHoleForButton(btn: HTMLElement): void {
   const section = btn.closest('.exp-dropdown-section');
-  if (section) {
-    const holeId = section
-      .closest('[data-hole-id]')
-      ?.getAttribute('data-hole-id');
-    if (holeId) {
-      expandHole(holeId);
-    }
-  }
+  const holeId = section!
+    .closest('[data-hole-id]')!
+    .getAttribute('data-hole-id');
+  expandHole(holeId!);
 }
 
 export function toggleHole(holeId: string): void {
@@ -66,10 +58,6 @@ function collapseHole(holeId: string): void {
     `[data-hole-id="${holeId}"].exp-dropdown-header`,
   ) as HTMLElement;
 
-  if (!header) {
-    return;
-  }
-
   if (!header.classList.contains('collapsed')) {
     header.classList.add('collapsed');
     const body = header.nextElementSibling as HTMLElement;
@@ -86,18 +74,14 @@ export function updateAllHolesFromState() {
     // Update expanded/collapsed state
     if (element.classList.contains('exp-dropdown-header')) {
       const header = element as HTMLElement;
-      const body = header.nextElementSibling as HTMLElement | null;
+      const body = header.nextElementSibling as HTMLElement;
 
       if (state.expanded) {
         header.classList.remove('collapsed');
-        if (body) {
-          body.classList.remove('hidden');
-        }
+        body.classList.remove('hidden');
       } else {
         header.classList.add('collapsed');
-        if (body) {
-          body.classList.add('hidden');
-        }
+        body.classList.add('hidden');
         // Ensure state is synced to false (if not already)
         setHoleState(holeId, { ...state, expanded: false });
       }
