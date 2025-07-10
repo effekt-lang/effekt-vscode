@@ -32,44 +32,33 @@ pre {
   background: var(--section-bg);
   border: 1.5px solid var(--border);
   border-radius: var(--radius);
-  margin-bottom: 2.25rem;
+  margin-bottom: 2rem;
   padding: 1.5rem;
 }
 
 .hole-header {
   display: flex;
   align-items: center;
-  padding-bottom: 0.7rem;
+  padding-bottom: 0.75rem;
   border-bottom: 1.5px solid var(--border);
-  margin-bottom: 1.1rem;
+  margin-bottom: 1rem;
 }
 
 .hole-id {
   font-family: var(--font-mono);
-  font-size: 1.13rem;
+  font-size: 1.125srem;
   font-weight: 700;
   color: var(--accent);
 }
 
-.hole-range {
-  margin-left: auto;
-  font-size: 0.97rem;
-  color: var(--foreground);
-  background: var(--highlight);
-  border-radius: 5px;
-  padding: 0.19em 0.8em;
-  font-weight: 500;
-}
-
 .hole-field {
-  margin: 0.72em 0;
-  font-size: 1.02em;
+  margin: 0.75em 0;
 }
 
 .field-label {
   color: var(--accent);
   font-weight: 600;
-  margin-right: 0.2em;
+  margin-right: 0.25em;
 }
 
 .field-value {
@@ -81,14 +70,13 @@ pre {
   display: flex;
   flex-direction: column;
   gap: 0.25em;
-  margin: 0.2em 0 0.55em 0;
+  margin: 0.2em 0 0.5em 0;
 }
 
 .binding {
   background: var(--code-bg);
-  border-radius: 5px;
-  padding: 0.14em 0.8em 0.14em 0.6em;
-  font-size: 0.98em;
+  border-radius: var(--radius);
+  padding: 0.25rem 0.75rem;
   border: 1px solid var(--border);
   color: var(--foreground);
 }
@@ -99,11 +87,11 @@ pre {
 }
 
 .binding-type {
-  color: var(--type);
+  color: var(--foreground);
 }
 
 .codicon {
-  color: var(--foreground, inherit);
+  color: var(--foreground);
 }
 
 .empty {
@@ -116,28 +104,25 @@ pre {
 .empty .desc {
   display: block;
   color: var(--foreground);
-  font-size: 0.98em;
-  margin-top: 0.3em;
+  margin-top: 0.25em;
   font-weight: 400;
 }
 
 code {
   background: var(--code-bg);
   border-radius: 4px;
-  padding: 0.12em 0.38em;
-  font-size: 0.98em;
+  padding: 0.125rem 0.375rem;
 }
 
 .filter-box {
   width: 100%;
-  padding: 0.36em 0.64em;
-  margin: 0.28em 0;
+  padding: 0.375rem 0.625rem;
+  margin: 0.25em 0;
   border: 1px solid var(--border);
   border-radius: 5px;
-  font-size: 0.97em;
   background: var(--background);
   color: var(--foreground);
-  transition: border 0.15s;
+  transition: border 0.2s ease;
 }
 
 .filter-box:focus {
@@ -182,9 +167,9 @@ code {
   align-items: center;
   background: var(--code-bg);
   font-weight: 600;
-  padding: 0.65em 1em;
+  padding: 0.625em 1em;
   cursor: pointer;
-  transition: background 0.15s;
+  transition: background 0.2s ease;
 }
 
 .bindings-header.collapsed ~ .bindings-body {
@@ -197,9 +182,8 @@ code {
 
 .bindings-toggle {
   display: inline-block;
-  margin-right: 0.55em;
-  transition: transform 0.22s ease;
-  font-size: 1.07em;
+  margin-right: 0.5em;
+  transition: transform 0.2s ease;
   color: var(--accent);
 }
 
@@ -208,7 +192,7 @@ code {
 }
 
 .bindings-title {
-  flex: 1 1 auto;
+  flex: 1;
   color: var(--accent);
   font-size: 1em;
 }
@@ -219,13 +203,12 @@ code {
 }
 
 .warning {
-  background: #fffae6;
-  color: #a67c00;
-  border: 1px solid #ffe58f;
-  padding: 0.7em 1em;
+  background: var(--vscode-inputValidation-warningBackground);
+  color: var(--vscode-inputValidation-warningForeground);
+  border: 1px solid var(--vscode-inputValidation-warningBorder);
+  padding: 0.75rem 1rem;
   border-radius: 4px;
-  margin-bottom: 1em;
-  font-size: 1em;
+  margin-bottom: 1rem;
 }
 
 .filter-toggle-btn {
@@ -240,7 +223,6 @@ code {
   background: var(--code-bg, #eee);
   border-radius: 4px;
   padding: 0.25em 0.5em;
-  font-size: 0.95em;
 }
 
 .filter-menu label {
