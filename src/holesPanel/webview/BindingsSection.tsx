@@ -7,6 +7,8 @@ import {
   TermBinding,
 } from '../effektHoleInfo';
 import { ScopeGroup } from './ScopeGroup';
+import { FilterMenu } from './FilterMenu';
+import { FilterBox } from './FilterBox';
 
 interface BindingsSectionProps {
   scope?: ScopeInfo;
@@ -91,32 +93,15 @@ export const BindingsSection: React.FC<BindingsSectionProps> = ({
       {expanded && (
         <div className="bindings-body">
           {filterMenuOpen && (
-            <div className="filter-menu" style={{ marginBottom: '0.5em' }}>
-              <label>
-                <input
-                  type="checkbox"
-                  checked={showDefined}
-                  onChange={(e) => setShowDefined(e.target.checked)}
-                />{' '}
-                Defined
-              </label>
-              <label>
-                <input
-                  type="checkbox"
-                  checked={showImported}
-                  onChange={(e) => setShowImported(e.target.checked)}
-                />{' '}
-                Imported
-              </label>
-            </div>
+            <FilterMenu
+              showDefined={showDefined}
+              showImported={showImported}
+              onToggleDefined={setShowDefined}
+              onToggleImported={setShowImported}
+            />
           )}
           {filterBoxOpen && (
-            <input
-              className="filter-box"
-              placeholder="Search bindings..."
-              value={filter}
-              onChange={(e) => setFilter(e.target.value)}
-            />
+            <FilterBox filter={filter} onFilterChange={setFilter} />
           )}
           <div
             className="bindings-list"
