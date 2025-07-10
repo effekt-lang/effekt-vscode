@@ -94,7 +94,6 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
 
   public updateHoles(holes: EffektHoleInfo[]) {
     this.holes = holes;
-    console.log('updateHoles called with', holes);
     this.webviewView?.webview.postMessage({
       command: 'updateHoles',
       holes: holes,
