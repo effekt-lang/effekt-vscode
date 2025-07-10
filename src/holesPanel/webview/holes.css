@@ -67,7 +67,6 @@ pre {
   font-size: 1.13rem;
   font-weight: 700;
   color: var(--accent);
-  letter-spacing: 0.02em;
 }
 
 .hole-range {
@@ -89,7 +88,6 @@ pre {
   color: var(--accent);
   font-weight: 600;
   margin-right: 0.2em;
-  letter-spacing: 0.01em;
 }
 
 .field-value {
@@ -231,7 +229,6 @@ code {
   flex: 1 1 auto;
   color: var(--accent);
   font-size: 1em;
-  letter-spacing: 0.01em;
 }
 
 .bindings-body {
