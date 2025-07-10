@@ -2,13 +2,11 @@ import React, { useState, useMemo } from 'react';
 import {
   ScopeInfo,
   BindingInfo,
-  TermBinding,
-  SCOPE_KIND_GLOBAL,
-  SCOPE_KIND_NAMESPACE,
   BINDING_ORIGIN_DEFINED,
   BINDING_ORIGIN_IMPORTED,
+  TermBinding,
 } from '../effektHoleInfo';
-import { BindingItem } from './BindingItem';
+import { ScopeGroup } from './ScopeGroup';
 
 interface BindingsSectionProps {
   scope?: ScopeInfo;
@@ -124,38 +122,14 @@ export const BindingsSection: React.FC<BindingsSectionProps> = ({
             className="bindings-list"
             id={`bindings-dropdown-list-${holeId}`}
           >
-            {collectScopes(scope).map((s, si) => {
-              const defined = s.bindings.filter(
-                (b) => b.origin === BINDING_ORIGIN_DEFINED,
-              );
-              const imported = s.bindings.filter(
-                (b) => b.origin === BINDING_ORIGIN_IMPORTED,
-              );
-
-              const renderList = (list: BindingInfo[]) =>
-                list
-                  .filter((b) => filteredBindings.includes(b))
-                  .map((b, bi) => (
-                    <BindingItem binding={b} key={`${s.kind}-${si}-${bi}`} />
-                  ));
-
-              if (![...renderList(defined), ...renderList(imported)].length) {
-                return null;
-              }
-
-              return (
-                <div className="scope-group" key={si}>
-                  {defined.some((b) => filteredBindings.includes(b)) && (
-                    <div className="scope-label">{scopeLabel(s, false)}</div>
-                  )}
-                  {renderList(defined)}
-                  {imported.some((b) => filteredBindings.includes(b)) && (
-                    <div className="scope-label">{scopeLabel(s, true)}</div>
-                  )}
-                  {renderList(imported)}
-                </div>
-              );
-            })}
+            {collectScopes(scope).map((s, si) => (
+              <ScopeGroup
+                key={si}
+                scope={s}
+                filteredBindings={filteredBindings}
+                groupIndex={si}
+              />
+            ))}
           </div>
         </div>
       )}
@@ -171,23 +145,4 @@ function collectScopes(scope?: ScopeInfo): ScopeInfo[] {
     current = current.outer;
   }
   return scopes;
-}
-
-function scopeLabel(scope: ScopeInfo, imported: boolean): string {
-  let label: string;
-  switch (scope.kind) {
-    case SCOPE_KIND_GLOBAL:
-      label = imported ? 'imports' : 'module';
-      break;
-    case SCOPE_KIND_NAMESPACE:
-      label = 'namespace';
-      break;
-    default:
-      label = 'local';
-      break;
-  }
-  if (scope.name) {
-    label += ` (${scope.name})`;
-  }
-  return label;
 }
