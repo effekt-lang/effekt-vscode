@@ -44,9 +44,9 @@ async function main() {
     ],
   });
 
-  // Compile React-based webview (HolesPanel.tsx)
+  // Compile React-based webview
   const webCtx = await esbuild.context({
-    entryPoints: ['src/holesPanel/webview/HolesPanel.tsx'],
+    entryPoints: ['src/holesPanel/webview/index.tsx'],
     bundle: true,
     format: 'iife',
     platform: 'browser',
@@ -55,6 +55,7 @@ async function main() {
       '.ts': 'ts',
       '.tsx': 'tsx',
     },
+    jsx: 'automatic',
     define: {
       'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'production')
     },

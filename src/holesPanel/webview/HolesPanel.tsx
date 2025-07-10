@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { createRoot } from 'react-dom/client';
 import { EffektHoleInfo } from '../effektHoleInfo';
 import { HoleCard } from './HoleCard';
 
@@ -45,7 +44,7 @@ const Warning: React.FC = () => (
   </div>
 );
 
-const HolesPanel: React.FC<{ initShowHoles: boolean }> = ({
+export const HolesPanel: React.FC<{ initShowHoles: boolean }> = ({
   initShowHoles,
 }) => {
   const [holes, setHoles] = useState<EffektHoleInfo[]>([]);
@@ -93,10 +92,3 @@ const HolesPanel: React.FC<{ initShowHoles: boolean }> = ({
     </div>
   );
 };
-
-const container = document.getElementById('react-root');
-if (!container) {
-  throw new Error('Root container missing');
-}
-const showHoles = container.dataset.showHoles === 'true';
-createRoot(container).render(<HolesPanel initShowHoles={showHoles} />);
