@@ -1,6 +1,5 @@
 :root {
   --radius: 8px;
-  --shadow: 0 4px 24px rgba(27, 31, 35, 0.06);
   --font:
     'Inter', 'Segoe UI', system-ui, 'Roboto', 'Helvetica Neue', Arial,
     'Noto Sans', sans-serif;
@@ -14,18 +13,14 @@ body {
   color: var(--foreground);
   font-family: var(--font);
   margin: 0;
-  padding: 0;
+  padding: 0 8px;
   --background: var(--vscode-editor-background);
   --foreground: var(--vscode-editor-foreground);
   --accent: var(--vscode-textLink-foreground);
   --border: var(--vscode-editorWidget-border);
   --section-bg: var(--vscode-sideBar-background);
-  --section-border: var(--vscode-editorWidget-border);
   --code-bg: var(--vscode-editorGutter-background);
-  --term: var(--vscode-editor-foreground);
-  --type: var(--vscode-editor-foreground);
   --highlight: var(--vscode-editor-selectionHighlightBackground);
-  --muted: var(--vscode-editor-foreground);
 }
 
 code,
@@ -33,129 +28,101 @@ pre {
   font-family: var(--font-mono);
 }
 
-.container {
-  max-width: 680px;
-  margin: 0 auto;
-  padding: 0 1.25rem;
-  padding-top: 0;
-}
-
 .hole-card {
   background: var(--section-bg);
-  border: 1.5px solid var(--section-border);
+  border: 1.5px solid var(--border);
   border-radius: var(--radius);
-  margin-bottom: 2.25rem;
-  box-shadow: var(--shadow);
-  padding: 1.7rem 1.5rem 1.15rem 1.5rem;
-  transition: box-shadow 0.15s;
-}
-
-.hole-card:hover {
-  box-shadow: 0 8px 32px rgba(27, 31, 35, 0.11);
+  margin-bottom: 32px;
+  padding: 16px;
 }
 
 .hole-header {
   display: flex;
   align-items: center;
-  padding-bottom: 0.7rem;
+  padding-bottom: 12px;
   border-bottom: 1.5px solid var(--border);
-  margin-bottom: 1.1rem;
+  margin-bottom: 16px;
 }
 
 .hole-id {
-  font-family: monospace;
-  font-size: 1.13rem;
+  font-family: var(--font-mono);
+  font-size: 1.125rem;
   font-weight: 700;
   color: var(--accent);
 }
 
-.hole-range {
-  margin-left: auto;
-  font-size: 0.97rem;
-  color: var(--muted);
-  background: var(--highlight);
-  border-radius: 5px;
-  padding: 0.19em 0.8em;
-  font-weight: 500;
-}
-
 .hole-field {
-  margin: 0.72em 0;
-  font-size: 1.02em;
+  margin: 12px 0;
 }
 
 .field-label {
   color: var(--accent);
   font-weight: 600;
-  margin-right: 0.2em;
+  margin-right: 4px;
 }
 
 .field-value {
-  font-family: monospace;
+  font-family: var(--font-mono);
   color: var(--foreground);
 }
 
 .bindings-list {
   display: flex;
   flex-direction: column;
-  gap: 0.25em;
-  margin: 0.2em 0 0.55em 0;
+  gap: 4px;
+  margin: 4px 0 8px 0;
 }
 
 .binding {
   background: var(--code-bg);
-  border-radius: 5px;
-  padding: 0.14em 0.8em 0.14em 0.6em;
-  font-size: 0.98em;
-  border: 1px solid var(--section-border);
+  border-radius: var(--radius);
+  padding: 4px 12px;
+  border: 1px solid var(--border);
   color: var(--foreground);
 }
 
 .binding-term {
-  color: var(--term);
+  color: var(--foreground);
   font-weight: bold;
 }
 
 .binding-type {
-  color: var(--type);
+  color: var(--foreground);
 }
 
 .codicon {
-  color: var(--term, inherit);
+  color: var(--foreground);
 }
 
 .empty {
   color: var(--foreground);
   font-style: normal;
   font-weight: 500;
-  margin-bottom: 0.5em;
+  margin-bottom: 8px;
 }
 
 .empty .desc {
   display: block;
   color: var(--foreground);
-  font-size: 0.98em;
-  margin-top: 0.3em;
+  margin-top: 4px;
   font-weight: 400;
 }
 
 code {
   background: var(--code-bg);
   border-radius: 4px;
-  padding: 0.12em 0.38em;
-  font-size: 0.98em;
+  padding: 2px 6px;
 }
 
 .filter-box {
   width: 100%;
-  padding: 0.36em 0.64em;
-  margin: 0.28em 0;
+  padding: 6px 10px;
+  margin: 4px 0;
   border: 1px solid var(--border);
-  border-radius: 5px;
-  font-size: 0.97em;
+  border-radius: 4px;
   background: var(--background);
   color: var(--foreground);
-  transition: border 0.15s;
+  transition: border 0.2s ease;
 }
 
 .filter-box:focus {
@@ -166,16 +133,16 @@ code {
 .expected-type-alert {
   background-color: var(--highlight);
   border: 1px solid var(--border);
-  border-radius: 0.375rem;
-  padding: 0.75em 1em;
-  margin-bottom: 0.75rem;
+  border-radius: 4px;
+  padding: 12px 16px;
+  margin-bottom: 12px;
 }
 
 .expected-type-alert-title {
   font-size: 0.75rem;
   font-weight: 600;
   color: var(--accent);
-  margin-bottom: 0.125rem;
+  margin-bottom: 2px;
 }
 
 .expected-type-alert-desc {
@@ -184,13 +151,13 @@ code {
 }
 
 .indented-field {
-  padding-left: 1em;
+  padding-left: 16px;
 }
 
 .bindings-section {
-  border: 1.5px solid var(--section-border);
+  border: 1.5px solid var(--border);
   border-radius: var(--radius);
-  margin-bottom: 1.25rem;
+  margin-bottom: 20px;
   background: var(--section-bg);
   overflow: hidden;
 }
@@ -200,9 +167,9 @@ code {
   align-items: center;
   background: var(--code-bg);
   font-weight: 600;
-  padding: 0.65em 1em;
+  padding: 10px 16px;
   cursor: pointer;
-  transition: background 0.15s;
+  transition: background 0.2s ease;
 }
 
 .bindings-header.collapsed ~ .bindings-body {
@@ -215,9 +182,8 @@ code {
 
 .bindings-toggle {
   display: inline-block;
-  margin-right: 0.55em;
-  transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1);
-  font-size: 1.07em;
+  margin-right: 8px;
+  transition: transform 0.2s ease;
   color: var(--accent);
 }
 
@@ -226,24 +192,23 @@ code {
 }
 
 .bindings-title {
-  flex: 1 1 auto;
+  flex: 1;
   color: var(--accent);
   font-size: 1em;
 }
 
 .bindings-body {
-  padding: 1em;
+  padding: 16px;
   background: var(--background);
 }
 
 .warning {
-  background: #fffae6;
-  color: #a67c00;
-  border: 1px solid #ffe58f;
-  padding: 0.7em 1em;
+  background: var(--vscode-inputValidation-warningBackground);
+  color: var(--vscode-inputValidation-warningForeground);
+  border: 1px solid var(--vscode-inputValidation-warningBorder);
+  padding: 12px 16px;
   border-radius: 4px;
-  margin-bottom: 1em;
-  font-size: 1em;
+  margin-bottom: 16px;
 }
 
 .filter-toggle-btn {
@@ -251,22 +216,17 @@ code {
   border: none;
   cursor: pointer;
   font-size: 1em;
-  margin-left: 0.5em;
-}
-
-.filter-box {
-  margin-bottom: 0.5em;
+  margin-left: 8px;
 }
 
 .filter-menu {
   background: var(--code-bg, #eee);
   border-radius: 4px;
-  padding: 0.25em 0.5em;
-  font-size: 0.95em;
+  padding: 4px 8px;
 }
 
 .filter-menu label {
-  margin-right: 1em;
+  margin-right: 16px;
   user-select: none;
 }
 
