@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+  BINDING_KIND_TERM,
   BindingInfo,
   fullyQualifiedName,
   TermBinding,
@@ -13,11 +14,11 @@ export const BindingItem: React.FC<BindingItemProps> = ({ binding }) => {
   return (
     <div className="binding">
       <span className="binding-term">
-        {binding.kind === 'Term'
+        {binding.kind === BINDING_KIND_TERM
           ? fullyQualifiedName(binding as TermBinding)
           : binding.definition || binding.name}
       </span>
-      {binding.kind === 'Term' && (binding as TermBinding).type && (
+      {binding.kind === BINDING_KIND_TERM && (binding as TermBinding).type && (
         <span className="binding-type">: {(binding as TermBinding).type}</span>
       )}
     </div>

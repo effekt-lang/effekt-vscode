@@ -6,6 +6,7 @@ import {
   BINDING_ORIGIN_IMPORTED,
   TermBinding,
   fullyQualifiedName,
+  BINDING_KIND_TERM,
 } from '../effektHoleInfo';
 import { ScopeGroup } from './ScopeGroup';
 import { FilterMenu } from './FilterMenu';
@@ -40,7 +41,7 @@ export const BindingsSection: React.FC<BindingsSectionProps> = ({
   const filteredBindings = useMemo(() => {
     return allBindings.filter((b) => {
       const text =
-        b.kind === 'Term'
+        b.kind === BINDING_KIND_TERM
           ? fullyQualifiedName(b as TermBinding) +
             ((b as TermBinding).type ? `: ${(b as TermBinding).type}` : '')
           : b.definition || b.name;
