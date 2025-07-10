@@ -29,7 +29,7 @@ export const BindingsSection: React.FC<BindingsSectionProps> = ({
   const [filterBoxOpen, setFilterBoxOpen] = useState(false);
 
   const allBindings = useMemo(() => {
-    const scopes = collectScopes(scope);
+    const scopes = flattenScopes(scope);
     return scopes.reduce<BindingInfo[]>((acc, s) => {
       return acc.concat(
         s.bindings.filter((b) => b.origin === BINDING_ORIGIN_DEFINED),
@@ -107,7 +107,7 @@ export const BindingsSection: React.FC<BindingsSectionProps> = ({
             className="bindings-list"
             id={`bindings-dropdown-list-${holeId}`}
           >
-            {collectScopes(scope).map((s, si) => (
+            {flattenScopes(scope).map((s, si) => (
               <ScopeGroup
                 key={si}
                 scope={s}
@@ -122,7 +122,7 @@ export const BindingsSection: React.FC<BindingsSectionProps> = ({
   );
 };
 
-function collectScopes(scope?: ScopeInfo): ScopeInfo[] {
+function flattenScopes(scope?: ScopeInfo): ScopeInfo[] {
   const scopes: ScopeInfo[] = [];
   let current = scope;
   while (current) {
