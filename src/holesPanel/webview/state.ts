@@ -1,3 +1,7 @@
+import {
+  BINDING_ORIGIN_DEFINED,
+  BINDING_ORIGIN_IMPORTED,
+} from '../effektHoleInfo';
 import { updateHoleView } from './view';
 
 export interface HoleState {
@@ -6,6 +10,15 @@ export interface HoleState {
   showDefined: boolean;
   showImported: boolean;
   filter: string;
+}
+
+export function showOrigin(state: HoleState, origin: string): boolean {
+  if (origin === BINDING_ORIGIN_DEFINED) {
+    return state.showDefined;
+  } else if (origin === BINDING_ORIGIN_IMPORTED) {
+    return state.showImported;
+  }
+  return true;
 }
 
 const holeStates = new Map<string, HoleState>();

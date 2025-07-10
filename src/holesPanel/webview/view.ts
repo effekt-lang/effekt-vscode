@@ -10,7 +10,7 @@ import {
   SCOPE_KIND_NAMESPACE,
 } from '../effektHoleInfo';
 import { escapeHtml } from '../htmlUtil';
-import { HoleState } from './state';
+import { HoleState, showOrigin } from './state';
 
 export function renderHolesPanel(holes: EffektHoleInfo[]) {
   const holesList = document.querySelector('[data-holes-list]') as HTMLElement;
@@ -244,40 +244,17 @@ export function updateHoleView(holeId: string, state: HoleState): void {
 
   filterInput.value = state.filter;
 
-  filterDropdownList(holeId);
+  filterDropdownList(holeId, state);
 }
 
-function updateFilteredCount(holeId: string): void {
-  const list = document.getElementById(`bindings-dropdown-list-${holeId}`)!;
-  const totalCount: number = list.querySelectorAll('.binding').length;
-
-  const visible: number = list.querySelectorAll(
-    '.binding:not([style*="display: none"])',
-  ).length;
-  const header = document.querySelector(
-    `[data-dropdown-toggle][data-hole-id="${holeId}"]`,
-  )!;
-  const filteredSpan = header.querySelector('[data-filtered-count]')!;
-  const totalSpan = header.querySelector('[data-total-count]')!;
-  filteredSpan.textContent = String(visible);
-  totalSpan.textContent = String(totalCount);
-}
-
-function filterDropdownList(holeId: string): void {
-  const input = document.querySelector<HTMLInputElement>(
-    `[data-filter-box][data-hole-id="${holeId}"]`,
-  )!;
-  const filter: string = input.value.toLowerCase();
-  const parent = input.closest('.exp-dropdown-body') as Element;
-  const origins: string[] = Array.from(
-    parent.querySelectorAll('.filter-origin:checked'),
-  ).map((cb) => (cb as HTMLInputElement).value);
+function filterDropdownList(holeId: string, state: HoleState): void {
+  const filter: string = state.filter.toLowerCase();
   const list = document.getElementById(`bindings-dropdown-list-${holeId}`)!;
   const items: NodeListOf<HTMLElement> = list.querySelectorAll('.binding');
   items.forEach((item) => {
     const text: string = item.textContent!.toLowerCase();
     const origin: string = item.getAttribute('data-origin')!;
-    const show: boolean = text.includes(filter) && origins.includes(origin);
+    const show: boolean = text.includes(filter) && showOrigin(state, origin);
     item.style.display = show ? '' : 'none';
   });
 
@@ -294,6 +271,22 @@ function filterDropdownList(holeId: string): void {
   });
 
   updateFilteredCount(holeId);
+}
+
+function updateFilteredCount(holeId: string): void {
+  const list = document.getElementById(`bindings-dropdown-list-${holeId}`)!;
+  const totalCount: number = list.querySelectorAll('.binding').length;
+
+  const visible: number = list.querySelectorAll(
+    '.binding:not([style*="display: none"])',
+  ).length;
+  const header = document.querySelector(
+    `[data-dropdown-toggle][data-hole-id="${holeId}"]`,
+  )!;
+  const filteredSpan = header.querySelector('[data-filtered-count]')!;
+  const totalSpan = header.querySelector('[data-total-count]')!;
+  filteredSpan.textContent = String(visible);
+  totalSpan.textContent = String(totalCount);
 }
 
 export function toggleFilterBox(btn: HTMLElement): void {
