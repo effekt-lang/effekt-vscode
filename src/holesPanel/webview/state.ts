@@ -63,7 +63,7 @@ export function expandHole(holeId: string): void {
 }
 
 export function expandHoleForButton(btn: HTMLElement): void {
-  const section = btn.closest('.exp-dropdown-section');
+  const section = btn.closest('.bindings-section');
   const holeId = section!
     .closest('[data-hole-id]')!
     .getAttribute('data-hole-id');

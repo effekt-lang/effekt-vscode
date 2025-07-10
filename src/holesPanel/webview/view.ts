@@ -49,10 +49,10 @@ function renderHolesList(holes: EffektHoleInfo[]): string {
     const collapsedClass = 'collapsed';
     const hiddenClass = 'hidden';
     return /*html*/ `
-      <div class="exp-dropdown-section">
-       <div class="exp-dropdown-header ${collapsedClass}" data-dropdown-toggle data-hole-id="${holeId}">
-          <span class="exp-dropdown-toggle">&#9660;</span>
-          <span class="exp-dropdown-title">
+      <div class="bindings-section">
+       <div class="bindings-header ${collapsedClass}" data-dropdown-toggle data-hole-id="${holeId}">
+          <span class="bindings-toggle">&#9660;</span>
+          <span class="bindings-title">
             ${escapeHtml(title)}
             (  <span data-filtered-count>${filteredCount}</span>
         /
@@ -61,7 +61,7 @@ function renderHolesList(holes: EffektHoleInfo[]): string {
           <button class="filter-toggle-btn" title="Search" data-search><i class="codicon codicon-search"></i></button>
           <button class="filter-toggle-btn" title="Filter" data-filter><i class="codicon codicon-filter"></i></button>
         </div>
-        <div class="exp-dropdown-body ${hiddenClass}">
+        <div class="bindings-body ${hiddenClass}">
           <div class="filter-menu" style="display:none; margin-bottom: 0.5em;">
             <label><input type="checkbox" class="filter-origin" data-filter-origin data-hole-id="${escapeHtml(holeId)}" value="Defined" checked> Defined</label>
             <label><input type="checkbox" class="filter-origin" data-filter-origin data-hole-id="${escapeHtml(holeId)}" value="Imported"> Imported</label>
@@ -69,7 +69,7 @@ function renderHolesList(holes: EffektHoleInfo[]): string {
           <input class="filter-box" style="display:none" placeholder="${escapeHtml(placeholder)}"
             data-filter-box
             data-hole-id="${escapeHtml(holeId)}" />
-          <div class="bindings-list exp-dropdown-list" id="bindings-dropdown-list-${holeId}">
+          <div class="bindings-list" id="bindings-dropdown-list-${holeId}">
             ${itemsHtml}
           </div>
         </div>
@@ -210,7 +210,7 @@ function renderHolesList(holes: EffektHoleInfo[]): string {
 
 export function updateHoleView(holeId: string, state: HoleState): void {
   const header = document.querySelector(
-    `[data-hole-id="${holeId}"].exp-dropdown-header`,
+    `[data-hole-id="${holeId}"].bindings-header`,
   )! as HTMLElement;
 
   if (state.expanded) {
@@ -291,8 +291,8 @@ function updateFilteredCount(holeId: string): void {
 
 export function toggleFilterBox(btn: HTMLElement): void {
   const body = btn
-    .closest('.exp-dropdown-section')!
-    .querySelector('.exp-dropdown-body') as Element;
+    .closest('.bindings-section')!
+    .querySelector('.bindings-body') as Element;
   const filterBox = body.querySelector('.filter-box') as HTMLElement;
   filterBox.style.display = filterBox.style.display === 'none' ? '' : 'none';
   if (filterBox.style.display !== 'none') {
@@ -302,8 +302,8 @@ export function toggleFilterBox(btn: HTMLElement): void {
 
 export function toggleFilterMenu(btn: HTMLElement): void {
   const body = btn
-    .closest('.exp-dropdown-section')!
-    .querySelector('.exp-dropdown-body') as Element;
+    .closest('.bindings-section')!
+    .querySelector('.bindings-body') as Element;
   const filterMenu = body.querySelector('.filter-menu') as HTMLElement;
   filterMenu.style.display = filterMenu.style.display === 'none' ? '' : 'none';
 }
