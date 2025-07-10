@@ -1,5 +1,9 @@
 import React from 'react';
-import { BindingInfo, TermBinding } from '../effektHoleInfo';
+import {
+  BindingInfo,
+  fullyQualifiedName,
+  TermBinding,
+} from '../effektHoleInfo';
 
 interface BindingItemProps {
   binding: BindingInfo;
@@ -10,9 +14,7 @@ export const BindingItem: React.FC<BindingItemProps> = ({ binding }) => {
     <div className="binding">
       <span className="binding-term">
         {binding.kind === 'Term'
-          ? [(binding as TermBinding).qualifier, (binding as TermBinding).name]
-              .flat()
-              .join('::')
+          ? fullyQualifiedName(binding as TermBinding)
           : binding.definition || binding.name}
       </span>
       {binding.kind === 'Term' && (binding as TermBinding).type && (

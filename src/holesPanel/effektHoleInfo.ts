@@ -30,6 +30,10 @@ export interface TypeBinding {
   kind: typeof BINDING_KIND_TYPE;
 }
 
+export function fullyQualifiedName(binding: TermBinding | TypeBinding): string {
+  return [...binding.qualifier, binding.name].join('::');
+}
+
 export type ScopeKind =
   | typeof SCOPE_KIND_NAMESPACE
   | typeof SCOPE_KIND_LOCAL

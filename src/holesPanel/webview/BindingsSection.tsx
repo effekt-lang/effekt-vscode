@@ -5,6 +5,7 @@ import {
   BINDING_ORIGIN_DEFINED,
   BINDING_ORIGIN_IMPORTED,
   TermBinding,
+  fullyQualifiedName,
 } from '../effektHoleInfo';
 import { ScopeGroup } from './ScopeGroup';
 import { FilterMenu } from './FilterMenu';
@@ -40,9 +41,7 @@ export const BindingsSection: React.FC<BindingsSectionProps> = ({
     return allBindings.filter((b) => {
       const text =
         b.kind === 'Term'
-          ? [...(b as TermBinding).qualifier, (b as TermBinding).name]
-              .flatMap((x, i) => (i > 0 ? ['::', x] : [x]))
-              .join('') +
+          ? fullyQualifiedName(b as TermBinding) +
             ((b as TermBinding).type ? `: ${(b as TermBinding).type}` : '')
           : b.definition || b.name;
       const originOk =
