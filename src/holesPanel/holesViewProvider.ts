@@ -5,6 +5,7 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = 'effekt.holesView';
   private webviewView?: vscode.WebviewView;
   private holes: EffektHoleInfo[] = [];
+  private configListener?: vscode.Disposable;
 
   constructor(private readonly context: vscode.ExtensionContext) {}
 
@@ -66,6 +67,19 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
       jsUri,
       codiconUri,
     );
+
+    this.configListener = vscode.workspace.onDidChangeConfiguration((e) => {
+      if (e.affectsConfiguration('effekt.showHoles')) {
+        const updated =
+          vscode.workspace
+            .getConfiguration('effekt')
+            .get<boolean>('showHoles') || false;
+        this.webviewView?.webview.postMessage({
+          command: 'setShowHoles',
+          show: updated,
+        });
+      }
+    });
 
     webviewView.webview.onDidReceiveMessage((message) => {
       if (message.command === 'jumpToHole') {
@@ -130,41 +144,25 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
       }
     }
 
-    if (found && this.webviewView) {
-      this.webviewView.webview.postMessage({
+    if (found) {
+      this.webviewView?.webview.postMessage({
         command: 'highlightHole',
         holeId: found.id,
       });
     }
   }
+
+  dispose() {
+    this.configListener?.dispose();
+  }
 }
 
-function webviewHtml(
+export function webviewHtml(
   showHoles: boolean,
   cssUri: vscode.Uri,
   jsUri: vscode.Uri,
   codiconUri: vscode.Uri,
 ): string {
-  const holesPanelDesc = /* html */ `
-    <div class="desc" data-holes-panel-desc>
-      This panel shows information about the types and terms in scope for each typed hole.
-      Holes are placeholders for missing code used for type-driven development.
-      You can create a hole using the <code>&lt;&gt;</code> syntax.
-      For example, you can write a definition without a right-hand side as follows:
-      <pre>def foo() = &lt;&gt;</pre><br/>
-      Use <code>&lt;{ x }&gt;</code> in order to fill in a hole with a statement or expression <code>x</code>, for example:
-      <pre>def foo() = &lt;{ println("foo"); 42 }&gt;</pre>
-    </div>
-  `;
-
-  const showHolesWarning = /*html*/ `
-    <div class="empty">
-      <div class="warning">
-        <b>Warning:</b> The Holes Panel requires the setting <b>Extension &gt; Effekt &gt; Show Holes</b> to be enabled to function.
-      </div>
-      ${holesPanelDesc}
-    </div>`;
-
   return /*html*/ `
 <!DOCTYPE html>
 <html lang="en">
@@ -180,9 +178,7 @@ function webviewHtml(
 <body>
 	<div class="container">
     <h1>Effekt Holes</h1>
-    ${!showHoles ? showHolesWarning : ''}
-    <div data-holes-list></div>
-    ${holesPanelDesc}
+    <div id="react-root" data-show-holes="${showHoles}"></div>
   </div>
 	<script src="${jsUri}"></script>
 </body>
