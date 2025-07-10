@@ -176,10 +176,8 @@ export function webviewHtml(
 </head>
 
 <body>
-	<div class="container">
-    <h1>Effekt Holes</h1>
-    <div id="react-root" data-show-holes="${showHoles}"></div>
-  </div>
+  <h1>Effekt Holes</h1>
+  <div id="react-root" data-show-holes="${showHoles}"></div>
 	<script src="${jsUri}"></script>
 </body>
 

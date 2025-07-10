@@ -1,6 +1,5 @@
 :root {
   --radius: 8px;
-  --shadow: 0 4px 24px rgba(27, 31, 35, 0.06);
   --font:
     'Inter', 'Segoe UI', system-ui, 'Roboto', 'Helvetica Neue', Arial,
     'Noto Sans', sans-serif;
@@ -14,7 +13,7 @@ body {
   color: var(--foreground);
   font-family: var(--font);
   margin: 0;
-  padding: 0;
+  padding: 0 1.25rem;
   --background: var(--vscode-editor-background);
   --foreground: var(--vscode-editor-foreground);
   --accent: var(--vscode-textLink-foreground);
@@ -31,13 +30,6 @@ body {
 code,
 pre {
   font-family: var(--font-mono);
-}
-
-.container {
-  max-width: 680px;
-  margin: 0 auto;
-  padding: 0 1.25rem;
-  padding-top: 0;
 }
 
 .hole-card {
