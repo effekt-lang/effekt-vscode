@@ -13,18 +13,14 @@ body {
   color: var(--foreground);
   font-family: var(--font);
   margin: 0;
-  padding: 0 1.25rem;
+  padding: 0 1.25em;
   --background: var(--vscode-editor-background);
   --foreground: var(--vscode-editor-foreground);
   --accent: var(--vscode-textLink-foreground);
   --border: var(--vscode-editorWidget-border);
   --section-bg: var(--vscode-sideBar-background);
-  --section-border: var(--vscode-editorWidget-border);
   --code-bg: var(--vscode-editorGutter-background);
-  --term: var(--vscode-editor-foreground);
-  --type: var(--vscode-editor-foreground);
   --highlight: var(--vscode-editor-selectionHighlightBackground);
-  --muted: var(--vscode-editor-foreground);
 }
 
 code,
@@ -34,7 +30,7 @@ pre {
 
 .hole-card {
   background: var(--section-bg);
-  border: 1.5px solid var(--section-border);
+  border: 1.5px solid var(--border);
   border-radius: var(--radius);
   margin-bottom: 2.25rem;
   box-shadow: var(--shadow);
@@ -64,7 +60,7 @@ pre {
 .hole-range {
   margin-left: auto;
   font-size: 0.97rem;
-  color: var(--muted);
+  color: var(--foreground);
   background: var(--highlight);
   border-radius: 5px;
   padding: 0.19em 0.8em;
@@ -99,12 +95,12 @@ pre {
   border-radius: 5px;
   padding: 0.14em 0.8em 0.14em 0.6em;
   font-size: 0.98em;
-  border: 1px solid var(--section-border);
+  border: 1px solid var(--border);
   color: var(--foreground);
 }
 
 .binding-term {
-  color: var(--term);
+  color: var(--foreground);
   font-weight: bold;
 }
 
@@ -113,7 +109,7 @@ pre {
 }
 
 .codicon {
-  color: var(--term, inherit);
+  color: var(--foreground, inherit);
 }
 
 .empty {
@@ -180,7 +176,7 @@ code {
 }
 
 .bindings-section {
-  border: 1.5px solid var(--section-border);
+  border: 1.5px solid var(--border);
   border-radius: var(--radius);
   margin-bottom: 1.25rem;
   background: var(--section-bg);
