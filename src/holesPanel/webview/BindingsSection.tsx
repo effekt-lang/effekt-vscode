@@ -74,6 +74,9 @@ export const BindingsSection: React.FC<BindingsSectionProps> = ({
           title="Search"
           onClick={(e) => {
             e.stopPropagation();
+            if (!expanded) {
+              setExpanded(true);
+            }
             setFilterBoxOpen((f) => !f);
           }}
         >
@@ -84,6 +87,9 @@ export const BindingsSection: React.FC<BindingsSectionProps> = ({
           title="Filter"
           onClick={(e) => {
             e.stopPropagation();
+            if (!expanded) {
+              setExpanded(true);
+            }
             setFilterMenuOpen((m) => !m);
           }}
         >
