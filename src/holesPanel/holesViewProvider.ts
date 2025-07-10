@@ -1,11 +1,11 @@
 import * as vscode from 'vscode';
-import { generateWebView } from './holesWebView';
 import { EffektHoleInfo } from './effektHoleInfo';
 
 export class HolesViewProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = 'effekt.holesView';
   private webviewView?: vscode.WebviewView;
   private holes: EffektHoleInfo[] = [];
+  private configListener?: vscode.Disposable;
 
   constructor(private readonly context: vscode.ExtensionContext) {}
 
@@ -45,6 +45,8 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
   }
 
   resolveWebviewView(webviewView: vscode.WebviewView) {
+    this.webviewView = webviewView;
+
     webviewView.webview.options = {
       enableScripts: true,
       localResourceRoots: [
@@ -52,15 +54,32 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
       ],
     };
 
-    const cssUri = this.getCssUri();
-    const jsUri = this.getJsUri();
-    const codiconUri = this.getCodiconUri();
+    const showHoles =
+      vscode.workspace.getConfiguration('effekt').get<boolean>('showHoles') ||
+      false;
+    const cssUri = this.getCssUri()!;
+    const jsUri = this.getJsUri()!;
+    const codiconUri = this.getCodiconUri()!;
 
-    if (cssUri && jsUri && codiconUri) {
-      webviewView.webview.html = generateWebView([], cssUri, jsUri, codiconUri); // initially empty
-    }
+    webviewView.webview.html = webviewHtml(
+      showHoles,
+      cssUri,
+      jsUri,
+      codiconUri,
+    );
 
-    this.webviewView = webviewView;
+    this.configListener = vscode.workspace.onDidChangeConfiguration((e) => {
+      if (e.affectsConfiguration('effekt.showHoles')) {
+        const updated =
+          vscode.workspace
+            .getConfiguration('effekt')
+            .get<boolean>('showHoles') || false;
+        this.webviewView?.webview.postMessage({
+          command: 'setShowHoles',
+          show: updated,
+        });
+      }
+    });
 
     webviewView.webview.onDidReceiveMessage((message) => {
       if (message.command === 'jumpToHole') {
@@ -89,21 +108,10 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
 
   public updateHoles(holes: EffektHoleInfo[]) {
     this.holes = holes;
-    if (!this.webviewView) {
-      return;
-    }
-    const cssUri = this.getCssUri();
-    const jsUri = this.getJsUri();
-    const codiconUri = this.getCodiconUri();
-
-    if (cssUri && jsUri && codiconUri) {
-      this.webviewView.webview.html = generateWebView(
-        holes,
-        cssUri,
-        jsUri,
-        codiconUri,
-      );
-    }
+    this.webviewView?.webview.postMessage({
+      command: 'updateHoles',
+      holes: holes,
+    });
   }
 
   public focusHoles(pos: vscode.Position) {
@@ -136,11 +144,45 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
       }
     }
 
-    if (found && this.webviewView) {
-      this.webviewView.webview.postMessage({
+    if (found) {
+      this.webviewView?.webview.postMessage({
         command: 'highlightHole',
         holeId: found.id,
       });
     }
   }
+
+  dispose() {
+    this.configListener?.dispose();
+  }
+}
+
+export function webviewHtml(
+  showHoles: boolean,
+  cssUri: vscode.Uri,
+  jsUri: vscode.Uri,
+  codiconUri: vscode.Uri,
+): string {
+  return /*html*/ `
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8" />
+	<title>Effekt Holes</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link href="${codiconUri}" rel="stylesheet" />
+	<link href="${cssUri}" rel="stylesheet">
+</head>
+
+<body>
+	<div class="container">
+    <h1>Effekt Holes</h1>
+    <div id="react-root" data-show-holes="${showHoles}"></div>
+  </div>
+	<script src="${jsUri}"></script>
+</body>
+
+</html>
+  `;
 }

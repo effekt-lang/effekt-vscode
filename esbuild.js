@@ -25,32 +25,40 @@ async function main() {
       esbuildProblemMatcherPlugin,
       copyPlugin({
         assets: {
-          from: ['./src/holesPanel/webview/holes.css'],
-          to: ['./holesPanel'],
+          from: ['src/holesPanel/webview/holes.css'],
+          to: ['holesPanel'],
         },
       }),
       copyPlugin({
         assets: {
-          from: ['./node_modules/@vscode/codicons/dist/codicon.css'],
-          to: ['./holesPanel'],
+          from: ['node_modules/@vscode/codicons/dist/codicon.css'],
+          to: ['holesPanel'],
         },
       }),
       copyPlugin({
         assets: {
-          from: ['./node_modules/@vscode/codicons/dist/codicon.ttf'],
-          to: ['./holesPanel'],
+          from: ['node_modules/@vscode/codicons/dist/codicon.ttf'],
+          to: ['holesPanel'],
         },
       }),
     ],
   });
 
-  // Compile scripts that run in the webview
+  // Compile React-based webview
   const webCtx = await esbuild.context({
-    entryPoints: ['src/holesPanel/webview/index.ts'],
+    entryPoints: ['src/holesPanel/webview/index.tsx'],
     bundle: true,
     format: 'iife',
     platform: 'browser',
     target: ['es2020'],
+    loader: {
+      '.ts': 'ts',
+      '.tsx': 'tsx',
+    },
+    jsx: 'automatic',
+    define: {
+      'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'production')
+    },
     outfile: 'dist/holesPanel/holes.js',
     minify: false,
     sourcemap: false,
@@ -78,9 +86,7 @@ const esbuildProblemMatcherPlugin = {
     build.onEnd((result) => {
       result.errors.forEach(({ text, location }) => {
         console.error(`✘ [ERROR] ${text}`);
-        console.error(
-          `    ${location.file}:${location.line}:${location.column}:`,
-        );
+        console.error(`    ${location.file}:${location.line}:${location.column}:`);
       });
       console.log('[watch] build finished');
     });

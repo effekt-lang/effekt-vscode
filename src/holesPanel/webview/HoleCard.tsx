@@ -1,0 +1,56 @@
+import React, { useEffect, useRef } from 'react';
+import { EffektHoleInfo } from '../effektHoleInfo';
+import { BindingsSection } from './BindingsSection';
+
+interface HoleCardProps {
+  hole: EffektHoleInfo;
+  highlighted: boolean;
+  onJump: (id: string) => void;
+}
+
+export const HoleCard: React.FC<HoleCardProps> = ({
+  hole,
+  highlighted,
+  onJump,
+}) => {
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (highlighted) {
+      cardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [highlighted]);
+
+  return (
+    <section
+      ref={cardRef}
+      className={`hole-card${highlighted ? ' highlighted' : ''}`}
+      id={`hole-${hole.id}`}
+    >
+      <div
+        className="hole-header"
+        onClick={() => onJump(hole.id)}
+        style={{ cursor: 'pointer' }}
+      >
+        <span className="hole-id">Hole: {hole.id}</span>
+      </div>
+      <div className="expected-type-alert">
+        <div className="expected-type-alert-title">Expected Type</div>
+        <div className="expected-type-alert-desc">
+          {hole.expectedType || <span className="empty">N/A</span>}
+        </div>
+      </div>
+      <div className="hole-field indented-field">
+        <span className="field-label">Inner type:</span>
+        <span className="field-value">
+          {hole.innerType ? (
+            <code>{hole.innerType}</code>
+          ) : (
+            <span className="empty">N/A</span>
+          )}
+        </span>
+      </div>
+      <BindingsSection scope={hole.scope} holeId={hole.id} />
+    </section>
+  );
+};
