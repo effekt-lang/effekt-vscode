@@ -33,13 +33,7 @@ pre {
   border: 1.5px solid var(--border);
   border-radius: var(--radius);
   margin-bottom: 2.25rem;
-  box-shadow: var(--shadow);
   padding: 1.7rem 1.5rem 1.15rem 1.5rem;
-  transition: box-shadow 0.15s;
-}
-
-.hole-card:hover {
-  box-shadow: 0 8px 32px rgba(27, 31, 35, 0.11);
 }
 
 .hole-header {
