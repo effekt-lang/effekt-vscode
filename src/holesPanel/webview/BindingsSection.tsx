@@ -8,6 +8,7 @@ import {
   BINDING_ORIGIN_DEFINED,
   BINDING_ORIGIN_IMPORTED,
 } from '../effektHoleInfo';
+import { BindingItem } from './BindingItem';
 
 interface BindingsSectionProps {
   scope?: ScopeInfo;
@@ -130,25 +131,12 @@ export const BindingsSection: React.FC<BindingsSectionProps> = ({
               const imported = s.bindings.filter(
                 (b) => b.origin === BINDING_ORIGIN_IMPORTED,
               );
+
               const renderList = (list: BindingInfo[]) =>
                 list
                   .filter((b) => filteredBindings.includes(b))
                   .map((b, bi) => (
-                    <div className="binding" key={`${s.kind}-${si}-${bi}`}>
-                      <span className="binding-term">
-                        {b.kind === 'Term'
-                          ? [
-                              ...(b as TermBinding).qualifier,
-                              (b as TermBinding).name,
-                            ].join('::')
-                          : b.definition || b.name}
-                      </span>
-                      {b.kind === 'Term' && (b as TermBinding).type && (
-                        <span className="binding-type">
-                          : {(b as TermBinding).type}
-                        </span>
-                      )}
-                    </div>
+                    <BindingItem binding={b} key={`${s.kind}-${si}-${bi}`} />
                   ));
 
               if (![...renderList(defined), ...renderList(imported)].length) {
