@@ -1,5 +1,4 @@
 import * as vscode from 'vscode';
-import { generateWebView } from './holesWebView';
 import { EffektHoleInfo } from './effektHoleInfo';
 
 export class HolesViewProvider implements vscode.WebviewViewProvider {
@@ -45,6 +44,8 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
   }
 
   resolveWebviewView(webviewView: vscode.WebviewView) {
+    this.webviewView = webviewView;
+
     webviewView.webview.options = {
       enableScripts: true,
       localResourceRoots: [
@@ -52,15 +53,19 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
       ],
     };
 
-    const cssUri = this.getCssUri();
-    const jsUri = this.getJsUri();
-    const codiconUri = this.getCodiconUri();
+    const showHoles =
+      vscode.workspace.getConfiguration('effekt').get<boolean>('showHoles') ||
+      false;
+    const cssUri = this.getCssUri()!;
+    const jsUri = this.getJsUri()!;
+    const codiconUri = this.getCodiconUri()!;
 
-    if (cssUri && jsUri && codiconUri) {
-      webviewView.webview.html = generateWebView([], cssUri, jsUri, codiconUri); // initially empty
-    }
-
-    this.webviewView = webviewView;
+    webviewView.webview.html = webviewHtml(
+      showHoles,
+      cssUri,
+      jsUri,
+      codiconUri,
+    );
 
     webviewView.webview.onDidReceiveMessage((message) => {
       if (message.command === 'jumpToHole') {
@@ -89,21 +94,11 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
 
   public updateHoles(holes: EffektHoleInfo[]) {
     this.holes = holes;
-    if (!this.webviewView) {
-      return;
-    }
-    const cssUri = this.getCssUri();
-    const jsUri = this.getJsUri();
-    const codiconUri = this.getCodiconUri();
-
-    if (cssUri && jsUri && codiconUri) {
-      this.webviewView.webview.html = generateWebView(
-        holes,
-        cssUri,
-        jsUri,
-        codiconUri,
-      );
-    }
+    console.log('updateHoles called with', holes);
+    this.webviewView?.webview.postMessage({
+      command: 'updateHoles',
+      holes: holes,
+    });
   }
 
   public focusHoles(pos: vscode.Position) {
@@ -143,4 +138,56 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
       });
     }
   }
+}
+
+function webviewHtml(
+  showHoles: boolean,
+  cssUri: vscode.Uri,
+  jsUri: vscode.Uri,
+  codiconUri: vscode.Uri,
+): string {
+  const holesPanelDesc = /* html */ `
+    <div class="desc" data-holes-panel-desc>
+      This panel shows information about the types and terms in scope for each typed hole.
+      Holes are placeholders for missing code used for type-driven development.
+      You can create a hole using the <code>&lt;&gt;</code> syntax.
+      For example, you can write a definition without a right-hand side as follows:
+      <pre>def foo() = &lt;&gt;</pre><br/>
+      Use <code>&lt;{ x }&gt;</code> in order to fill in a hole with a statement or expression <code>x</code>, for example:
+      <pre>def foo() = &lt;{ println("foo"); 42 }&gt;</pre>
+    </div>
+  `;
+
+  const showHolesWarning = /*html*/ `
+    <div class="empty">
+      <div class="warning">
+        <b>Warning:</b> The Holes Panel requires the setting <b>Extension &gt; Effekt &gt; Show Holes</b> to be enabled to function.
+      </div>
+      ${holesPanelDesc}
+    </div>`;
+
+  return /*html*/ `
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8" />
+	<title>Effekt Holes</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link href="${codiconUri}" rel="stylesheet" />
+	<link href="${cssUri}" rel="stylesheet">
+</head>
+
+<body>
+	<div class="container">
+    <h1>Effekt Holes</h1>
+    ${!showHoles ? showHolesWarning : ''}
+    <div data-holes-list></div>
+    ${holesPanelDesc}
+  </div>
+	<script src="${jsUri}"></script>
+</body>
+
+</html>
+  `;
 }
