@@ -19,7 +19,7 @@ export const BindingItem: React.FC<BindingItemProps> = ({ binding }) => {
           : binding.definition || binding.name}
       </span>
       {binding.kind === BINDING_KIND_TERM && (binding as TermBinding).type && (
-        <span className="binding-type">: {(binding as TermBinding).type}</span>
+        <span>: {(binding as TermBinding).type}</span>
       )}
     </div>
   );

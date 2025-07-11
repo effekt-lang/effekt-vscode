@@ -74,7 +74,7 @@ export const HolesPanel: React.FC<{ initShowHoles: boolean }> = ({
   }, []);
 
   return (
-    <div data-holes-panel>
+    <div className="holes-list">
       {!showHoles && <Warning />}
       {holes.length === 0 ? (
         <div className="empty">There are no holes in this file.</div>

@@ -13,7 +13,7 @@ export const FilterMenu: React.FC<FilterMenuProps> = ({
   onToggleDefined,
   onToggleImported,
 }) => (
-  <div className="filter-menu" style={{ marginBottom: '0.5em' }}>
+  <div className="filter-menu">
     <label>
       <input
         type="checkbox"

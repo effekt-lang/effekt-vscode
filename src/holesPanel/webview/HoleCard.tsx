@@ -34,22 +34,18 @@ export const HoleCard: React.FC<HoleCardProps> = ({
       >
         <span className="hole-id">Hole: {hole.id}</span>
       </div>
-      <div className="expected-type-alert">
-        <div className="expected-type-alert-title">Expected Type</div>
-        <div className="expected-type-alert-desc">
-          {hole.expectedType || <span className="empty">N/A</span>}
+      {hole.expectedType && (
+        <div className="hole-field">
+          <span className="field-label">Expected Type:</span>
+          <span className="field-value">{hole.expectedType}</span>
         </div>
-      </div>
-      <div className="hole-field indented-field">
-        <span className="field-label">Inner type:</span>
-        <span className="field-value">
-          {hole.innerType ? (
-            <code>{hole.innerType}</code>
-          ) : (
-            <span className="empty">N/A</span>
-          )}
-        </span>
-      </div>
+      )}
+      {hole.innerType && (
+        <div className="hole-field">
+          <span className="field-label">Inner type:</span>
+          <span className="field-value">{hole.innerType}</span>
+        </div>
+      )}
       <BindingsSection scope={hole.scope} holeId={hole.id} />
     </section>
   );
