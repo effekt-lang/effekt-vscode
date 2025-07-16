@@ -143,7 +143,7 @@ code {
 }
 
 .bindings-body {
-  padding: 4px 8px;
+  padding: 2px 8px;
   background: var(--background);
   display: flex;
   flex-direction: column;
@@ -186,7 +186,7 @@ code {
 .bindings-list {
   display: flex;
   flex-direction: column;
-  margin: 4px 0 8px 0;
+  margin: 0 0 2px 0;
 }
 
 .scope-label-line {
@@ -209,7 +209,6 @@ code {
 
 .binding {
   background: var(--code-bg);
-  padding: 4px 0;
 }
 
 .binding-term {
