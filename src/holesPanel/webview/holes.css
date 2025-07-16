@@ -1,5 +1,5 @@
 :root {
-  --radius: 8px;
+  --radius: 4px;
   --font:
     'Inter', 'Segoe UI', system-ui, 'Roboto', 'Helvetica Neue', Arial,
     'Noto Sans', sans-serif;
@@ -28,27 +28,34 @@ pre {
   font-family: var(--font-mono);
 }
 
+.holes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
 .hole-card {
   background: var(--section-bg);
   border: 1.5px solid var(--border);
   border-radius: var(--radius);
-  margin-bottom: 32px;
   padding: 16px;
+}
+
+.hole-card.highlighted {
+  border: 2px solid
+    var(--vscode-editorSuggestWidget-highlightForeground, #007acc);
+  background-color: rgba(0, 122, 204, 0.05);
 }
 
 .hole-header {
   display: flex;
   align-items: center;
-  padding-bottom: 12px;
-  border-bottom: 1.5px solid var(--border);
-  margin-bottom: 16px;
+  margin-bottom: 8px;
+  font-weight: bold;
 }
 
 .hole-id {
   font-family: var(--font-mono);
-  font-size: 1.125rem;
-  font-weight: 700;
-  color: var(--accent);
 }
 
 .hole-field {
@@ -56,56 +63,23 @@ pre {
 }
 
 .field-label {
-  color: var(--accent);
-  font-weight: 600;
   margin-right: 4px;
 }
 
 .field-value {
   font-family: var(--font-mono);
-  color: var(--foreground);
-}
-
-.bindings-list {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  margin: 4px 0 8px 0;
-}
-
-.binding {
-  background: var(--code-bg);
-  border-radius: var(--radius);
-  padding: 4px 12px;
-  border: 1px solid var(--border);
-  color: var(--foreground);
-}
-
-.binding-term {
-  color: var(--foreground);
-  font-weight: bold;
-}
-
-.binding-type {
-  color: var(--foreground);
-}
-
-.codicon {
-  color: var(--foreground);
+  background: var(--highlight);
+  padding: 2px;
+  border-radius: 2px;
 }
 
 .empty {
-  color: var(--foreground);
-  font-style: normal;
-  font-weight: 500;
-  margin-bottom: 8px;
+  margin-top: 16px;
 }
 
 .empty .desc {
   display: block;
-  color: var(--foreground);
   margin-top: 4px;
-  font-weight: 400;
 }
 
 code {
@@ -115,14 +89,14 @@ code {
 }
 
 .filter-box {
-  width: 100%;
   padding: 6px 10px;
   margin: 4px 0;
   border: 1px solid var(--border);
   border-radius: 4px;
-  background: var(--background);
   color: var(--foreground);
+  background: var(--background);
   transition: border 0.2s ease;
+  flex: 1;
 }
 
 .filter-box:focus {
@@ -130,34 +104,9 @@ code {
   border-color: var(--accent);
 }
 
-.expected-type-alert {
-  background-color: var(--highlight);
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  padding: 12px 16px;
-  margin-bottom: 12px;
-}
-
-.expected-type-alert-title {
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--accent);
-  margin-bottom: 2px;
-}
-
-.expected-type-alert-desc {
-  font-family: var(--font-mono);
-  font-size: 0.875rem;
-}
-
-.indented-field {
-  padding-left: 16px;
-}
-
 .bindings-section {
   border: 1.5px solid var(--border);
   border-radius: var(--radius);
-  margin-bottom: 20px;
   background: var(--section-bg);
   overflow: hidden;
 }
@@ -166,10 +115,9 @@ code {
   display: flex;
   align-items: center;
   background: var(--code-bg);
-  font-weight: 600;
-  padding: 10px 16px;
+  padding: 6px;
   cursor: pointer;
-  transition: background 0.2s ease;
+  font-weight: bold;
 }
 
 .bindings-header.collapsed ~ .bindings-body {
@@ -184,7 +132,6 @@ code {
   display: inline-block;
   margin-right: 8px;
   transition: transform 0.2s ease;
-  color: var(--accent);
 }
 
 .bindings-header.collapsed .bindings-toggle {
@@ -193,13 +140,13 @@ code {
 
 .bindings-title {
   flex: 1;
-  color: var(--accent);
-  font-size: 1em;
 }
 
 .bindings-body {
-  padding: 16px;
+  padding: 4px 8px;
   background: var(--background);
+  display: flex;
+  flex-direction: column;
 }
 
 .warning {
@@ -215,23 +162,38 @@ code {
   background: none;
   border: none;
   cursor: pointer;
-  font-size: 1em;
-  margin-left: 8px;
 }
 
 .filter-menu {
   background: var(--code-bg, #eee);
   border-radius: 4px;
-  padding: 4px 8px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 }
 
 .filter-menu label {
+  display: flex;
+  align-items: center;
   margin-right: 16px;
   user-select: none;
 }
 
-.hole-card.highlighted {
-  border: 2px solid
-    var(--vscode-editorSuggestWidget-highlightForeground, #007acc);
-  background-color: rgba(0, 122, 204, 0.05);
+.codicon {
+  color: var(--foreground);
+}
+
+.bindings-list {
+  display: flex;
+  flex-direction: column;
+  margin: 4px 0 8px 0;
+}
+
+.binding {
+  background: var(--code-bg);
+  padding: 4px 0;
+}
+
+.binding-term {
+  font-weight: bold;
 }
