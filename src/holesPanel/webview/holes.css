@@ -188,10 +188,6 @@ code {
   margin-bottom: 4px;
 }
 
-.scope-bindings-list {
-  border: 1px solid var(--border);
-  border-radius: 4px;
-}
 
 .bindings-list {
   display: flex;
@@ -202,12 +198,9 @@ code {
 
 .binding {
   background: var(--code-bg);
-  padding: 4px 12px;
+  padding: 4px 0;
 }
 
-.binding:last-child {
-  border-bottom: none;
-}
 
 .binding-term {
   font-weight: bold;
