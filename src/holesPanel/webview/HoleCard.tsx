@@ -1,5 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { EffektHoleInfo } from '../effektHoleInfo';
+import {
+  EffektHoleInfo,
+  ScopeInfo,
+  BINDING_ORIGIN_DEFINED,
+} from '../effektHoleInfo';
 import { BindingsSection } from './BindingsSection';
 
 // VS Code API type
@@ -14,19 +18,41 @@ interface HoleCardProps {
   vscode: VsCodeApi;
 }
 
+// Filter function to remove imported bindings from scope
+const filterImportedBindings = (scope: ScopeInfo): ScopeInfo => {
+  return {
+    ...scope,
+    bindings: scope.bindings.filter(
+      (binding) => binding.origin === BINDING_ORIGIN_DEFINED,
+    ),
+    outer: scope.outer ? filterImportedBindings(scope.outer) : undefined,
+  };
+};
+
+// Filter function to create a clean hole info without imported bindings
+const filterHoleInfo = (hole: EffektHoleInfo): EffektHoleInfo => {
+  return {
+    ...hole,
+    scope: filterImportedBindings(hole.scope),
+  };
+};
+
 // Chat integration function
 const solveHole = async (
   hole: EffektHoleInfo,
   vscode: VsCodeApi,
 ): Promise<void> => {
+  // Filter out imported bindings to reduce noise
+  const filteredHole = filterHoleInfo(hole);
+
   // Send request to extension host to open copilot chat
   vscode.postMessage({
     type: 'open-copilot-chat',
     payload: {
-      holeId: hole.id,
-      expectedType: hole.expectedType,
-      innerType: hole.innerType,
-      scope: hole.scope,
+      holeId: filteredHole.id,
+      expectedType: filteredHole.expectedType,
+      innerType: filteredHole.innerType,
+      scope: filteredHole.scope,
     },
   });
 };
