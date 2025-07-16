@@ -2,8 +2,10 @@ import React, { useEffect, useRef, useState } from 'react';
 import { EffektHoleInfo } from '../effektHoleInfo';
 import { BindingsSection } from './BindingsSection';
 
-// VS Code API for webview communication
-declare const acquireVsCodeApi: () => any;
+// VS Code API type
+interface VsCodeApi {
+  postMessage(msg: any): void;
+}
 
 interface HoleCardProps {
   hole: EffektHoleInfo;
@@ -11,12 +13,14 @@ interface HoleCardProps {
   selected: boolean;
   onJump: (id: string) => void;
   onDeselect: () => void;
+  vscode: VsCodeApi;
 }
 
 // Chat integration function
-const solveHole = async (hole: EffektHoleInfo): Promise<void> => {
-  const vscode = acquireVsCodeApi();
-
+const solveHole = async (
+  hole: EffektHoleInfo,
+  vscode: VsCodeApi,
+): Promise<void> => {
   // Send request to extension host to open copilot chat
   vscode.postMessage({
     type: 'open-copilot-chat',
@@ -35,6 +39,7 @@ export const HoleCard: React.FC<HoleCardProps> = ({
   selected,
   onJump,
   onDeselect,
+  vscode,
 }) => {
   const cardRef = useRef<HTMLDivElement>(null);
   const [isSolving, setIsSolving] = useState(false);
@@ -48,7 +53,7 @@ export const HoleCard: React.FC<HoleCardProps> = ({
   const handleSolve = async () => {
     setIsSolving(true);
     try {
-      await solveHole(hole);
+      await solveHole(hole, vscode);
       // Chat window will open automatically, no need to handle response
     } catch (error) {
       console.error('Error opening copilot chat:', error);
