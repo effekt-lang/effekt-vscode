@@ -1,22 +1,11 @@
 import * as vscode from 'vscode';
 import { EffektHoleInfo } from './effektHoleInfo';
 
-export interface MCPCompletionRequest {
+interface CopilotChatRequest {
   holeId: string;
   expectedType?: string;
   innerType?: string;
   scope: any;
-  context: {
-    file?: string;
-    line?: number;
-    column?: number;
-  };
-}
-
-export interface MCPCompletionResponse {
-  success: boolean;
-  completion?: string;
-  error?: string;
 }
 
 export class HolesViewProvider implements vscode.WebviewViewProvider {
@@ -120,46 +109,54 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
             );
           }
         }
-      } else if (message.type === 'mcp-completion-request') {
-        // Handle MCP completion request
-        this.handleMCPCompletionRequest(message.payload);
+      } else if (message.type === 'open-copilot-chat') {
+        // Handle opening copilot chat
+        this.handleOpenCopilotChat(message.payload);
       }
     });
   }
 
-  private async handleMCPCompletionRequest(
-    request: MCPCompletionRequest,
+  private async handleOpenCopilotChat(
+    request: CopilotChatRequest,
   ): Promise<void> {
-    // TODO: When MCP server is ready, implement actual communication here
-    // For now, just log the request for debugging
-    console.log('MCP completion request received:', request);
-
     try {
-      // TODO: Replace this with actual MCP server communication
-      // const response = await mcpServerClient.getCompletion(request);
+      // Build the query for the copilot chat
+      const queryParts = [
+        `Help me fill in this hole with ID "${request.holeId}".`,
+      ];
 
-      // Simulate response for now
-      const response: MCPCompletionResponse = {
-        success: true,
-        completion: `// MCP completion for hole ${request.holeId}\n// Expected type: ${request.expectedType || 'unknown'}`,
-      };
+      if (request.expectedType) {
+        queryParts.push(`Expected type: ${request.expectedType}`);
+      }
 
-      // Send response back to webview
-      this.webviewView?.webview.postMessage({
-        type: 'mcp-completion-response',
-        payload: response,
+      if (request.innerType) {
+        queryParts.push(`Inner type: ${request.innerType}`);
+      }
+
+      if (request.scope && Object.keys(request.scope).length > 0) {
+        queryParts.push(
+          `Available bindings: ${JSON.stringify(request.scope, null, 2)}`,
+        );
+      }
+
+      const query = queryParts.join('\n\n');
+
+      // Open copilot chat with the query
+      await vscode.commands.executeCommand('workbench.action.chat.open', {
+        query: query,
+        selection: vscode.window.activeTextEditor?.selection,
+        files: vscode.window.activeTextEditor?.document.uri
+          ? [vscode.window.activeTextEditor.document.uri]
+          : [],
+        workspaceFolder: vscode.workspace.workspaceFolders?.[0],
+        newSession: true,
+        participant: '@workspace',
       });
     } catch (error) {
-      console.error('Error handling MCP completion request:', error);
-
-      // Send error response back to webview
-      this.webviewView?.webview.postMessage({
-        type: 'mcp-completion-response',
-        payload: {
-          success: false,
-          error: error instanceof Error ? error.message : 'Unknown error',
-        },
-      });
+      console.error('Error opening copilot chat:', error);
+      vscode.window.showErrorMessage(
+        `Failed to open copilot chat: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      );
     }
   }
 
