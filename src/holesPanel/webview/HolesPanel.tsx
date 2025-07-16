@@ -85,6 +85,7 @@ export const HolesPanel: React.FC<{ initShowHoles: boolean }> = ({
             hole={h}
             highlighted={h.id === highlightedHoleId}
             onJump={handleJump}
+            vscode={vscode}
           />
         ))
       )}
