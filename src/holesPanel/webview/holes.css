@@ -189,6 +189,24 @@ code {
   margin: 4px 0 8px 0;
 }
 
+.scope-label-line {
+  height: 0;
+  border-top: 1px solid var(--vscode-widget-border);
+  position: relative;
+  margin: 8px 0 0 0;
+  overflow: visible; /* Allow child text to be visible */
+}
+
+.scope-label-text {
+  position: absolute;
+  right: 0;
+  top: 4px;
+  font-size: 10px;
+  color: var(--vscode-descriptionForeground);
+  background: var(--background);
+  padding-left: 8px;
+}
+
 .binding {
   background: var(--code-bg);
   padding: 4px 0;
