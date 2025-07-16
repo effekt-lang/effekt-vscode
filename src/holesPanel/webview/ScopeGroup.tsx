@@ -38,16 +38,9 @@ export const ScopeGroup: React.FC<ScopeGroupProps> = ({
 
   return (
     <div className="scope-group" key={groupIndex}>
-      {defined.some((b) => filteredBindings.includes(b)) && (
-        <>
-          <div>{renderList(defined)}</div>
-        </>
-      )}
-      {imported.some((b) => filteredBindings.includes(b)) && (
-        <>
-          <div>{renderList(imported)}</div>
-        </>
-      )}
+      {defined.some((b) => filteredBindings.includes(b)) && renderList(defined)}
+      {imported.some((b) => filteredBindings.includes(b)) &&
+        renderList(imported)}
     </div>
   );
 };
