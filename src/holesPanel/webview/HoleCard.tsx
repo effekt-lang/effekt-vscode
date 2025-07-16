@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { EffektHoleInfo } from '../effektHoleInfo';
 import { BindingsSection } from './BindingsSection';
 
@@ -8,18 +8,38 @@ interface HoleCardProps {
   onJump: (id: string) => void;
 }
 
+// Placeholder function for MCP server communication
+const solveHole = async (hole: EffektHoleInfo): Promise<void> => {
+  // TODO: Implement MCP server communication
+  console.log('Solving hole:', hole);
+  // Simulate async operation
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+};
+
 export const HoleCard: React.FC<HoleCardProps> = ({
   hole,
   highlighted,
   onJump,
 }) => {
   const cardRef = useRef<HTMLDivElement>(null);
+  const [isSolving, setIsSolving] = useState(false);
 
   useEffect(() => {
     if (highlighted) {
       cardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   }, [highlighted]);
+
+  const handleSolve = async () => {
+    setIsSolving(true);
+    try {
+      await solveHole(hole);
+    } catch (error) {
+      console.error('Error solving hole:', error);
+    } finally {
+      setIsSolving(false);
+    }
+  };
 
   return (
     <section
@@ -30,6 +50,16 @@ export const HoleCard: React.FC<HoleCardProps> = ({
     >
       <div className="hole-header">
         <span className="hole-id">Hole: {hole.id}</span>
+        <button
+          className="solve-button"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleSolve();
+          }}
+          disabled={isSolving}
+        >
+          {isSolving ? 'Solving...' : 'Solve'}
+        </button>
       </div>
       {hole.expectedType && (
         <div className="hole-field">
