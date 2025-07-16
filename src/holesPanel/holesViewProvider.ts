@@ -151,6 +151,7 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
         workspaceFolder: vscode.workspace.workspaceFolders?.[0],
         newSession: true,
         participant: '@workspace',
+        mode: 'agent',
       });
     } catch (error) {
       console.error('Error opening copilot chat:', error);
