@@ -193,7 +193,7 @@ code {
   height: 0;
   border-top: 1px solid var(--vscode-widget-border);
   position: relative;
-  margin: 4px 0 4px 0;
+  margin: 4px;
   overflow: visible; /* Allow child text to be visible */
 }
 
