@@ -193,7 +193,7 @@ code {
   height: 0;
   border-top: 1px solid var(--border);
   position: relative;
-  margin: 4px;
+  margin: 4px 0;
   overflow: visible; /* Allow child text to be visible */
 }
 
