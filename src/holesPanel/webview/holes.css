@@ -191,7 +191,7 @@ code {
 
 .scope-label-line {
   height: 0;
-  border-top: 1px solid var(--vscode-widget-border);
+  border-top: 1px solid var(--border);
   position: relative;
   margin: 4px;
   overflow: visible; /* Allow child text to be visible */
