@@ -18,6 +18,20 @@ interface BindingsSectionProps {
   holeId: string;
 }
 
+const isOriginAllowed = (
+  binding: BindingInfo,
+  showDefined: boolean,
+  showImported: boolean,
+): boolean => {
+  if (binding.origin === BINDING_ORIGIN_DEFINED) {
+    return showDefined;
+  }
+  if (binding.origin === BINDING_ORIGIN_IMPORTED) {
+    return showImported;
+  }
+  return true;
+};
+
 export const BindingsSection: React.FC<BindingsSectionProps> = ({
   scope,
   holeId,
@@ -40,21 +54,18 @@ export const BindingsSection: React.FC<BindingsSectionProps> = ({
   }, [scope]);
 
   const filteredBindings = useMemo(() => {
+    // Apply origin filtering first
+    const originFiltered = allBindings.filter((b) =>
+      isOriginAllowed(b, showDefined, showImported),
+    );
+
+    // If no search text, return origin-filtered results
     if (!filter.trim()) {
-      // If no filter, return all bindings that match origin filters
-      return allBindings.filter((b) => {
-        const originOk =
-          b.origin === BINDING_ORIGIN_DEFINED
-            ? showDefined
-            : b.origin === BINDING_ORIGIN_IMPORTED
-              ? showImported
-              : true;
-        return originOk;
-      });
+      return originFiltered;
     }
 
-    // Use fuzzy search when there is a filter
-    const searchableBindings = allBindings.map((b) => {
+    // Apply fuzzy search to origin-filtered results
+    const searchableBindings = originFiltered.map((b) => {
       const text =
         b.kind === BINDING_KIND_TERM
           ? fullyQualifiedName(b as TermBinding) +
@@ -67,17 +78,7 @@ export const BindingsSection: React.FC<BindingsSectionProps> = ({
       key: 'text',
     });
 
-    return fuzzyResults
-      .map((result) => result.obj.binding)
-      .filter((b) => {
-        const originOk =
-          b.origin === BINDING_ORIGIN_DEFINED
-            ? showDefined
-            : b.origin === BINDING_ORIGIN_IMPORTED
-              ? showImported
-              : true;
-        return originOk;
-      });
+    return fuzzyResults.map((result) => result.obj.binding);
   }, [allBindings, filter, showDefined, showImported]);
 
   const totalCount = allBindings.length;
