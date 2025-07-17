@@ -11,7 +11,7 @@ export const FilterBox: React.FC<FilterBoxProps> = ({
 }) => (
   <input
     className="filter-box"
-    placeholder="Fuzzy search bindings..."
+    placeholder="Search bindings..."
     value={filter}
     onChange={(e) => onFilterChange(e.target.value)}
   />
