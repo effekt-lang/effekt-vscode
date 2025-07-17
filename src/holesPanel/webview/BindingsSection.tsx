@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import fuzzysort from 'fuzzysort';
 import {
   ScopeInfo,
   BindingInfo,
@@ -39,20 +40,44 @@ export const BindingsSection: React.FC<BindingsSectionProps> = ({
   }, [scope]);
 
   const filteredBindings = useMemo(() => {
-    return allBindings.filter((b) => {
+    if (!filter.trim()) {
+      // If no filter, return all bindings that match origin filters
+      return allBindings.filter((b) => {
+        const originOk =
+          b.origin === BINDING_ORIGIN_DEFINED
+            ? showDefined
+            : b.origin === BINDING_ORIGIN_IMPORTED
+              ? showImported
+              : true;
+        return originOk;
+      });
+    }
+
+    // Use fuzzy search when there is a filter
+    const searchableBindings = allBindings.map((b) => {
       const text =
         b.kind === BINDING_KIND_TERM
           ? fullyQualifiedName(b as TermBinding) +
             ((b as TermBinding).type ? `: ${(b as TermBinding).type}` : '')
           : b.definition || b.name;
-      const originOk =
-        b.origin === BINDING_ORIGIN_DEFINED
-          ? showDefined
-          : b.origin === BINDING_ORIGIN_IMPORTED
-            ? showImported
-            : true;
-      return text.toLowerCase().includes(filter.toLowerCase()) && originOk;
+      return { binding: b, text };
     });
+
+    const fuzzyResults = fuzzysort.go(filter, searchableBindings, {
+      key: 'text',
+    });
+
+    return fuzzyResults
+      .map((result) => result.obj.binding)
+      .filter((b) => {
+        const originOk =
+          b.origin === BINDING_ORIGIN_DEFINED
+            ? showDefined
+            : b.origin === BINDING_ORIGIN_IMPORTED
+              ? showImported
+              : true;
+        return originOk;
+      });
   }, [allBindings, filter, showDefined, showImported]);
 
   const totalCount = allBindings.length;
