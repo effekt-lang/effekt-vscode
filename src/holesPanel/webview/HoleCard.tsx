@@ -26,12 +26,10 @@ export const HoleCard: React.FC<HoleCardProps> = ({
       ref={cardRef}
       className={`hole-card${highlighted ? ' highlighted' : ''}`}
       id={`hole-${hole.id}`}
+      onClick={highlighted ? undefined : () => onJump(hole.id)}
+      style={highlighted ? undefined : { cursor: 'pointer' }}
     >
-      <div
-        className="hole-header"
-        onClick={() => onJump(hole.id)}
-        style={{ cursor: 'pointer' }}
-      >
+      <div className="hole-header">
         <span className="hole-id">Hole: {hole.id}</span>
       </div>
       {hole.expectedType && (
