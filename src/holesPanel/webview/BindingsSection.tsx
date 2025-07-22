@@ -67,7 +67,6 @@ export const BindingsSection: React.FC<BindingsSectionProps> = ({
         className={`bindings-header${isActive ? '' : ' collapsed'}`}
         data-hole-id={holeId}
       >
-        <span className="bindings-toggle">&#9660;</span>
         <span className="bindings-title">
           Bindings (<span>{filteredCount}</span>/<span>{totalCount}</span>)
         </span>
