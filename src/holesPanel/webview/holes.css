@@ -164,21 +164,6 @@ code {
   cursor: pointer;
 }
 
-.filter-menu {
-  background: var(--code-bg, #eee);
-  border-radius: 4px;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-}
-
-.filter-menu label {
-  display: flex;
-  align-items: center;
-  margin-right: 16px;
-  user-select: none;
-}
-
 .codicon {
   color: var(--foreground);
 }
