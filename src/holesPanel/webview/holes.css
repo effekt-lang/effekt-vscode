@@ -39,7 +39,9 @@ pre {
   border: 1.5px solid var(--border);
   border-radius: var(--radius);
   padding: 16px;
-  transition: background-color 0.2s ease, border-color 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
 }
 
 .hole-card:not(.highlighted):hover {
