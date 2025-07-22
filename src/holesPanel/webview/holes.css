@@ -39,6 +39,11 @@ pre {
   border: 1.5px solid var(--border);
   border-radius: var(--radius);
   padding: 16px;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.hole-card:not(.highlighted):hover {
+  background-color: var(--highlight);
 }
 
 .hole-card.highlighted {
@@ -116,21 +121,12 @@ code {
   align-items: center;
   background: var(--code-bg);
   padding: 6px;
+  cursor: pointer;
   font-weight: bold;
 }
 
 .bindings-header.collapsed ~ .bindings-body {
   display: none;
-}
-
-.bindings-toggle {
-  display: inline-block;
-  margin-right: 8px;
-  transition: transform 0.2s ease;
-}
-
-.bindings-header.collapsed .bindings-toggle {
-  transform: rotate(-90deg);
 }
 
 .bindings-title {
