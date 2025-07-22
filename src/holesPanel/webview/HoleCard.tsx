@@ -46,7 +46,11 @@ export const HoleCard: React.FC<HoleCardProps> = ({
           <span className="field-value">{hole.innerType}</span>
         </div>
       )}
-      <BindingsSection scope={hole.scope} holeId={hole.id} />
+      <BindingsSection
+        scope={hole.scope}
+        holeId={hole.id}
+        isActive={highlighted}
+      />
     </section>
   );
 };

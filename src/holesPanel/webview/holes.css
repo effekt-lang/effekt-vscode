@@ -116,16 +116,11 @@ code {
   align-items: center;
   background: var(--code-bg);
   padding: 6px;
-  cursor: pointer;
   font-weight: bold;
 }
 
 .bindings-header.collapsed ~ .bindings-body {
   display: none;
-}
-
-.bindings-header:hover {
-  background: var(--highlight);
 }
 
 .bindings-toggle {
