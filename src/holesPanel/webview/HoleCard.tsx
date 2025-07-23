@@ -1,11 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { EffektHoleInfo } from '../effektHoleInfo';
 import { BindingsSection } from './BindingsSection';
-
-// VS Code API type
-interface VsCodeApi {
-  postMessage(msg: any): void;
-}
+import { VSCodeAPI } from './vscodeApi';
 
 interface HoleCardProps {
   hole: EffektHoleInfo;
@@ -13,18 +9,16 @@ interface HoleCardProps {
   selected: boolean;
   onJump: (id: string) => void;
   onDeselect: () => void;
-  vscode: VsCodeApi;
+  vscode: VSCodeAPI;
 }
 
 const solveHole = async (
   hole: EffektHoleInfo,
-  vscode: VsCodeApi,
+  vscode: VSCodeAPI,
 ): Promise<void> => {
   vscode.postMessage({
     command: 'openCopilotChat',
-    payload: {
-      holeId: hole.id,
-    },
+    holeId: hole.id,
   });
 };
 
