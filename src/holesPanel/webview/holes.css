@@ -39,12 +39,20 @@ pre {
   border: 1.5px solid var(--border);
   border-radius: var(--radius);
   padding: 16px;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.hole-card:not(.highlighted):hover {
+  background-color: var(--highlight);
 }
 
 .hole-card.highlighted {
   border: 2px solid
     var(--vscode-editorSuggestWidget-highlightForeground, #007acc);
   background-color: rgba(0, 122, 204, 0.05);
+  cursor: pointer;
 }
 
 .hole-header {
@@ -124,20 +132,6 @@ code {
   display: none;
 }
 
-.bindings-header:hover {
-  background: var(--highlight);
-}
-
-.bindings-toggle {
-  display: inline-block;
-  margin-right: 8px;
-  transition: transform 0.2s ease;
-}
-
-.bindings-header.collapsed .bindings-toggle {
-  transform: rotate(-90deg);
-}
-
 .bindings-title {
   flex: 1;
 }
@@ -173,7 +167,7 @@ code {
   border-top: 1px solid var(--border);
   position: relative;
   margin: 4px 0;
-  overflow: visible; /* Allow child text to be visible */
+  overflow: visible;
 }
 
 .scope-label-text {

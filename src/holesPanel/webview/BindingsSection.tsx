@@ -15,13 +15,14 @@ import { FilterBox } from './FilterBox';
 interface BindingsSectionProps {
   scope?: ScopeInfo;
   holeId: string;
+  isActive: boolean;
 }
 
 export const BindingsSection: React.FC<BindingsSectionProps> = ({
   scope,
   holeId,
+  isActive,
 }) => {
-  const [expanded, setExpanded] = useState(false);
   const [filter, setFilter] = useState('');
 
   const allBindings = useMemo(() => {
@@ -63,16 +64,14 @@ export const BindingsSection: React.FC<BindingsSectionProps> = ({
   return (
     <div className="bindings-section">
       <div
-        className={`bindings-header${expanded ? '' : ' collapsed'}`}
-        onClick={() => setExpanded((e) => !e)}
+        className={`bindings-header${isActive ? '' : ' collapsed'}`}
         data-hole-id={holeId}
       >
-        <span className="bindings-toggle">&#9660;</span>
         <span className="bindings-title">
           Bindings (<span>{filteredCount}</span>/<span>{totalCount}</span>)
         </span>
       </div>
-      {expanded && (
+      {isActive && (
         <div className="bindings-body">
           <FilterBox filter={filter} onFilterChange={setFilter} />
           <div
