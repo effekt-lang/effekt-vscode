@@ -14,7 +14,7 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
   private holes: EffektHoleInfo[] = [];
   private configListener?: vscode.Disposable;
 
-  constructor(private readonly context: vscode.ExtensionContext) { }
+  constructor(private readonly context: vscode.ExtensionContext) {}
 
   private getCssUri(): vscode.Uri | undefined {
     if (!this.webviewView) {
