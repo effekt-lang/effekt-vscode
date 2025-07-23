@@ -3,9 +3,6 @@ import { EffektHoleInfo } from './effektHoleInfo';
 
 interface CopilotChatRequest {
   holeId: string;
-  expectedType?: string;
-  innerType?: string;
-  scope: any;
 }
 
 export class HolesViewProvider implements vscode.WebviewViewProvider {
@@ -113,8 +110,7 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
             holeId: hole.id,
           });
         }
-      } else if (message.type === 'open-copilot-chat') {
-        // Handle opening copilot chat
+      } else if (message.command === 'openCopilotChat') {
         this.handleOpenCopilotChat(message.payload);
       }
     });
