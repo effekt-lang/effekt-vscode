@@ -188,7 +188,7 @@ code {
   font-weight: bold;
 }
 
-.solve-button{
+.solve-button {
   background: var(--vscode-button-background);
   color: var(--vscode-button-foreground);
   border: none;
