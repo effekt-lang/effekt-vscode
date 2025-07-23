@@ -10,7 +10,6 @@ import {
   BINDING_KIND_TERM,
 } from '../effektHoleInfo';
 import { ScopeGroup } from './ScopeGroup';
-import { FilterMenu } from './FilterMenu';
 import { FilterBox } from './FilterBox';
 
 interface BindingsSectionProps {
@@ -18,30 +17,12 @@ interface BindingsSectionProps {
   holeId: string;
 }
 
-const isOriginAllowed = (
-  binding: BindingInfo,
-  showDefined: boolean,
-  showImported: boolean,
-): boolean => {
-  if (binding.origin === BINDING_ORIGIN_DEFINED) {
-    return showDefined;
-  }
-  if (binding.origin === BINDING_ORIGIN_IMPORTED) {
-    return showImported;
-  }
-  return true;
-};
-
 export const BindingsSection: React.FC<BindingsSectionProps> = ({
   scope,
   holeId,
 }) => {
   const [expanded, setExpanded] = useState(false);
-  const [showDefined, setShowDefined] = useState(true);
-  const [showImported, setShowImported] = useState(false);
   const [filter, setFilter] = useState('');
-  const [filterMenuOpen, setFilterMenuOpen] = useState(false);
-  const [filterBoxOpen, setFilterBoxOpen] = useState(false);
 
   const allBindings = useMemo(() => {
     const scopes = flattenScopes(scope);
@@ -54,18 +35,13 @@ export const BindingsSection: React.FC<BindingsSectionProps> = ({
   }, [scope]);
 
   const filteredBindings = useMemo(() => {
-    // Apply origin filtering first
-    const originFiltered = allBindings.filter((b) =>
-      isOriginAllowed(b, showDefined, showImported),
-    );
-
-    // If no search text, return origin-filtered results
+    // If no search text, return all bindings
     if (!filter.trim()) {
-      return originFiltered;
+      return allBindings;
     }
 
-    // Apply fuzzy search to origin-filtered results
-    const searchableBindings = originFiltered.map((b) => {
+    // Apply fuzzy search to all bindings
+    const searchableBindings = allBindings.map((b) => {
       const text =
         b.kind === BINDING_KIND_TERM
           ? fullyQualifiedName(b as TermBinding) +
@@ -79,7 +55,7 @@ export const BindingsSection: React.FC<BindingsSectionProps> = ({
     });
 
     return fuzzyResults.map((result) => result.obj.binding);
-  }, [allBindings, filter, showDefined, showImported]);
+  }, [allBindings, filter]);
 
   const totalCount = allBindings.length;
   const filteredCount = filteredBindings.length;
@@ -95,46 +71,10 @@ export const BindingsSection: React.FC<BindingsSectionProps> = ({
         <span className="bindings-title">
           Bindings (<span>{filteredCount}</span>/<span>{totalCount}</span>)
         </span>
-        <button
-          className="filter-toggle-btn"
-          title="Search"
-          onClick={(e) => {
-            e.stopPropagation();
-            if (!expanded) {
-              setExpanded(true);
-            }
-            setFilterBoxOpen((f) => !f);
-          }}
-        >
-          <i className="codicon codicon-search" />
-        </button>
-        <button
-          className="filter-toggle-btn"
-          title="Filter"
-          onClick={(e) => {
-            e.stopPropagation();
-            if (!expanded) {
-              setExpanded(true);
-            }
-            setFilterMenuOpen((m) => !m);
-          }}
-        >
-          <i className="codicon codicon-filter" />
-        </button>
       </div>
       {expanded && (
         <div className="bindings-body">
-          {filterMenuOpen && (
-            <FilterMenu
-              showDefined={showDefined}
-              showImported={showImported}
-              onToggleDefined={setShowDefined}
-              onToggleImported={setShowImported}
-            />
-          )}
-          {filterBoxOpen && (
-            <FilterBox filter={filter} onFilterChange={setFilter} />
-          )}
+          <FilterBox filter={filter} onFilterChange={setFilter} />
           <div
             className="bindings-list"
             id={`bindings-dropdown-list-${holeId}`}
