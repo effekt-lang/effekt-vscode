@@ -1,9 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
-import {
-  EffektHoleInfo,
-  ScopeInfo,
-  BINDING_ORIGIN_DEFINED,
-} from '../effektHoleInfo';
+import React, { useEffect, useRef } from 'react';
+import { EffektHoleInfo } from '../effektHoleInfo';
 import { BindingsSection } from './BindingsSection';
 
 // VS Code API type
@@ -18,41 +14,14 @@ interface HoleCardProps {
   vscode: VsCodeApi;
 }
 
-// Filter function to remove imported bindings from scope
-const filterImportedBindings = (scope: ScopeInfo): ScopeInfo => {
-  return {
-    ...scope,
-    bindings: scope.bindings.filter(
-      (binding) => binding.origin === BINDING_ORIGIN_DEFINED,
-    ),
-    outer: scope.outer ? filterImportedBindings(scope.outer) : undefined,
-  };
-};
-
-// Filter function to create a clean hole info without imported bindings
-const filterHoleInfo = (hole: EffektHoleInfo): EffektHoleInfo => {
-  return {
-    ...hole,
-    scope: filterImportedBindings(hole.scope),
-  };
-};
-
-// Chat integration function
 const solveHole = async (
   hole: EffektHoleInfo,
   vscode: VsCodeApi,
 ): Promise<void> => {
-  // Filter out imported bindings to reduce noise
-  const filteredHole = filterHoleInfo(hole);
-
-  // Send request to extension host to open copilot chat
   vscode.postMessage({
-    type: 'open-copilot-chat',
+    command: 'openCopilotChat',
     payload: {
-      holeId: filteredHole.id,
-      expectedType: filteredHole.expectedType,
-      innerType: filteredHole.innerType,
-      scope: filteredHole.scope,
+      holeId: hole.id,
     },
   });
 };
@@ -64,25 +33,12 @@ export const HoleCard: React.FC<HoleCardProps> = ({
   vscode,
 }) => {
   const cardRef = useRef<HTMLDivElement>(null);
-  const [isSolving, setIsSolving] = useState(false);
 
   useEffect(() => {
     if (highlighted) {
       cardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   }, [highlighted]);
-
-  const handleSolve = async () => {
-    setIsSolving(true);
-    try {
-      await solveHole(hole, vscode);
-      // Chat window will open automatically, no need to handle response
-    } catch (error) {
-      console.error('Error opening copilot chat:', error);
-    } finally {
-      setIsSolving(false);
-    }
-  };
 
   return (
     <section
@@ -97,11 +53,10 @@ export const HoleCard: React.FC<HoleCardProps> = ({
           className="solve-button"
           onClick={(e) => {
             e.stopPropagation();
-            handleSolve();
+            solveHole(hole, vscode);
           }}
-          disabled={isSolving}
         >
-          {isSolving ? 'Solving...' : 'Solve'}
+          Solve
         </button>
       </div>
       {hole.expectedType && (
