@@ -14,7 +14,7 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
   private holes: EffektHoleInfo[] = [];
   private configListener?: vscode.Disposable;
 
-  constructor(private readonly context: vscode.ExtensionContext) {}
+  constructor(private readonly context: vscode.ExtensionContext) { }
 
   private getCssUri(): vscode.Uri | undefined {
     if (!this.webviewView) {
@@ -120,28 +120,8 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
     request: CopilotChatRequest,
   ): Promise<void> {
     try {
-      // Build the query for the copilot chat
-      const queryParts = [
-        `Help me fill in this hole with ID "${request.holeId}".`,
-      ];
+      const query = `Fill the hole with ID "${request.holeId}".`;
 
-      if (request.expectedType) {
-        queryParts.push(`Expected type: ${request.expectedType}`);
-      }
-
-      if (request.innerType) {
-        queryParts.push(`Inner type: ${request.innerType}`);
-      }
-
-      if (request.scope && Object.keys(request.scope).length > 0) {
-        queryParts.push(
-          `Available bindings: ${JSON.stringify(request.scope, null, 2)}`,
-        );
-      }
-
-      const query = queryParts.join('\n\n');
-
-      // Open copilot chat with the query
       await vscode.commands.executeCommand('workbench.action.chat.open', {
         query: query,
         selection: vscode.window.activeTextEditor?.selection,
