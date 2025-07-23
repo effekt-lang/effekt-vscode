@@ -235,6 +235,7 @@
     "format:check": "prettier --config .prettierrc \"**/*.{ts,tsx,json,css}\" --check"
   },
   "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.16.0",
     "@vscode/codicons": "^0.0.36",
     "compare-versions": "^6.1.1",
     "esbuild-plugin-copy": "^2.1.1",
