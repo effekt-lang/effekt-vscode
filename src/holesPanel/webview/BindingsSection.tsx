@@ -23,7 +23,6 @@ export const BindingsSection: React.FC<BindingsSectionProps> = ({
 }) => {
   const [expanded, setExpanded] = useState(false);
   const [filter, setFilter] = useState('');
-  const [filterBoxOpen, setFilterBoxOpen] = useState(false);
 
   const allBindings = useMemo(() => {
     const scopes = flattenScopes(scope);
@@ -72,25 +71,10 @@ export const BindingsSection: React.FC<BindingsSectionProps> = ({
         <span className="bindings-title">
           Bindings (<span>{filteredCount}</span>/<span>{totalCount}</span>)
         </span>
-        <button
-          className="filter-toggle-btn"
-          title="Search"
-          onClick={(e) => {
-            e.stopPropagation();
-            if (!expanded) {
-              setExpanded(true);
-            }
-            setFilterBoxOpen((f) => !f);
-          }}
-        >
-          <i className="codicon codicon-search" />
-        </button>
       </div>
       {expanded && (
         <div className="bindings-body">
-          {filterBoxOpen && (
-            <FilterBox filter={filter} onFilterChange={setFilter} />
-          )}
+          <FilterBox filter={filter} onFilterChange={setFilter} />
           <div
             className="bindings-list"
             id={`bindings-dropdown-list-${holeId}`}
