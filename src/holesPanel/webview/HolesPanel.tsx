@@ -1,19 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { EffektHoleInfo } from '../effektHoleInfo';
 import { HoleCard } from './HoleCard';
-
-declare function acquireVsCodeApi<T>(): { postMessage(msg: T): void };
-
-interface OutgoingMessage {
-  command: 'jumpToHole';
-  holeId?: string;
-}
-type IncomingMessage =
-  | { command: 'highlightHole'; holeId: string }
-  | { command: 'updateHoles'; holes: EffektHoleInfo[] }
-  | { command: 'setShowHoles'; show: boolean };
-
-const vscode = acquireVsCodeApi<OutgoingMessage>();
+import { IncomingMessage, JumpToHole, vscode } from './vscodeApi';
 
 const Description: React.FC = () => (
   <div className="desc" data-holes-panel-desc>
@@ -70,7 +58,7 @@ export const HolesPanel: React.FC<{ initShowHoles: boolean }> = ({
   }, []);
 
   const handleJump = useCallback((id: string) => {
-    vscode.postMessage({ command: 'jumpToHole', holeId: id });
+    vscode.postMessage({ command: 'jumpToHole', holeId: id } as JumpToHole);
   }, []);
 
   return (

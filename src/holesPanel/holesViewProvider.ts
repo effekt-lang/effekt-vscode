@@ -1,10 +1,6 @@
 import * as vscode from 'vscode';
 import { EffektHoleInfo } from './effektHoleInfo';
 
-interface CopilotChatRequest {
-  holeId: string;
-}
-
 export class HolesViewProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = 'effekt.holesView';
   private webviewView?: vscode.WebviewView;
@@ -107,14 +103,14 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
           }
         }
       } else if (message.command === 'openCopilotChat') {
-        this.handleOpenCopilotChat(message.payload);
+        this.handleOpenCopilotChat(message);
       }
     });
   }
 
-  private async handleOpenCopilotChat(
-    request: CopilotChatRequest,
-  ): Promise<void> {
+  private async handleOpenCopilotChat(request: {
+    holeId: string;
+  }): Promise<void> {
     try {
       const query = `Fill the hole with ID "${request.holeId}".`;
 
