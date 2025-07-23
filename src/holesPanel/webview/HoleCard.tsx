@@ -10,16 +10,6 @@ interface HoleCardProps {
   vscode: VSCodeAPI;
 }
 
-const solveHole = async (
-  hole: EffektHoleInfo,
-  vscode: VSCodeAPI,
-): Promise<void> => {
-  vscode.postMessage({
-    command: 'openCopilotChat',
-    holeId: hole.id,
-  });
-};
-
 export const HoleCard: React.FC<HoleCardProps> = ({
   hole,
   highlighted,
@@ -72,4 +62,14 @@ export const HoleCard: React.FC<HoleCardProps> = ({
       />
     </section>
   );
+};
+
+const solveHole = async (
+  hole: EffektHoleInfo,
+  vscode: VSCodeAPI,
+): Promise<void> => {
+  vscode.postMessage({
+    command: 'openCopilotChat',
+    holeId: hole.id,
+  });
 };
