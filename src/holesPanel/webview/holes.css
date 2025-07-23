@@ -70,6 +70,7 @@ pre {
 
 .hole-id {
   font-family: var(--font-mono);
+  flex: 1;
 }
 
 .hole-field {
