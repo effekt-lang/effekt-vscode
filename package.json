@@ -238,7 +238,7 @@
     "@vscode/codicons": "^0.0.36",
     "compare-versions": "^6.1.1",
     "esbuild-plugin-copy": "^2.1.1",
-    "fuzzysort": "^3.1.0",
+    "minisearch": "^7.1.0",
     "vscode-languageclient": "^8.1.0"
   },
   "devDependencies": {

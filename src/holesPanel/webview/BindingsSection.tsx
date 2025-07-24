@@ -1,13 +1,10 @@
 import React, { useState, useMemo } from 'react';
-import fuzzysort from 'fuzzysort';
+import MiniSearch from 'minisearch';
 import {
   ScopeInfo,
   BindingInfo,
   BINDING_ORIGIN_DEFINED,
   BINDING_ORIGIN_IMPORTED,
-  TermBinding,
-  fullyQualifiedName,
-  BINDING_KIND_TERM,
 } from '../effektHoleInfo';
 import { ScopeGroup } from './ScopeGroup';
 import { FilterBox } from './FilterBox';
@@ -36,26 +33,37 @@ export const BindingsSection: React.FC<BindingsSectionProps> = ({
   }, [scope]);
 
   const filteredBindings = useMemo(() => {
-    // If no search text, return all bindings
     if (!filter.trim()) {
       return allBindings;
     }
 
-    // Apply fuzzy search to all bindings
-    const searchableBindings = allBindings.map((b) => {
-      const text =
-        b.kind === BINDING_KIND_TERM
-          ? fullyQualifiedName(b as TermBinding) +
-            ((b as TermBinding).type ? `: ${(b as TermBinding).type}` : '')
-          : b.definition || b.name;
-      return { binding: b, text };
+    const miniSearch = new MiniSearch({
+      fields: ['name', 'qualifier', 'type', 'definition'],
+      storeFields: [
+        'name',
+        'qualifier',
+        'origin',
+        'kind',
+        'type',
+        'definition',
+      ],
+      idField: 'id',
     });
 
-    const fuzzyResults = fuzzysort.go(filter, searchableBindings, {
-      key: 'text',
+    const searchableBindings = allBindings.map((b, index) => ({
+      id: index,
+      ...b,
+      qualifier: b.qualifier.join('::'),
+    }));
+
+    miniSearch.addAll(searchableBindings);
+
+    const searchResults = miniSearch.search(filter, {
+      combineWith: 'OR',
+      fuzzy: 0.2,
     });
 
-    return fuzzyResults.map((result) => result.obj.binding);
+    return searchResults.map((result) => allBindings[result.id]);
   }, [allBindings, filter]);
 
   const totalCount = allBindings.length;
