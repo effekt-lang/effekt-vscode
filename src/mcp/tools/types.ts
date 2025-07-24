@@ -1,8 +1,10 @@
 import { HoleListener } from '../holeListener';
+import { DocIndexer } from '../docIndexer';
 
 export interface ToolCtx {
   openEffektFileAndWaitForHoles(uri: string): Promise<void>;
   holeListener: HoleListener;
+  docIndexer: DocIndexer;
 }
 
 export interface Tool {
