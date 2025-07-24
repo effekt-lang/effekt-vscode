@@ -36,7 +36,6 @@ export class LspClient {
     const writer = new StreamMessageWriter(this.proc.stdin);
     this.conn = createMessageConnection(reader, writer);
 
-    // Set up hole listener for notifications
     this.conn.onNotification('$/effekt/publishHoles', (params: any) => {
       this.log('IN', '$/effekt/publishHoles', params);
       if (this.holeListener) {
