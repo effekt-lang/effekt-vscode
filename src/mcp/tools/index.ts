@@ -1,7 +1,8 @@
 import { Tool, ToolCtx } from './types';
 import { getHoleByIdTool } from './holeById';
+import { searchStdlibTool } from './searchStdlib';
 
-const TOOLS: Tool[] = [getHoleByIdTool];
+const TOOLS: Tool[] = [getHoleByIdTool, searchStdlibTool];
 
 export function getAvailableTools() {
   return TOOLS.map((tool) => ({
