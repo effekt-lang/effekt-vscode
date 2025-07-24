@@ -1,6 +1,7 @@
 import { Server as McpServer } from '@modelcontextprotocol/sdk/server/index.js';
 import { LspClient } from './lspClient';
 import { HoleListener } from './holeListener';
+import { DocIndexer } from './docIndexer';
 import {
   ListToolsRequestSchema,
   CallToolRequestSchema,
@@ -14,6 +15,7 @@ export class App {
   private readonly mcpServer: McpServer;
   private readonly lspClient: LspClient;
   private readonly holeListener: HoleListener;
+  private readonly docIndexer: DocIndexer;
 
   constructor() {
     this.mcpServer = new McpServer(
@@ -28,6 +30,7 @@ export class App {
       },
     );
     this.holeListener = new HoleListener();
+    this.docIndexer = new DocIndexer();
 
     const transport = new StdioServerTransport();
     this.mcpServer.connect(transport);
@@ -68,6 +71,7 @@ export class App {
       openEffektFileAndWaitForHoles:
         this.openEffektFileAndWaitForHoles.bind(this),
       holeListener: this.holeListener,
+      docIndexer: this.docIndexer,
     };
   }
 
