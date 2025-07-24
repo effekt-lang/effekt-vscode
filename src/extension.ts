@@ -14,6 +14,7 @@ import { EffektLanguageClient } from './effektLanguageClient';
 import { EffektHoleInfo } from './holesPanel/effektHoleInfo';
 import { HolesViewProvider } from './holesPanel/holesViewProvider';
 import * as net from 'net';
+import { installMCPServer, isMCPServerInstalled } from './mcpManager';
 
 let client: EffektLanguageClient;
 let effektManager: EffektManager;
@@ -114,8 +115,10 @@ export async function activate(context: vscode.ExtensionContext) {
     // If Effekt is installed (no matter which version), start the language server
     await ensureEffektIsAvailable();
     await initializeLSPAndProviders(context);
+    await promptForMCPServerInstallation();
 
-    handleEffektUpdates(); // Do not await handleEffektUpdates() so the holes panel and LSP features load immediately, even if the update prompt is open.
+    // Do not await handleEffektUpdates() so the holes panel and LSP features load immediately, even if the update prompt is open.
+    handleEffektUpdates();
   } catch (error) {
     if (error instanceof EffektExecutableNotFoundError) {
       // If Effekt is not installed, we prompt the user to install it
@@ -404,6 +407,24 @@ function initializeHoleDecorations(context: vscode.ExtensionContext) {
   );
 
   scheduleDecorations();
+}
+
+function promptForMCPServerInstallation() {
+  if (isMCPServerInstalled()) {
+    return;
+  }
+
+  const installMCP = vscode.window.showInformationMessage(
+    'The Effekt MCP server is not installed. Would you like to install it now?',
+    {},
+    'Install',
+  );
+
+  installMCP.then((selection) => {
+    if (selection === 'Install') {
+      installMCPServer();
+    }
+  });
 }
 
 export function deactivate(): Thenable<void> | undefined {

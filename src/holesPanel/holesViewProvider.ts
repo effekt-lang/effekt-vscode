@@ -102,8 +102,35 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
             );
           }
         }
+      } else if (message.command === 'openCopilotChat') {
+        this.handleOpenCopilotChat(message);
       }
     });
+  }
+
+  private async handleOpenCopilotChat(request: {
+    holeId: string;
+  }): Promise<void> {
+    try {
+      const query = `Fill the hole with ID "${request.holeId}".`;
+
+      await vscode.commands.executeCommand('workbench.action.chat.open', {
+        query: query,
+        selection: vscode.window.activeTextEditor?.selection,
+        files: vscode.window.activeTextEditor?.document.uri
+          ? [vscode.window.activeTextEditor.document.uri]
+          : [],
+        workspaceFolder: vscode.workspace.workspaceFolders?.[0],
+        newSession: true,
+        participant: '@workspace',
+        mode: 'agent',
+      });
+    } catch (error) {
+      console.error('Error opening copilot chat:', error);
+      vscode.window.showErrorMessage(
+        `Failed to open copilot chat: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      );
+    }
   }
 
   public updateHoles(holes: EffektHoleInfo[]) {
