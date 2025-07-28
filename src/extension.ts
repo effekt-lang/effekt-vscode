@@ -14,7 +14,12 @@ import { EffektLanguageClient } from './effektLanguageClient';
 import { EffektHoleInfo } from './holesPanel/effektHoleInfo';
 import { HolesViewProvider } from './holesPanel/holesViewProvider';
 import * as net from 'net';
-import { installMCPServer, isMCPServerInstalled } from './mcpManager';
+import {
+  createEffektInstructions,
+  hasEffektInstructions,
+  installMCPServer,
+  isMCPServerInstalled,
+} from './mcpManager';
 
 let client: EffektLanguageClient;
 let effektManager: EffektManager;
@@ -116,6 +121,7 @@ export async function activate(context: vscode.ExtensionContext) {
     await ensureEffektIsAvailable();
     await initializeLSPAndProviders(context);
     await promptForMCPServerInstallation();
+    await promptForEffektInstructions(context);
 
     // Do not await handleEffektUpdates() so the holes panel and LSP features load immediately, even if the update prompt is open.
     handleEffektUpdates();
@@ -423,6 +429,22 @@ function promptForMCPServerInstallation() {
   installMCP.then((selection) => {
     if (selection === 'Install') {
       installMCPServer();
+    }
+  });
+}
+
+async function promptForEffektInstructions(context: vscode.ExtensionContext) {
+  if (await hasEffektInstructions()) {
+    return;
+  }
+  const createInstructions = vscode.window.showInformationMessage(
+    'AI agents perform better with Effekt-specific instructions. Would you like to create the Effekt instructions file now?',
+    {},
+    'Create',
+  );
+  createInstructions.then((selection) => {
+    if (selection === 'Create') {
+      createEffektInstructions(context);
     }
   });
 }
