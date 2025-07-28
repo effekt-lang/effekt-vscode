@@ -116,13 +116,6 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
 
       await vscode.commands.executeCommand('workbench.action.chat.open', {
         query: query,
-        selection: vscode.window.activeTextEditor?.selection,
-        files: vscode.window.activeTextEditor?.document.uri
-          ? [vscode.window.activeTextEditor.document.uri]
-          : [],
-        workspaceFolder: vscode.workspace.workspaceFolders?.[0],
-        newSession: true,
-        participant: '@workspace',
         mode: 'agent',
       });
     } catch (error) {
