@@ -75,6 +75,14 @@ async function main() {
     minify: false,
     banner: { js: '#!/usr/bin/env node' },
     logLevel: 'silent',
+    plugins: [
+      copyPlugin({
+        assets: {
+          from: ['src/mcp/effekt.instructions.md'],
+          to: ['.'],
+        },
+      }),
+    ],
   });
 
   if (watch) {

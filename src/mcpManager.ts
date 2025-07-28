@@ -22,3 +22,31 @@ export function installMCPServer() {
   const link = `vscode:mcp/install?${encodeURIComponent(JSON.stringify(obj))}`;
   vscode.env.openExternal(vscode.Uri.parse(link));
 }
+
+export function hasEffektInstructions(): PromiseLike<boolean> {
+  const workspace = vscode.workspace.workspaceFolders?.[0];
+  if (!workspace) {
+    return Promise.resolve(false);
+  }
+  const instructionsPath = vscode.Uri.joinPath(
+    workspace.uri,
+    '.github/instructions/effekt.instructions.md',
+  );
+
+  return vscode.workspace.fs.stat(instructionsPath).then(
+    () => true,
+    () => false,
+  );
+}
+
+export function createEffektInstructions(context: vscode.ExtensionContext) {
+  const source = vscode.Uri.joinPath(
+    context.extensionUri,
+    'dist/mcp/effekt.instructions.md',
+  );
+  const target = vscode.Uri.joinPath(
+    vscode.workspace.workspaceFolders?.[0].uri || vscode.Uri.file('.'),
+    '.github/instructions/effekt.instructions.md',
+  );
+  vscode.workspace.fs.copy(source, target, { overwrite: true });
+}
