@@ -12,6 +12,7 @@ For example, `if e1 then e2 else e3` is not valid Effekt code, use `if (e1) { e2
 To get the length of a list `l`, use `l.size`, to get the first element use `l.head`.
 If there are multiple statements in a definition, wrap them in curly braces, e.g. `def f = { ... }`.
 To create a data type with a single constructor, use `type MyType { MyType() }`.
+The main function (`def main()`) cannot have effects in its signature. If you need to use effects in main, handle them using `with` statements or effect handlers within the function body.
 A common pattern to handle exceptions is to use the following patterns:
 
 If it makes sense to provide a default value when an error occurs, you can use:
