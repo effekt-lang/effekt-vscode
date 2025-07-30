@@ -32,12 +32,8 @@ export const BindingsSection: React.FC<BindingsSectionProps> = ({
     }, []);
   }, [scope]);
 
-  const filteredBindings = useMemo(() => {
-    if (!filter.trim()) {
-      return allBindings;
-    }
-
-    const miniSearch = new MiniSearch({
+  const miniSearch = useMemo(() => {
+    const search = new MiniSearch({
       fields: ['name', 'qualifier', 'type', 'definition'],
       storeFields: [
         'name',
@@ -56,7 +52,14 @@ export const BindingsSection: React.FC<BindingsSectionProps> = ({
       qualifier: b.qualifier.join('::'),
     }));
 
-    miniSearch.addAll(searchableBindings);
+    search.addAll(searchableBindings);
+    return search;
+  }, [allBindings]);
+
+  const filteredBindings = useMemo(() => {
+    if (!filter.trim()) {
+      return allBindings;
+    }
 
     const searchResults = miniSearch.search(filter, {
       combineWith: 'OR',
@@ -64,7 +67,7 @@ export const BindingsSection: React.FC<BindingsSectionProps> = ({
     });
 
     return searchResults.map((result) => allBindings[result.id]);
-  }, [allBindings, filter]);
+  }, [allBindings, filter, miniSearch]);
 
   const totalCount = allBindings.length;
   const filteredCount = filteredBindings.length;
