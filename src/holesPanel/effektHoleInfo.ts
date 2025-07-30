@@ -19,6 +19,7 @@ export interface TermBinding {
   name: string;
   origin: BindingOrigin;
   type?: string;
+  typeHtml?: string;
   kind: typeof BINDING_KIND_TERM;
 }
 
@@ -27,6 +28,7 @@ export interface TypeBinding {
   name: string;
   origin: BindingOrigin;
   definition: string;
+  definitionHtml?: string;
   kind: typeof BINDING_KIND_TYPE;
 }
 
