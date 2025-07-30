@@ -64,6 +64,7 @@ export const BindingsSection: React.FC<BindingsSectionProps> = ({
     const searchResults = miniSearch.search(filter, {
       combineWith: 'OR',
       fuzzy: 0.2,
+      prefix: true,
     });
 
     return searchResults.map((result) => allBindings[result.id]);
