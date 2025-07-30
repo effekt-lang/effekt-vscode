@@ -65,13 +65,34 @@ async function main() {
     logLevel: 'silent',
   });
 
+  const mcpCtx = await esbuild.context({
+    entryPoints: ['src/mcp/index.ts'],
+    bundle: true,
+    platform: 'node',
+    format: 'cjs',
+    outfile: 'dist/mcp/server.js',
+    sourcemap: false,
+    minify: false,
+    banner: { js: '#!/usr/bin/env node' },
+    logLevel: 'silent',
+    plugins: [
+      copyPlugin({
+        assets: {
+          from: ['src/mcp/effekt.instructions.md'],
+          to: ['.'],
+        },
+      }),
+    ],
+  });
+
   if (watch) {
-    await Promise.all([extCtx.watch(), webCtx.watch()]);
+    await Promise.all([extCtx.watch(), webCtx.watch(), mcpCtx.watch()]);
   } else {
-    await Promise.all([extCtx.rebuild(), webCtx.rebuild()]);
-    await Promise.all([extCtx.dispose(), webCtx.dispose()]);
+    await Promise.all([extCtx.rebuild(), webCtx.rebuild(), mcpCtx.rebuild()]);
+    await Promise.all([extCtx.dispose(), webCtx.dispose(), mcpCtx.dispose()]);
   }
 }
+
 
 /**
  * @type {import('esbuild').Plugin}
