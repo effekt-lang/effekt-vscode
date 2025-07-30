@@ -1,13 +1,10 @@
 import React, { useState, useMemo } from 'react';
-import fuzzysort from 'fuzzysort';
+import MiniSearch from 'minisearch';
 import {
   ScopeInfo,
   BindingInfo,
   BINDING_ORIGIN_DEFINED,
   BINDING_ORIGIN_IMPORTED,
-  TermBinding,
-  fullyQualifiedName,
-  BINDING_KIND_TERM,
 } from '../effektHoleInfo';
 import { ScopeGroup } from './ScopeGroup';
 import { FilterBox } from './FilterBox';
@@ -35,28 +32,42 @@ export const BindingsSection: React.FC<BindingsSectionProps> = ({
     }, []);
   }, [scope]);
 
+  const miniSearch = useMemo(() => {
+    const search = new MiniSearch({
+      fields: ['name', 'qualifier', 'type', 'definition'],
+      storeFields: [
+        'name',
+        'qualifier',
+        'origin',
+        'kind',
+        'type',
+        'definition',
+      ],
+      idField: 'id',
+    });
+
+    const searchableBindings = allBindings.map((b, index) => ({
+      id: index,
+      ...b,
+      qualifier: b.qualifier.join('::'),
+    }));
+
+    search.addAll(searchableBindings);
+    return search;
+  }, [allBindings]);
+
   const filteredBindings = useMemo(() => {
-    // If no search text, return all bindings
     if (!filter.trim()) {
       return allBindings;
     }
 
-    // Apply fuzzy search to all bindings
-    const searchableBindings = allBindings.map((b) => {
-      const text =
-        b.kind === BINDING_KIND_TERM
-          ? fullyQualifiedName(b as TermBinding) +
-            ((b as TermBinding).type ? `: ${(b as TermBinding).type}` : '')
-          : b.definition || b.name;
-      return { binding: b, text };
+    const searchResults = miniSearch.search(filter, {
+      combineWith: 'OR',
+      fuzzy: 0.2,
     });
 
-    const fuzzyResults = fuzzysort.go(filter, searchableBindings, {
-      key: 'text',
-    });
-
-    return fuzzyResults.map((result) => result.obj.binding);
-  }, [allBindings, filter]);
+    return searchResults.map((result) => allBindings[result.id]);
+  }, [allBindings, filter, miniSearch]);
 
   const totalCount = allBindings.length;
   const filteredCount = filteredBindings.length;
