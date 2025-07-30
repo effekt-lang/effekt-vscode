@@ -44,6 +44,18 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
     );
   }
 
+  private getGrammarUri(): vscode.Uri | undefined {
+    if (!this.webviewView) {
+      return undefined;
+    }
+    return this.webviewView.webview.asWebviewUri(
+      vscode.Uri.joinPath(
+        this.context.extensionUri,
+        'dist/holesPanel/syntaxes/effekt.tmLanguage.json',
+      ),
+    );
+  }
+
   resolveWebviewView(webviewView: vscode.WebviewView) {
     this.webviewView = webviewView;
 
@@ -60,12 +72,14 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
     const cssUri = this.getCssUri()!;
     const jsUri = this.getJsUri()!;
     const codiconUri = this.getCodiconUri()!;
+    const grammarUri = this.getGrammarUri()!;
 
     webviewView.webview.html = webviewHtml(
       showHoles,
       cssUri,
       jsUri,
       codiconUri,
+      grammarUri,
     );
 
     this.configListener = vscode.workspace.onDidChangeConfiguration((e) => {
@@ -162,6 +176,7 @@ export function webviewHtml(
   cssUri: vscode.Uri,
   jsUri: vscode.Uri,
   codiconUri: vscode.Uri,
+  grammarUri: vscode.Uri,
 ): string {
   return /*html*/ `
 <!DOCTYPE html>
@@ -176,7 +191,7 @@ export function webviewHtml(
 </head>
 
 <body>
-  <div id="react-root" data-show-holes="${showHoles}"></div>
+  <div id="react-root" data-show-holes="${showHoles}" data-grammar-uri="${grammarUri}"></div>
 	<script src="${jsUri}"></script>
 </body>
 

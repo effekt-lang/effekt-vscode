@@ -239,6 +239,7 @@
     "compare-versions": "^6.1.1",
     "esbuild-plugin-copy": "^2.1.1",
     "minisearch": "^7.1.0",
+    "shiki": "^3.8.1",
     "vscode-languageclient": "^8.1.0"
   },
   "devDependencies": {

@@ -31,6 +31,12 @@ async function main() {
       }),
       copyPlugin({
         assets: {
+          from: ['syntaxes/effekt.tmLanguage.json'],
+          to: ['holesPanel/syntaxes'],
+        },
+      }),
+      copyPlugin({
+        assets: {
           from: ['node_modules/@vscode/codicons/dist/codicon.css'],
           to: ['holesPanel'],
         },
@@ -57,7 +63,9 @@ async function main() {
     },
     jsx: 'automatic',
     define: {
-      'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'production')
+      'process.env.NODE_ENV': JSON.stringify(
+        process.env.NODE_ENV || 'production',
+      ),
     },
     outfile: 'dist/holesPanel/holes.js',
     minify: false,
@@ -86,7 +94,9 @@ const esbuildProblemMatcherPlugin = {
     build.onEnd((result) => {
       result.errors.forEach(({ text, location }) => {
         console.error(`✘ [ERROR] ${text}`);
-        console.error(`    ${location.file}:${location.line}:${location.column}:`);
+        console.error(
+          `    ${location.file}:${location.line}:${location.column}:`,
+        );
       });
       console.log('[watch] build finished');
     });

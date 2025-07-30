@@ -182,8 +182,82 @@ code {
 
 .binding {
   background: var(--code-bg);
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px;
 }
 
 .binding-term {
   font-weight: bold;
+}
+
+.binding-colon {
+  color: var(--vscode-editorCodeLens-foreground);
+  margin: 0 2px;
+}
+
+.binding-type {
+  font-style: italic;
+  color: var(--vscode-debugTokenExpression-type);
+}
+
+.syntax-highlighted-code {
+  display: inline;
+  font-family: var(--font-mono);
+}
+
+.syntax-highlighted-code pre {
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  font-family: inherit;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.syntax-highlighted-code code {
+  background: transparent;
+  padding: 0;
+  font-family: inherit;
+}
+
+/* Override Shiki colors to use VS Code theme colors */
+.syntax-highlighted-code .token.comment {
+  color: var(--vscode-editorCodeLens-foreground);
+}
+
+.syntax-highlighted-code .token.keyword {
+  color: var(--vscode-debugTokenExpression-value);
+}
+
+.syntax-highlighted-code .token.string {
+  color: var(--vscode-debugTokenExpression-string);
+}
+
+.syntax-highlighted-code .token.number {
+  color: var(--vscode-debugTokenExpression-number);
+}
+
+.syntax-highlighted-code .token.operator {
+  color: var(--vscode-symbolIcon-operatorForeground);
+}
+
+.syntax-highlighted-code .token.function {
+  color: var(--vscode-symbolIcon-functionForeground);
+}
+
+.syntax-highlighted-code .token.variable {
+  color: var(--vscode-symbolIcon-variableForeground);
+}
+
+.syntax-highlighted-code .token.type {
+  color: var(--vscode-debugTokenExpression-type);
+}
+
+.fallback-code {
+  color: var(--foreground);
+  background: transparent;
+  padding: 0;
+  font-family: var(--font-mono);
 }
