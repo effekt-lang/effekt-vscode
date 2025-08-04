@@ -138,19 +138,19 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
 
       const query = `Solve all holes in this file. The holes are: ${holesList}
 
-Instructions:
-1. First, analyze all holes and create a priority/order for solving them based on:
-   - Dependencies between holes (solve simpler/foundational holes first)
-   - Type complexity (simpler types before complex ones)
-   - Logical flow and context
+        Instructions:
+        1. First, analyze all holes and create a priority/order for solving them based on:
+          - Dependencies between holes (solve simpler/foundational holes first)
+          - Type complexity (simpler types before complex ones)
+          - Logical flow and context
 
-2. Then, go through each hole one by one in your determined order:
-   - Analyze the hole's expected type and context
-   - Examine available bindings in scope
-   - Generate appropriate code to fill the hole
-   - Fill the hole with the same approach as a single solve
+        2. Then, go through each hole one by one in your determined order:
+          - Analyze the hole's expected type and context
+          - Examine available bindings in scope
+          - Generate appropriate code to fill the hole
+          - Fill the hole with the same approach as a single solve
 
-Use type-driven development principles and leverage the available bindings to create meaningful implementations. Process systematically through your prioritized list.`;
+        Use type-driven development principles and leverage the available bindings to create meaningful implementations. Process systematically through your prioritized list.`;
 
       await vscode.commands.executeCommand('workbench.action.chat.open', {
         query: query,
