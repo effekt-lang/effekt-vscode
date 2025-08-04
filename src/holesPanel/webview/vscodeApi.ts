@@ -8,7 +8,18 @@ declare function acquireVsCodeApi(): VSCodeAPI;
 
 export type OutgoingMessage =
   | { command: 'openCopilotChat'; holeId: string }
-  | { command: 'jumpToHole'; holeId: string };
+  | { command: 'jumpToHole'; holeId: string }
+  | { command: 'solveAllHoles'; holeIds: string[] };
+
+export interface JumpToHole {
+  command: 'jumpToHole';
+  holeId: string;
+}
+
+export interface SolveAllHoles {
+  command: 'solveAllHoles';
+  holeIds: string[];
+}
 
 export type IncomingMessage =
   | { command: 'highlightHole'; holeId: string }
