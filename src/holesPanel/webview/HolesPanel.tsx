@@ -61,21 +61,43 @@ export const HolesPanel: React.FC<{ initShowHoles: boolean }> = ({
     vscode.postMessage({ command: 'jumpToHole', holeId: id } as JumpToHole);
   }, []);
 
+  const handleSolveAll = useCallback(() => {
+    const holeIds = holes.map((h) => h.id);
+
+    vscode.postMessage({
+      command: 'solveAllHoles',
+      holeIds: holeIds,
+    });
+  }, [holes]);
+
   return (
     <div className="holes-list">
       {!showHoles && <Warning />}
       {holes.length === 0 ? (
         <div className="empty">There are no holes in this file.</div>
       ) : (
-        holes.map((h) => (
-          <HoleCard
-            key={h.id}
-            hole={h}
-            highlighted={h.id === highlightedHoleId}
-            onJump={handleJump}
-            vscode={vscode}
-          />
-        ))
+        <>
+          {holes.length > 1 && (
+            <div className="solve-all-container">
+              <button
+                className="solve-all-button"
+                onClick={handleSolveAll}
+                title="Let AI analyze, prioritize, and solve all holes intelligently"
+              >
+                Solve All ({holes.length} holes)
+              </button>
+            </div>
+          )}
+          {holes.map((h) => (
+            <HoleCard
+              key={h.id}
+              hole={h}
+              highlighted={h.id === highlightedHoleId}
+              onJump={handleJump}
+              vscode={vscode}
+            />
+          ))}
+        </>
       )}
       {holes.length === 0 && <Description />}
     </div>
