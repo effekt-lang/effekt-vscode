@@ -80,7 +80,7 @@ export const HolesPanel: React.FC<{ initShowHoles: boolean }> = ({
           {holes.length > 1 && (
             <div className="solve-all-container">
               <button
-                className="solve-all-button"
+                className="solve-button"
                 onClick={handleSolveAll}
                 title="Let AI analyze, prioritize, and solve all holes intelligently"
               >
