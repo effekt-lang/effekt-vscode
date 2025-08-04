@@ -104,6 +104,8 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
         }
       } else if (message.command === 'openCopilotChat') {
         this.handleOpenCopilotChat(message);
+      } else if (message.command === 'solveAllHoles') {
+        this.handleSolveAllHoles(message);
       }
     });
   }
@@ -122,6 +124,42 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
       console.error('Error opening copilot chat:', error);
       vscode.window.showErrorMessage(
         `Failed to open copilot chat: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      );
+    }
+  }
+
+  private async handleSolveAllHoles(request: {
+    holeIds: string[];
+  }): Promise<void> {
+    try {
+      const holeNames = request.holeIds;
+
+      const holesList = holeNames.join(', ');
+
+      const query = `Solve all holes in this file. The holes are: ${holesList}
+
+Instructions:
+1. First, analyze all holes and create a priority/order for solving them based on:
+   - Dependencies between holes (solve simpler/foundational holes first)
+   - Type complexity (simpler types before complex ones)
+   - Logical flow and context
+
+2. Then, go through each hole one by one in your determined order:
+   - Analyze the hole's expected type and context
+   - Examine available bindings in scope
+   - Generate appropriate code to fill the hole
+   - Fill the hole with the same approach as a single solve
+
+Use type-driven development principles and leverage the available bindings to create meaningful implementations. Process systematically through your prioritized list.`;
+
+      await vscode.commands.executeCommand('workbench.action.chat.open', {
+        query: query,
+        mode: 'agent',
+      });
+    } catch (error) {
+      console.error('Error opening copilot chat for solve all:', error);
+      vscode.window.showErrorMessage(
+        `Failed to open copilot chat for solve all: ${error instanceof Error ? error.message : 'Unknown error'}`,
       );
     }
   }
