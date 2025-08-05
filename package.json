@@ -10,7 +10,8 @@
   "version": "0.4.4",
   "publisher": "effekt-lang",
   "engines": {
-    "vscode": "^1.80.0"
+    "vscode": "^1.80.0",
+    "node": ">=20.0.0"
   },
   "categories": [
     "Other"
