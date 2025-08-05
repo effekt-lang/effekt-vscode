@@ -9,7 +9,8 @@ declare function acquireVsCodeApi(): VSCodeAPI;
 export type OutgoingMessage =
   | { command: 'openCopilotChat'; holeId: string }
   | { command: 'jumpToHole'; holeId: string }
-  | { command: 'solveAllHoles'; holeIds: string[] };
+  | { command: 'solveAllHoles'; holeIds: string[] }
+  | { command: 'createDraft' };
 
 export interface JumpToHole {
   command: 'jumpToHole';
