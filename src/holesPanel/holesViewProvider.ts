@@ -147,8 +147,7 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
         2. Then, go through each hole one by one in your determined order:
           - Analyze the hole's expected type and context
           - Examine available bindings in scope
-          - Generate appropriate code to fill the hole
-          - Fill the hole with the same approach as a single solve
+          - Generate appropriate code to fill the hole, using the same approach as single hole solving
 
         Use type-driven development principles and leverage the available bindings to create meaningful implementations. Process systematically through your prioritized list.`;
 
