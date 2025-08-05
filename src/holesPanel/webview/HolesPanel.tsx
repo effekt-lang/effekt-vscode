@@ -20,6 +20,11 @@ const Description: React.FC = () => (
     <pre>
       def foo() = &lt;{'{'} println("foo"); 42 {'}'}&gt;
     </pre>
+    <p>
+      <strong>Tipp:</strong> Use "Create Draft" to generate function signatures
+      with descriptive holes for your program structure, then use "Solve All" to
+      implement them systematically.
+    </p>
   </div>
 );
 
@@ -70,9 +75,24 @@ export const HolesPanel: React.FC<{ initShowHoles: boolean }> = ({
     });
   }, [holes]);
 
+  const handleCreateDraft = useCallback(() => {
+    vscode.postMessage({
+      command: 'createDraft',
+    });
+  }, []);
+
   return (
     <div className="holes-list">
       {!showHoles && <Warning />}
+      <div className="draft-container">
+        <button
+          className="solve-button draft-button"
+          onClick={handleCreateDraft}
+          title="Create function signatures with descriptive holes to draft your program structure"
+        >
+          Create Draft
+        </button>
+      </div>
       {holes.length === 0 ? (
         <div className="empty">There are no holes in this file.</div>
       ) : (
