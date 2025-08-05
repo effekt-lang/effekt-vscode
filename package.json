@@ -10,7 +10,7 @@
   "version": "0.4.5",
   "publisher": "effekt-lang",
   "engines": {
-    "vscode": "^1.100.0",
+    "vscode": "^1.90.0",
     "node": ">=20.0.0"
   },
   "categories": [
@@ -248,7 +248,7 @@
     "@types/node": "^20.11.25",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
-    "@types/vscode": "^1.100.0",
+    "@types/vscode": "^1.90.0",
     "@typescript-eslint/eslint-plugin": "^7.1.0",
     "@typescript-eslint/parser": "^7.1.0",
     "esbuild": "^0.25.4",
