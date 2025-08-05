@@ -171,6 +171,9 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
 
       Instructions:
       1. Analyze the existing code to understand the intended program structure
+      
+      If the context is unclear or the file is empty/minimal, ask the user what kind of program they want to create 
+
       2. Create function signatures for missing functionality
       3. Use descriptive holes like <"description of what this function should return"> instead of empty holes
       4. Focus on creating a logical program structure with clear interfaces
