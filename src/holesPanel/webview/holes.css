@@ -196,6 +196,13 @@ code {
   border-bottom: 1px solid var(--border);
 }
 
+.draft-container {
+  text-align: center;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
 .solve-button {
   background: var(--vscode-button-background);
   color: var(--vscode-button-foreground);
@@ -207,6 +214,15 @@ code {
   cursor: pointer;
   transition: all 0.2s ease;
   outline: none;
+}
+
+.draft-button {
+  background: var(--vscode-button-secondaryBackground);
+  color: var(--vscode-button-secondaryForeground);
+}
+
+.draft-button:hover:not(:disabled) {
+  background: var(--vscode-button-secondaryHoverBackground);
 }
 
 .solve-button:hover:not(:disabled) {
