@@ -4,35 +4,50 @@ applyTo: '**/*.effekt'
 
 # Instructions on writing Effekt code
 
-Negate `x: Bool` by writing `x.not`.
-Handle exceptions `MyError` using `try { ... } with Exception[ErrorType] { def raise(exception, msg) = ... }`.
-Even though the Effekt language is similiar in syntax to Scala, not all Scala code is valid Effekt code.
-Do not assume Scala code will work in Effekt.
-For example, `if e1 then e2 else e3` is not valid Effekt code, use `if (e1) { e2 } else { e3 }` instead.
-To get the length of a list `l`, use `l.size`, to get the first element use `l.head`.
-If there are multiple statements in a definition, wrap them in curly braces, e.g. `def f = { ... }`.
-To create a data type with a single constructor, use `type MyType { MyType() }`.
-The main function (`def main()`) cannot have effects in its signature. If you need to use effects in main, handle them using `with` statements or effect handlers within the function body.
-A common pattern to handle exceptions is to use the following patterns:
+## Syntax Differences from Scala
+- Use `if (condition) { then_branch } else { else_branch }` instead of `if condition then ... else ...`
+- Always use parentheses when calling functions, even with no arguments: `myFunction()`
+- Wrap multiple statements in definitions with curly braces: `def f = { statement1; statement2 }`
 
-If it makes sense to provide a default value when an error occurs, you can use:
-```
-with on[MyError].default { defaultValueGoesHere }
+## Basic Operations
+- Negate boolean `x` with `x.not`
+- Get list length with `l.size`, first element with `l.head`
+- Create single-constructor data types: `type MyType { MyType(field1: Type1, field2: Type2) }`
+
+## Effect Handling
+The main function (`def main()`) cannot have effects in its signature. So no `def main() : Unit / { io } ` for example. Handle effects within the function body.
+
+### Exception Handling
+Handle exceptions using `try { ... } with Exception[ErrorType] { def raise(exception, msg) = ... }`
+
+Common patterns for exception handling:
+```effekt
+// Provide default value on error
+with on[MyError].default { defaultValue }
 codeThatCanRaiseMyError
-```
 
-```
+// Panic on error
 with on[MyError].panic
 codeThatCanRaiseMyError
 ```
 
-In general, note that
-```
-with f
+### Effect Handler Syntax
+```effekt
+with handler
 code
 ```
-is syntax sugar for `f { code }`, i.e. supplying a block argument to`f`.
-In particular, do not parenthsize `code`. `with f { code }` will not work!
-When you call functions, always use parentheses, even if there are no arguments.
+This is syntactic sugar for `handler { code }`. 
 
-Do not be contempt with subpar code. If you don't manage to implement part of the program, create a hole with the syntax `<"Put the TODO description here">`.
+**Important:** 
+- Do NOT parenthesize the code block: `with handler { code }` is invalid
+- Do NOT use parentheses around the code after `with`
+
+## Development Workflow
+- When implementation is incomplete, use holes: `<"TODO: description of what needs to be implemented">`
+- Always strive for complete, working code rather than accepting partial implementations
+
+## Key Reminders
+- Effekt syntax differs significantly from Scala - do not assume Scala patterns work
+- Always use parentheses for function calls
+- Effect handling is mandatory for effects in main()
+- If unsure about anything, use tools to lookup in the stdlib
