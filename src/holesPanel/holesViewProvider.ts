@@ -106,6 +106,8 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
         this.handleOpenCopilotChat(message);
       } else if (message.command === 'solveAllHoles') {
         this.handleSolveAllHoles(message);
+      } else if (message.command === 'createDraft') {
+        this.handleCreateDraft();
       }
     });
   }
@@ -159,6 +161,36 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
       console.error('Error opening copilot chat for solve all:', error);
       vscode.window.showErrorMessage(
         `Failed to open copilot chat for solve all: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      );
+    }
+  }
+
+  private async handleCreateDraft(): Promise<void> {
+    try {
+      const query = `Create a draft structure for this Effekt file. Generate only function/method signatures with descriptive holes that explain what each function should do.
+
+      Instructions:
+      1. Analyze the existing code to understand the intended program structure
+      2. Create function signatures for missing functionality
+      3. Use descriptive holes like <"description of what this function should return"> instead of empty holes
+      4. Focus on creating a logical program structure with clear interfaces
+      5. Don't implement the function bodies - only create signatures with meaningful hole descriptions
+      6. Consider the types and effects that would be appropriate for each function
+
+      Example of what to generate:
+      def processInput(input: String): Result / { IO, Console } = <"process the input string and return appropriate result">
+      def validateData(data: Data): Boolean / { Error } = <"validate the data and return true if valid">
+
+      Please analyze the current file and suggest a draft structure with function signatures and descriptive holes.`;
+
+      await vscode.commands.executeCommand('workbench.action.chat.open', {
+        query: query,
+        mode: 'agent',
+      });
+    } catch (error) {
+      console.error('Error creating draft:', error);
+      vscode.window.showErrorMessage(
+        `Failed to create draft: ${error instanceof Error ? error.message : 'Unknown error'}`,
       );
     }
   }
