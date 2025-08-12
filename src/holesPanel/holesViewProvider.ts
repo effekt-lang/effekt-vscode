@@ -108,6 +108,8 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
         this.handleSolveAllHoles(message);
       } else if (message.command === 'createDraft') {
         this.handleCreateDraft();
+      } else if (message.command === 'explainHole') {
+        this.handleExplainHole(message);
       }
     });
   }
@@ -194,6 +196,21 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
       console.error('Error creating draft:', error);
       vscode.window.showErrorMessage(
         `Failed to create draft: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      );
+    }
+  }
+
+  private async handleExplainHole(request: { holeId: string }): Promise<void> {
+    try {
+      const query = `Explain the selected Effekt hole (ID: "${request.holeId}"). Summarize the expected type and any effects involved, and show 1-2 minimal example snippets that would typecheck here. Use valid Effekt syntax.`;
+      await vscode.commands.executeCommand('workbench.action.chat.open', {
+        query,
+        mode: 'ask',
+      });
+    } catch (error) {
+      console.error('Error opening copilot chat (explain hole):', error);
+      vscode.window.showErrorMessage(
+        `Failed to explain hole: ${error instanceof Error ? error.message : 'Unknown error'}`,
       );
     }
   }

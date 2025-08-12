@@ -42,6 +42,16 @@ export const HoleCard: React.FC<HoleCardProps> = ({
         >
           Solve
         </button>
+        <button
+          className="solve-button"
+          onClick={(e) => {
+            e.stopPropagation();
+            explainHole(hole, vscode);
+          }}
+          title="Explain the required type/effects and show a tiny example"
+        >
+          Explain
+        </button>
       </div>
       {hole.expectedType && (
         <div className="hole-field">
@@ -70,6 +80,16 @@ const solveHole = async (
 ): Promise<void> => {
   vscode.postMessage({
     command: 'openCopilotChat',
+    holeId: hole.id,
+  });
+};
+
+const explainHole = async (
+  hole: EffektHoleInfo,
+  vscode: VSCodeAPI,
+): Promise<void> => {
+  vscode.postMessage({
+    command: 'explainHole',
     holeId: hole.id,
   });
 };

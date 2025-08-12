@@ -10,7 +10,8 @@ export type OutgoingMessage =
   | { command: 'openCopilotChat'; holeId: string }
   | { command: 'jumpToHole'; holeId: string }
   | { command: 'solveAllHoles'; holeIds: string[] }
-  | { command: 'createDraft' };
+  | { command: 'createDraft' }
+  | { command: 'explainHole'; holeId: string };
 
 export interface JumpToHole {
   command: 'jumpToHole';
