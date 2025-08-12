@@ -247,7 +247,7 @@ Rules:
 Use valid Effekt syntax and keep snippets minimal.`;
       await vscode.commands.executeCommand('workbench.action.chat.open', {
         query,
-        mode: 'ask',
+        mode: 'agent',
       });
     } catch (error) {
       console.error('Error opening copilot chat (next step):', error);
