@@ -110,6 +110,8 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
         this.handleCreateDraft();
       } else if (message.command === 'explainHole') {
         this.handleExplainHole(message);
+      } else if (message.command === 'suggestNextStep') {
+        this.handleSuggestNextStep(message);
       }
     });
   }
@@ -211,6 +213,46 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
       console.error('Error opening copilot chat (explain hole):', error);
       vscode.window.showErrorMessage(
         `Failed to explain hole: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      );
+    }
+  }
+
+  private async handleSuggestNextStep(request: {
+    holeId: string;
+  }): Promise<void> {
+    try {
+      const query = `Effekt – suggest next steps for the selected hole (ID: "${request.holeId}").
+
+Please respond in this format:
+
+1. Goal
+- Briefly state the expected value type and any effects you infer at this position.
+
+2. Context
+- List 3–6 most relevant in-scope bindings as bullets: name: Type
+
+3. Next steps (3 options)
+- For each option provide:
+  - Rationale (1 sentence)
+  - A tiny code snippet that would typecheck here
+
+Rules:
+- Prefer using existing bindings and simple composition. Avoid proposing bare literals.
+- If effects are likely, show the correct Effekt syntax (with handler/try-with) in the snippet.
+- If the goal is a function or an ADT, consider a lambda or a match skeleton as one option.
+
+4. Recommendation
+- Pick one option as the recommended next small step (one sentence).
+
+Use valid Effekt syntax and keep snippets minimal.`;
+      await vscode.commands.executeCommand('workbench.action.chat.open', {
+        query,
+        mode: 'ask',
+      });
+    } catch (error) {
+      console.error('Error opening copilot chat (next step):', error);
+      vscode.window.showErrorMessage(
+        `Failed to suggest next step: ${error instanceof Error ? error.message : 'Unknown error'}`,
       );
     }
   }
