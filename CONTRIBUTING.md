@@ -37,7 +37,7 @@ Make sure you're on the latest `master` by running:
 git checkout master && git pull
 ```
 
-Depending on if the new change is minor or a patch (choose one), run:
+Depending on whether the new change is minor or a patch (choose one), run:
 
 ```sh
 npm version [minor/patch] -m "Release v%s"
