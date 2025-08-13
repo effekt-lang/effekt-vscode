@@ -38,7 +38,7 @@ npm run lint
 ```
 
 > ![TIP]
-> You can run these command in a git pre-commit hook by editing `.git/hooks/pre-commit` and running `chmod +x .git/hooks/pre-commit`
+> You can run these commands in a git pre-commit hook by editing `.git/hooks/pre-commit` and running `chmod +x .git/hooks/pre-commit`
 
 ## Creating a Pull Request
 
