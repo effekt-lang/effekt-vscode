@@ -40,6 +40,19 @@ npm run lint
 > ![TIP]
 > You can run these command in a git pre-commit hook by editing `.git/hooks/pre-commit` and running `chmod +x .git/hooks/pre-commit`
 
+## Creating a Pull Request
+
+Before creating a pull request, it is important to test exporting the extension via `vsce` to ensure that the release build published to the VSCode marketplace will work.
+
+To do so, run:
+
+```sh
+vsce package --out effekt.vsix
+code --install-extension effekt.vsix
+```
+
+Then, in a separate instance of VSCode, test the extension on some Effekt code.
+
 ## Release Process
 
 This section describes how to release a new version of the Effekt VSCode extension to the VSCode Marketplace.
