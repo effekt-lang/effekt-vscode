@@ -27,6 +27,19 @@ npm run compile
 Finally, within VSCode, press `F5`.
 This should launch the extension in debug mode in a separate VSCode window for you to test.
 
+## Creating a Commit
+
+Before each commit, make sure the typechecker, linter and formatter pass:
+
+```sh
+npm run compile
+npm run format
+npm run lint
+```
+
+> ![TIP]
+> You can run these command in a git pre-commit hook by editing `.git/hooks/pre-commit` and running `chmod +x .git/hooks/pre-commit`
+
 ## Release Process
 
 This section describes how to release a new version of the Effekt VSCode extension to the VSCode Marketplace.
