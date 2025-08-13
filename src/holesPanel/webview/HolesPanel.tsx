@@ -77,6 +77,38 @@ export const HolesPanel: React.FC<{ initShowHoles: boolean }> = ({
     setHighlightedHoleId(null);
   }, []);
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setHighlightedHoleId(null);
+      } else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        if (holes.length === 0) {
+          return;
+        }
+
+        e.preventDefault();
+        const currentIndex = highlightedHoleId
+          ? holes.findIndex((h) => h.id === highlightedHoleId)
+          : -1;
+
+        let nextIndex: number;
+        if (e.key === 'ArrowDown') {
+          nextIndex = currentIndex < holes.length - 1 ? currentIndex + 1 : 0;
+        } else {
+          nextIndex = currentIndex > 0 ? currentIndex - 1 : holes.length - 1;
+        }
+
+        const nextHole = holes[nextIndex];
+        if (nextHole) {
+          vscode.postMessage({ command: 'jumpToHole', holeId: nextHole.id });
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [holes, highlightedHoleId]);
+
   return (
     <div className="holes-list">
       {!showHoles && <Warning />}
