@@ -268,8 +268,22 @@
         {
           "name": "string.quoted.double.effekt",
           "begin": "\"",
-          "end": "\"",
+          "beginCaptures": {
+            "0": {
+              "name": "punctuation.definition.string.begin.effekt"
+            }
+          },
+          "end": "\"|(?=\\n)",
+          "endCaptures": {
+            "0": {
+              "name": "punctuation.definition.string.end.effekt"
+            }
+          },
           "patterns": [
+            {
+              "match": "[^\"]*(?=\\n)",
+              "name": "invalid.illegal.unterminated-string.effekt"
+            },
             {
               "include": "#escapes"
             },
