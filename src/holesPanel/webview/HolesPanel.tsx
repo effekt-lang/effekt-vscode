@@ -20,6 +20,11 @@ const Description: React.FC = () => (
     <pre>
       def foo() = &lt;{'{'} println("foo"); 42 {'}'}&gt;
     </pre>
+    <p>
+      <strong>Tipp:</strong> Use "Create Draft" to generate function signatures
+      with descriptive holes for your program structure, then use "Solve All" to
+      implement them systematically.
+    </p>
   </div>
 );
 
@@ -61,21 +66,58 @@ export const HolesPanel: React.FC<{ initShowHoles: boolean }> = ({
     vscode.postMessage({ command: 'jumpToHole', holeId: id } as JumpToHole);
   }, []);
 
+  const handleSolveAll = useCallback(() => {
+    const holeIds = holes.map((h) => h.id);
+
+    vscode.postMessage({
+      command: 'solveAllHoles',
+      holeIds: holeIds,
+    });
+  }, [holes]);
+
+  const handleCreateDraft = useCallback(() => {
+    vscode.postMessage({
+      command: 'createDraft',
+    });
+  }, []);
+
   return (
     <div className="holes-list">
       {!showHoles && <Warning />}
+      <div className="draft-container">
+        <button
+          className="solve-button draft-button"
+          onClick={handleCreateDraft}
+          title="Create function signatures with descriptive holes to draft your program structure"
+        >
+          Create Draft
+        </button>
+      </div>
       {holes.length === 0 ? (
         <div className="empty">There are no holes in this file.</div>
       ) : (
-        holes.map((h) => (
-          <HoleCard
-            key={h.id}
-            hole={h}
-            highlighted={h.id === highlightedHoleId}
-            onJump={handleJump}
-            vscode={vscode}
-          />
-        ))
+        <>
+          {holes.length > 1 && (
+            <div className="solve-all-container">
+              <button
+                className="solve-button"
+                onClick={handleSolveAll}
+                title="Let AI analyze, prioritize, and solve all holes intelligently"
+              >
+                Solve All ({holes.length} holes)
+              </button>
+            </div>
+          )}
+          {holes.map((h) => (
+            <HoleCard
+              key={h.id}
+              hole={h}
+              highlighted={h.id === highlightedHoleId}
+              onJump={handleJump}
+              vscode={vscode}
+            />
+          ))}
+        </>
       )}
       {holes.length === 0 && <Description />}
     </div>
