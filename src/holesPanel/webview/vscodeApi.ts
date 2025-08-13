@@ -13,7 +13,10 @@ export type OutgoingMessage =
   | { command: 'createDraft' }
   | { command: 'explainHole'; holeId: string }
   | { command: 'suggestNextStep'; holeId: string }
-  | { command: 'createTests'; holeId: string };
+  | { command: 'createTests'; holeId: string }
+  | { command: 'writeTestFirst'; holeId: string }
+  | { command: 'runTests'; holeId?: string }
+  | { command: 'implementToPass'; holeId: string };
 
 export interface JumpToHole {
   command: 'jumpToHole';

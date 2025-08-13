@@ -33,45 +33,83 @@ export const HoleCard: React.FC<HoleCardProps> = ({
     >
       <div className="hole-header">
         <span className="hole-id">Hole: {hole.id}</span>
-        <button
-          className="solve-button"
-          onClick={(e) => {
-            e.stopPropagation();
-            solveHole(hole, vscode);
-          }}
-        >
-          Solve
-        </button>
-        <button
-          className="solve-button"
-          onClick={(e) => {
-            e.stopPropagation();
-            explainHole(hole, vscode);
-          }}
-          title="Explain the required type/effects and show a tiny example"
-        >
-          Explain
-        </button>
-        <button
-          className="solve-button"
-          onClick={(e) => {
-            e.stopPropagation();
-            suggestNextStep(hole, vscode);
-          }}
-          title="Suggest the next small step toward solving this hole"
-        >
-          Next step
-        </button>
-        <button
-          className="solve-button"
-          onClick={(e) => {
-            e.stopPropagation();
-            createTests(hole, vscode);
-          }}
-          title="Create tests for the expected behavior of this hole"
-        >
-          Create tests
-        </button>
+        <div className="button-group basic-actions">
+          <button
+            className="solve-button"
+            onClick={(e) => {
+              e.stopPropagation();
+              solveHole(hole, vscode);
+            }}
+          >
+            Solve
+          </button>
+          <button
+            className="solve-button"
+            onClick={(e) => {
+              e.stopPropagation();
+              explainHole(hole, vscode);
+            }}
+            title="Explain the required type/effects and show a tiny example"
+          >
+            Explain
+          </button>
+          <button
+            className="solve-button"
+            onClick={(e) => {
+              e.stopPropagation();
+              suggestNextStep(hole, vscode);
+            }}
+            title="Suggest the next small step toward solving this hole"
+          >
+            Next step
+          </button>
+        </div>
+
+        <div className="button-group tdd-workflow">
+          <button
+            className="solve-button tdd-button"
+            onClick={(e) => {
+              e.stopPropagation();
+              writeTestFirst(hole, vscode);
+            }}
+            title="Write a test first that defines expected behavior"
+          >
+            Write Test First
+          </button>
+          <button
+            className="solve-button tdd-button"
+            onClick={(e) => {
+              e.stopPropagation();
+              runTests(hole, vscode);
+            }}
+            title="Run tests to see current failures"
+          >
+            Run Tests
+          </button>
+          <button
+            className="solve-button tdd-button"
+            onClick={(e) => {
+              e.stopPropagation();
+              implementToPass(hole, vscode);
+            }}
+            title="Implement the hole to make tests pass"
+          >
+            Implement to Pass
+          </button>
+        </div>
+
+        <div className="button-group test-utilities">
+          <button
+            className="solve-button test-button"
+            onClick={(e) => {
+              e.stopPropagation();
+              createTests(hole, vscode);
+            }}
+            title="Create comprehensive tests for this hole"
+          >
+            Create Tests
+          </button>
+        </div>
       </div>
       {hole.expectedType && (
         <div className="hole-field">
@@ -130,6 +168,36 @@ const createTests = async (
 ): Promise<void> => {
   vscode.postMessage({
     command: 'createTests',
+    holeId: hole.id,
+  });
+};
+
+const writeTestFirst = async (
+  hole: EffektHoleInfo,
+  vscode: VSCodeAPI,
+): Promise<void> => {
+  vscode.postMessage({
+    command: 'writeTestFirst',
+    holeId: hole.id,
+  });
+};
+
+const runTests = async (
+  hole: EffektHoleInfo,
+  vscode: VSCodeAPI,
+): Promise<void> => {
+  vscode.postMessage({
+    command: 'runTests',
+    holeId: hole.id,
+  });
+};
+
+const implementToPass = async (
+  hole: EffektHoleInfo,
+  vscode: VSCodeAPI,
+): Promise<void> => {
+  vscode.postMessage({
+    command: 'implementToPass',
     holeId: hole.id,
   });
 };

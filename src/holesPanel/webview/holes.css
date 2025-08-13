@@ -57,14 +57,28 @@ pre {
 
 .hole-header {
   display: flex;
-  align-items: center;
-  margin-bottom: 8px;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
   font-weight: bold;
 }
 
 .hole-id {
   font-family: var(--font-mono);
-  flex: 1;
+  margin-bottom: 8px;
+}
+
+.button-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+}
+
+.button-group + .button-group {
+  margin-top: 4px;
+  padding-top: 4px;
+  border-top: 1px solid var(--border);
 }
 
 .hole-field {
@@ -244,4 +258,26 @@ code {
 .solve-button:focus {
   outline: 1px solid var(--vscode-focusBorder);
   outline-offset: 2px;
+}
+
+.tdd-button {
+  background: var(--vscode-testing-runAction);
+  color: var(--vscode-button-foreground);
+  border-left: 3px solid var(--vscode-testing-iconQueued);
+}
+
+.tdd-button:hover:not(:disabled) {
+  background: var(--vscode-button-hoverBackground);
+  border-left-color: var(--vscode-testing-iconPassed);
+}
+
+.test-button {
+  background: var(--vscode-testing-iconUnset);
+  color: var(--vscode-button-foreground);
+  border-left: 3px solid var(--vscode-testing-iconSkipped);
+}
+
+.test-button:hover:not(:disabled) {
+  background: var(--vscode-button-hoverBackground);
+  border-left-color: var(--vscode-testing-iconFailed);
 }

@@ -114,6 +114,12 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
         this.handleSuggestNextStep(message);
       } else if (message.command === 'createTests') {
         this.handleCreateTests(message);
+      } else if (message.command === 'writeTestFirst') {
+        this.handleWriteTestFirst(message);
+      } else if (message.command === 'runTests') {
+        this.handleRunTests(message);
+      } else if (message.command === 'implementToPass') {
+        this.handleImplementToPass(message);
       }
     });
   }
@@ -300,6 +306,100 @@ Instructions:
       console.error('Error opening copilot chat (create tests):', error);
       vscode.window.showErrorMessage(
         `Failed to create tests: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      );
+    }
+  }
+
+  // TDD workflow handlers
+  private async handleWriteTestFirst(request: {
+    holeId: string;
+  }): Promise<void> {
+    try {
+      const query = `Write a test FIRST for Effekt hole "${request.holeId}" using TDD approach.
+
+Create a comprehensive test that defines expected behavior BEFORE implementing the hole. The test should:
+1. Specify clear input/output expectations
+2. Include edge cases and error conditions  
+3. Handle any expected effects properly
+4. Initially FAIL when run (since hole is not implemented)
+
+Follow this pattern:
+\`\`\`effekt
+test("${request.holeId} behavior") {
+  val input = ...
+  val expected = ...
+  val actual = // call function containing hole
+  assertEqual(actual, expected, "should meet expectation")
+}
+\`\`\`
+
+Write failing tests first, then we'll implement to make them pass.`;
+
+      await vscode.commands.executeCommand('workbench.action.chat.open', {
+        query,
+        mode: 'agent',
+      });
+    } catch (error) {
+      console.error('Error opening copilot chat (write test first):', error);
+      vscode.window.showErrorMessage(
+        `Failed to write test first: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      );
+    }
+  }
+
+  private async handleRunTests(request: { holeId?: string }): Promise<void> {
+    try {
+      const query = request.holeId
+        ? `Run tests for Effekt hole "${request.holeId}" and show current failures.
+
+Execute the relevant test suite and display:
+1. Which tests are currently failing
+2. Why they are failing (expected vs actual)
+3. Stack traces or error messages
+4. Guidance on what needs to be implemented to make tests pass
+
+Focus on the failing tests related to hole "${request.holeId}".`
+        : `Run all Effekt tests and show current status.
+
+Execute the test suite and display:
+1. Passing vs failing test counts
+2. Details of any failures
+3. Overall test coverage status`;
+
+      await vscode.commands.executeCommand('workbench.action.chat.open', {
+        query,
+        mode: 'agent',
+      });
+    } catch (error) {
+      console.error('Error opening copilot chat (run tests):', error);
+      vscode.window.showErrorMessage(
+        `Failed to run tests: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      );
+    }
+  }
+
+  private async handleImplementToPass(request: {
+    holeId: string;
+  }): Promise<void> {
+    try {
+      const query = `Implement Effekt hole "${request.holeId}" to make the existing tests pass.
+
+Analyze current test failures and create the MINIMAL implementation that satisfies all test requirements:
+1. Look at failing test assertions to understand expected behavior
+2. Implement just enough code to make tests pass (no over-engineering)
+3. Use proper Effekt syntax and effects handling
+4. Ensure the implementation handles all test cases (normal, edge, error cases)
+
+Focus on making tests pass rather than adding extra functionality. Follow TDD principle: implement the simplest thing that makes tests green.`;
+
+      await vscode.commands.executeCommand('workbench.action.chat.open', {
+        query,
+        mode: 'agent',
+      });
+    } catch (error) {
+      console.error('Error opening copilot chat (implement to pass):', error);
+      vscode.window.showErrorMessage(
+        `Failed to implement to pass: ${error instanceof Error ? error.message : 'Unknown error'}`,
       );
     }
   }
