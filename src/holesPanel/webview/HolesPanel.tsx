@@ -102,6 +102,29 @@ export const HolesPanel: React.FC<{ initShowHoles: boolean }> = ({
         if (nextHole) {
           vscode.postMessage({ command: 'jumpToHole', holeId: nextHole.id });
         }
+      } else if (e.key === 'Enter') {
+        if (holes.length === 0) {
+          return;
+        }
+
+        e.preventDefault();
+        if (!highlightedHoleId) {
+          // No hole selected, jump to first hole
+          const firstHole = holes[0];
+          if (firstHole) {
+            vscode.postMessage({ command: 'jumpToHole', holeId: firstHole.id });
+          }
+        }
+      } else if ((e.key === '/' || e.key === ' ') && highlightedHoleId) {
+        // Focus search bar when inside a hole
+        e.preventDefault();
+        const searchBox = document.querySelector(
+          '.filter-box',
+        ) as HTMLInputElement;
+        if (searchBox) {
+          searchBox.focus();
+          searchBox.select();
+        }
       }
     };
 
