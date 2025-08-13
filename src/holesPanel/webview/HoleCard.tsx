@@ -6,12 +6,14 @@ interface HoleCardProps {
   hole: EffektHoleInfo;
   highlighted: boolean;
   onJump: (id: string) => void;
+  onDeselect: () => void;
 }
 
 export const HoleCard: React.FC<HoleCardProps> = ({
   hole,
   highlighted,
   onJump,
+  onDeselect,
 }) => {
   const cardRef = useRef<HTMLDivElement>(null);
 
@@ -26,7 +28,13 @@ export const HoleCard: React.FC<HoleCardProps> = ({
       ref={cardRef}
       className={`hole-card${highlighted ? ' highlighted' : ''}`}
       id={`hole-${hole.id}`}
-      onClick={highlighted ? undefined : () => onJump(hole.id)}
+      onClick={() => {
+        if (highlighted) {
+          onDeselect();
+        } else {
+          onJump(hole.id);
+        }
+      }}
     >
       <div className="hole-header">
         <span className="hole-id">Hole: {hole.id}</span>

@@ -101,6 +101,10 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
               vscode.TextEditorRevealType.InCenter,
             );
           }
+          this.webviewView?.webview.postMessage({
+            command: 'highlightHole',
+            holeId: hole.id,
+          });
         }
       }
     });
