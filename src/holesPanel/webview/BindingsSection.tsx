@@ -74,7 +74,7 @@ export const BindingsSection: React.FC<BindingsSectionProps> = ({
   const filteredCount = filteredBindings.length;
 
   return (
-    <div className="bindings-section">
+    <div className="bindings-section" onClick={(e) => e.stopPropagation()}>
       <div
         className={`bindings-header${isActive ? '' : ' collapsed'}`}
         data-hole-id={holeId}

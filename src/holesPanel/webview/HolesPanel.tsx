@@ -73,6 +73,10 @@ export const HolesPanel: React.FC<{ initShowHoles: boolean }> = ({
     vscode.postMessage({ command: 'jumpToHole', holeId: id });
   }, []);
 
+  const handleDeselect = useCallback(() => {
+    setHighlightedHoleId(null);
+  }, []);
+
   return (
     <div className="holes-list">
       {!showHoles && <Warning />}
@@ -85,6 +89,7 @@ export const HolesPanel: React.FC<{ initShowHoles: boolean }> = ({
             hole={h}
             highlighted={h.id === highlightedHoleId}
             onJump={handleJump}
+            onDeselect={handleDeselect}
           />
         ))
       )}
