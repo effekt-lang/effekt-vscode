@@ -1,7 +1,31 @@
 # Developer and Contributor Information
 
-This document contains information about the developer workflow.
+Thank you for contributing to the Effekt VSCode extension!
+This document contains information about our developer workflow.
 If you have any questions, do not hesitate to join our [Discord server](https://discord.gg/dMdPZVeWNJ).
+
+## Requirements
+
+* VSCode `>= 1.90`
+* NodeJS `>= 20.0` and npm
+
+## Build and Run
+
+To build and run the VSCode extension, open this repository in VSCode.
+From within the terminal, install the dependencies by running:
+
+```sh
+npm install
+```
+
+Then, compile the project using:
+
+```sh
+npm run compile
+```
+
+Finally, within VSCode, press `F5`.
+This should launch the extension in debug mode in a separate VSCode window for you to test.
 
 ## Release Process
 
