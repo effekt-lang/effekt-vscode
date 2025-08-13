@@ -184,6 +184,15 @@ code {
   background: var(--code-bg);
 }
 
-.binding-term {
-  font-weight: bold;
+/* Effekt Syntax Highlighting in the holes panel
+   This is very conservative as there is no good way to get the correct colors of the user theme:
+   https://github.com/Microsoft/vscode/issues/32813
+*/
+
+.effekt-ident.pascal-case {
+  color: var(--vscode-debugTokenExpression-type);
+}
+
+.effekt-keyword {
+  color: var(--vscode-debugTokenExpression-name);
 }
