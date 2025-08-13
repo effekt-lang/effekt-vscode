@@ -62,6 +62,16 @@ export const HoleCard: React.FC<HoleCardProps> = ({
         >
           Next step
         </button>
+        <button
+          className="solve-button"
+          onClick={(e) => {
+            e.stopPropagation();
+            createTests(hole, vscode);
+          }}
+          title="Create tests for the expected behavior of this hole"
+        >
+          Create tests
+        </button>
       </div>
       {hole.expectedType && (
         <div className="hole-field">
@@ -110,6 +120,16 @@ const suggestNextStep = async (
 ): Promise<void> => {
   vscode.postMessage({
     command: 'suggestNextStep',
+    holeId: hole.id,
+  });
+};
+
+const createTests = async (
+  hole: EffektHoleInfo,
+  vscode: VSCodeAPI,
+): Promise<void> => {
+  vscode.postMessage({
+    command: 'createTests',
     holeId: hole.id,
   });
 };

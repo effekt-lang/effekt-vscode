@@ -112,6 +112,8 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
         this.handleExplainHole(message);
       } else if (message.command === 'suggestNextStep') {
         this.handleSuggestNextStep(message);
+      } else if (message.command === 'createTests') {
+        this.handleCreateTests(message);
       }
     });
   }
@@ -253,6 +255,51 @@ Use valid Effekt syntax and keep snippets minimal.`;
       console.error('Error opening copilot chat (next step):', error);
       vscode.window.showErrorMessage(
         `Failed to suggest next step: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      );
+    }
+  }
+
+  private async handleCreateTests(request: { holeId: string }): Promise<void> {
+    try {
+      const query = `Create Effekt tests for hole "${request.holeId}" in the src/test folder. 
+
+Analyze the hole's expected behavior and create comprehensive tests. Follow this Effekt test pattern:
+
+\`\`\`effekt
+module [moduleName]Test
+
+import test
+import src/[moduleName]
+
+def [moduleName]Suite() = suite("[moduleName]") {
+  test("test description") {
+    // Test setup
+    val expected = ...
+    val actual = ...
+    
+    // Assertions
+    assertTrue(condition, "error message")
+    assertEqual(actual, expected, "values should match")
+  }
+}
+\`\`\`
+
+Instructions:
+1. Determine if tests should go in an existing test file or create a new one
+2. Create meaningful test cases covering different scenarios
+3. Use proper Effekt syntax with effects handling (with/try blocks)
+4. Include edge cases and typical use cases
+5. Generate complete, runnable test code
+`;
+
+      await vscode.commands.executeCommand('workbench.action.chat.open', {
+        query,
+        mode: 'agent',
+      });
+    } catch (error) {
+      console.error('Error opening copilot chat (create tests):', error);
+      vscode.window.showErrorMessage(
+        `Failed to create tests: ${error instanceof Error ? error.message : 'Unknown error'}`,
       );
     }
   }

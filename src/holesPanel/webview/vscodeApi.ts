@@ -12,7 +12,8 @@ export type OutgoingMessage =
   | { command: 'solveAllHoles'; holeIds: string[] }
   | { command: 'createDraft' }
   | { command: 'explainHole'; holeId: string }
-  | { command: 'suggestNextStep'; holeId: string };
+  | { command: 'suggestNextStep'; holeId: string }
+  | { command: 'createTests'; holeId: string };
 
 export interface JumpToHole {
   command: 'jumpToHole';
