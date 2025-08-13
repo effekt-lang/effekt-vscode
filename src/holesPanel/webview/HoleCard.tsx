@@ -19,7 +19,7 @@ export const HoleCard: React.FC<HoleCardProps> = ({
 
   useEffect(() => {
     if (highlighted) {
-      cardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      cardRef.current?.scrollIntoView({ behavior: 'auto', block: 'start' });
     }
   }, [highlighted]);
 
