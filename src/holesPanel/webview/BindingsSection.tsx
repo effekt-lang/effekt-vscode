@@ -54,7 +54,7 @@ export const BindingsSection: React.FC<BindingsSectionProps> = ({
 
   const miniSearch = useMemo(() => {
     const search = new MiniSearch({
-      fields: ['name', 'qualifier', 'signature'],
+      fields: ['signature'],
       storeFields: ['name', 'qualifier', 'origin', 'kind', 'signature'],
       idField: 'id',
     });
@@ -75,7 +75,7 @@ export const BindingsSection: React.FC<BindingsSectionProps> = ({
     }
 
     const searchResults = miniSearch.search(filter, {
-      combineWith: 'OR',
+      combineWith: 'AND',
       fuzzy: 0.2,
       prefix: true,
     });
