@@ -57,4 +57,4 @@ Push the tag:
 git push origin tag "v<version>" # replace <version> with the version returned by `npm version`!
 ```
 
-then check the deploy pipeline went through in the Actions tab: https://github.com/effekt-lang/effekt-vscode/actions/workflows/deploy.yml.
+then check if the deploy pipeline went through in the Actions tab: https://github.com/effekt-lang/effekt-vscode/actions/workflows/deploy.yml.
