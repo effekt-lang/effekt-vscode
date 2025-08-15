@@ -35,7 +35,6 @@ export const BindingsSection: React.FC<BindingsSectionProps> = ({
   const miniSearch = useMemo(() => {
     const search = new MiniSearch({
       fields: ['signature'],
-      storeFields: ['name', 'qualifier', 'origin', 'kind', 'signature'],
       idField: 'id',
     });
 
