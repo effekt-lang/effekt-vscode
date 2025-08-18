@@ -39,6 +39,7 @@ pre {
   border: 1.5px solid var(--border);
   border-radius: var(--radius);
   padding: 16px;
+  cursor: pointer;
   transition:
     background-color 0.2s ease,
     border-color 0.2s ease;
@@ -52,7 +53,6 @@ pre {
   border: 2px solid
     var(--vscode-editorSuggestWidget-highlightForeground, #007acc);
   background-color: rgba(0, 122, 204, 0.05);
-  cursor: pointer;
 }
 
 .hole-header {
@@ -79,6 +79,7 @@ pre {
   background: var(--highlight);
   padding: 2px;
   border-radius: 2px;
+  display: inline-block;
 }
 
 .empty {
@@ -105,6 +106,7 @@ code {
   background: var(--background);
   transition: border 0.2s ease;
   flex: 1;
+  cursor: text;
 }
 
 .filter-box:focus {
@@ -117,6 +119,7 @@ code {
   border-radius: var(--radius);
   background: var(--section-bg);
   overflow: hidden;
+  cursor: default;
 }
 
 .bindings-header {
@@ -124,7 +127,6 @@ code {
   align-items: center;
   background: var(--code-bg);
   padding: 6px;
-  cursor: pointer;
   font-weight: bold;
 }
 
