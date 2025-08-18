@@ -108,7 +108,6 @@ code {
   background: var(--background);
   transition: border 0.2s ease;
   flex: 1;
-  cursor: text;
 }
 
 .filter-box:focus {
@@ -121,6 +120,7 @@ code {
   border-radius: var(--radius);
   background: var(--section-bg);
   overflow: hidden;
+  cursor: default;
 }
 
 .bindings-header {
