@@ -40,13 +40,13 @@ export const HoleCard: React.FC<HoleCardProps> = ({
         <span className="hole-id">Hole: {hole.id}</span>
       </div>
       {hole.expectedType && (
-        <div className="hole-field" onClick={(e) => e.stopPropagation()}>
+        <div className="hole-field">
           <span className="field-label">Expected Type:</span>
           <span className="field-value">{hole.expectedType}</span>
         </div>
       )}
       {hole.innerType && (
-        <div className="hole-field" onClick={(e) => e.stopPropagation()}>
+        <div className="hole-field">
           <span className="field-label">Inner type:</span>
           <span className="field-value">{hole.innerType}</span>
         </div>
