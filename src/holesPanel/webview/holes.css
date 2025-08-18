@@ -121,7 +121,6 @@ code {
   border-radius: var(--radius);
   background: var(--section-bg);
   overflow: hidden;
-  cursor: default;
 }
 
 .bindings-header {
