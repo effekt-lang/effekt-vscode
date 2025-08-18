@@ -156,6 +156,13 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
     }
   }
 
+  // Bring keyboard focus to the panel
+  public focusPanel() {
+    this.webviewView?.webview.postMessage({
+      command: 'focusPanel',
+    });
+  }
+
   dispose() {
     this.configListener?.dispose();
   }

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import MiniSearch from 'minisearch';
 import {
   ScopeInfo,
@@ -8,6 +8,7 @@ import {
 } from '../effektHoleInfo';
 import { ScopeGroup } from './ScopeGroup';
 import { FilterBox } from './FilterBox';
+import { IncomingMessage } from './messages';
 
 interface BindingsSectionProps {
   scope?: ScopeInfo;
@@ -21,6 +22,25 @@ export const BindingsSection: React.FC<BindingsSectionProps> = ({
   isActive,
 }) => {
   const [filter, setFilter] = useState('');
+  const filterInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    // only focus searchbar when the panel has keyboard focus - prevents stealing editor focus
+    if (isActive && document.hasFocus() && filterInputRef.current) {
+      filterInputRef.current.focus();
+    }
+  }, [isActive]);
+
+  useEffect(() => {
+    const handler = (event: MessageEvent<IncomingMessage>) => {
+      const msg = event.data;
+      if (msg.command === 'focusPanel' && isActive) {
+        filterInputRef.current!.focus();
+      }
+    };
+    window.addEventListener('message', handler);
+    return () => window.removeEventListener('message', handler);
+  }, [isActive]);
 
   const allBindings = useMemo(() => {
     const scopes = flattenScopes(scope);
@@ -85,7 +105,11 @@ export const BindingsSection: React.FC<BindingsSectionProps> = ({
       </div>
       {isActive && (
         <div className="bindings-body">
-          <FilterBox filter={filter} onFilterChange={setFilter} />
+          <FilterBox
+            ref={filterInputRef}
+            filter={filter}
+            onFilterChange={setFilter}
+          />
           <div
             className="bindings-list"
             id={`bindings-dropdown-list-${holeId}`}
