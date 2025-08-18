@@ -3,7 +3,7 @@ import React from 'react';
 interface FilterBoxProps {
   filter: string;
   onFilterChange: (value: string) => void;
-  ref?: React.RefObject<HTMLInputElement>;
+  ref?: React.Ref<HTMLInputElement>;
 }
 
 export const FilterBox: React.FC<FilterBoxProps> = ({
