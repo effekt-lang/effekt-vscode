@@ -115,16 +115,6 @@ export const HolesPanel: React.FC<{ initShowHoles: boolean }> = ({
             vscode.postMessage({ command: 'jumpToHole', holeId: firstHole.id });
           }
         }
-      } else if (e.key === '/' && highlightedHoleId) {
-        // Focus search bar when inside a hole
-        e.preventDefault();
-        const searchBox = document.querySelector(
-          '.filter-box',
-        ) as HTMLInputElement;
-        if (searchBox) {
-          searchBox.focus();
-          searchBox.select();
-        }
       }
     };
 
