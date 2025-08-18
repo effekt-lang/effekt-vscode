@@ -1,20 +1,21 @@
-import React, { forwardRef } from 'react';
+import React from 'react';
 
 interface FilterBoxProps {
   filter: string;
   onFilterChange: (value: string) => void;
+  ref?: React.RefObject<HTMLInputElement>;
 }
 
-export const FilterBox = forwardRef<HTMLInputElement, FilterBoxProps>(
-  ({ filter, onFilterChange }, ref) => (
-    <input
-      ref={ref}
-      className="filter-box"
-      placeholder="Search bindings..."
-      value={filter}
-      onChange={(e) => onFilterChange(e.target.value)}
-    />
-  ),
+export const FilterBox: React.FC<FilterBoxProps> = ({
+  filter,
+  onFilterChange,
+  ref,
+}) => (
+  <input
+    ref={ref}
+    className="filter-box"
+    placeholder="Search bindings..."
+    value={filter}
+    onChange={(e) => onFilterChange(e.target.value)}
+  />
 );
-
-FilterBox.displayName = 'FilterBox';
