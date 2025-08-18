@@ -24,6 +24,7 @@ export const BindingsSection: React.FC<BindingsSectionProps> = ({
   const filterInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
+    // only focus searchbar when the panel has keyboard focus - prevents stealing editor focus
     if (isActive && document.hasFocus() && filterInputRef.current) {
       filterInputRef.current.focus();
     }
