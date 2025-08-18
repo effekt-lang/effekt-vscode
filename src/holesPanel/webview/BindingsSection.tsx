@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import MiniSearch from 'minisearch';
 import {
   ScopeInfo,
@@ -22,6 +22,12 @@ export const BindingsSection: React.FC<BindingsSectionProps> = ({
 }) => {
   const [filter, setFilter] = useState('');
   const filterInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (isActive && document.hasFocus() && filterInputRef.current) {
+      filterInputRef.current.focus();
+    }
+  }, [isActive]);
 
   const allBindings = useMemo(() => {
     const scopes = flattenScopes(scope);
