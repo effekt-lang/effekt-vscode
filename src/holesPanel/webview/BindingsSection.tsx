@@ -8,6 +8,7 @@ import {
 } from '../effektHoleInfo';
 import { ScopeGroup } from './ScopeGroup';
 import { FilterBox } from './FilterBox';
+import { IncomingMessage } from './messages';
 
 interface BindingsSectionProps {
   scope?: ScopeInfo;
@@ -28,6 +29,17 @@ export const BindingsSection: React.FC<BindingsSectionProps> = ({
     if (isActive && document.hasFocus() && filterInputRef.current) {
       filterInputRef.current.focus();
     }
+  }, [isActive]);
+
+  useEffect(() => {
+    const handler = (event: MessageEvent<IncomingMessage>) => {
+      const msg = event.data;
+      if (msg.command === 'focusPanel' && isActive) {
+        filterInputRef.current!.focus();
+      }
+    };
+    window.addEventListener('message', handler);
+    return () => window.removeEventListener('message', handler);
   }, [isActive]);
 
   const allBindings = useMemo(() => {

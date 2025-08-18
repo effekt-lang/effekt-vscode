@@ -305,6 +305,7 @@ function initializeHolesView(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     vscode.commands.registerCommand('effekt.openHolesPanel', () => {
       vscode.commands.executeCommand('effekt.holesView.focus');
+      holesViewProvider.focusPanel();
     }),
   );
   vscode.window.onDidChangeTextEditorSelection((event) => {

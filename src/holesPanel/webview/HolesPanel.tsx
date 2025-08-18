@@ -1,17 +1,9 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { EffektHoleInfo } from '../effektHoleInfo';
 import { HoleCard } from './HoleCard';
+import { OutgoingMessage, IncomingMessage } from './messages';
 
 declare function acquireVsCodeApi<T>(): { postMessage(msg: T): void };
-
-interface OutgoingMessage {
-  command: 'jumpToHole';
-  holeId?: string;
-}
-type IncomingMessage =
-  | { command: 'highlightHole'; holeId: string }
-  | { command: 'updateHoles'; holes: EffektHoleInfo[] }
-  | { command: 'setShowHoles'; show: boolean };
 
 const vscode = acquireVsCodeApi<OutgoingMessage>();
 
