@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import MiniSearch from 'minisearch';
 import {
   ScopeInfo,
@@ -21,6 +21,13 @@ export const BindingsSection: React.FC<BindingsSectionProps> = ({
   isActive,
 }) => {
   const [filter, setFilter] = useState('');
+  const filterInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (isActive && filterInputRef.current) {
+      filterInputRef.current.focus();
+    }
+  }, [isActive]);
 
   const allBindings = useMemo(() => {
     const scopes = flattenScopes(scope);
@@ -85,7 +92,11 @@ export const BindingsSection: React.FC<BindingsSectionProps> = ({
       </div>
       {isActive && (
         <div className="bindings-body">
-          <FilterBox filter={filter} onFilterChange={setFilter} />
+          <FilterBox
+            ref={filterInputRef}
+            filter={filter}
+            onFilterChange={setFilter}
+          />
           <div
             className="bindings-list"
             id={`bindings-dropdown-list-${holeId}`}
