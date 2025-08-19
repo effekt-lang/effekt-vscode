@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { EffektHoleInfo } from '../effektHoleInfo';
 import { HoleCard } from './HoleCard';
 import { OutgoingMessage, IncomingMessage } from './messages';
@@ -43,6 +43,7 @@ export const HolesPanel: React.FC<{ initShowHoles: boolean }> = ({
   const [highlightedHoleId, setHighlightedHoleId] = useState<string | null>(
     null,
   );
+  const [selectedHoleId, setSelectedHoleId] = useState<string | null>(null);
   const [showHoles, setShowHoles] = useState<boolean>(initShowHoles);
 
   useEffect(() => {
@@ -51,8 +52,10 @@ export const HolesPanel: React.FC<{ initShowHoles: boolean }> = ({
       if (msg.command === 'updateHoles') {
         setHoles(msg.holes);
         setHighlightedHoleId(null);
+        setSelectedHoleId(null);
       } else if (msg.command === 'highlightHole') {
         setHighlightedHoleId(msg.holeId);
+        setSelectedHoleId(null);
       } else if (msg.command === 'setShowHoles') {
         setShowHoles(msg.show);
       }
@@ -62,25 +65,32 @@ export const HolesPanel: React.FC<{ initShowHoles: boolean }> = ({
   }, []);
 
   const handleJump = useCallback((id: string) => {
+    setHighlightedHoleId(id);
+    setSelectedHoleId(null);
     vscode.postMessage({ command: 'jumpToHole', holeId: id });
   }, []);
 
   const handleDeselect = useCallback(() => {
     setHighlightedHoleId(null);
+    setSelectedHoleId(null);
   }, []);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         setHighlightedHoleId(null);
+        setSelectedHoleId(null);
       } else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
         if (holes.length === 0) {
           return;
         }
 
         e.preventDefault();
-        const currentIndex = highlightedHoleId
-          ? holes.findIndex((h) => h.id === highlightedHoleId)
+
+        setHighlightedHoleId(null);
+
+        const currentIndex = selectedHoleId
+          ? holes.findIndex((h) => h.id === selectedHoleId)
           : -1;
 
         let nextIndex: number;
@@ -92,7 +102,9 @@ export const HolesPanel: React.FC<{ initShowHoles: boolean }> = ({
 
         const nextHole = holes[nextIndex];
         if (nextHole) {
-          vscode.postMessage({ command: 'jumpToHole', holeId: nextHole.id });
+          setSelectedHoleId(nextHole.id);
+          const holeElement = document.getElementById(`hole-${nextHole.id}`);
+          holeElement!.scrollIntoView({ behavior: 'auto', block: 'start' });
         }
       } else if (e.key === 'Enter') {
         if (holes.length === 0) {
@@ -100,11 +112,14 @@ export const HolesPanel: React.FC<{ initShowHoles: boolean }> = ({
         }
 
         e.preventDefault();
-        if (!highlightedHoleId) {
-          // No hole selected, jump to first hole
+        if (selectedHoleId) {
+          handleJump(selectedHoleId);
+        } else if (!highlightedHoleId) {
           const firstHole = holes[0];
           if (firstHole) {
-            vscode.postMessage({ command: 'jumpToHole', holeId: firstHole.id });
+            setSelectedHoleId(firstHole.id);
+            const holeElement = document.getElementById(`hole-${firstHole.id}`);
+            holeElement!.scrollIntoView({ behavior: 'auto', block: 'start' });
           }
         }
       }
@@ -112,7 +127,7 @@ export const HolesPanel: React.FC<{ initShowHoles: boolean }> = ({
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [holes, highlightedHoleId]);
+  }, [holes, highlightedHoleId, selectedHoleId, handleJump]);
 
   return (
     <div className="holes-list">
@@ -125,6 +140,7 @@ export const HolesPanel: React.FC<{ initShowHoles: boolean }> = ({
             key={h.id}
             hole={h}
             highlighted={h.id === highlightedHoleId}
+            selected={h.id === selectedHoleId}
             onJump={handleJump}
             onDeselect={handleDeselect}
           />
