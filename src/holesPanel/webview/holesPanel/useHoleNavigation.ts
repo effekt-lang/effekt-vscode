@@ -7,7 +7,6 @@
 
 import { useCallback } from 'react';
 import { HoleState } from './holeState';
-import { isInputFocused } from './useKeyboardNavigation';
 interface HoleNavigationActions {
   setSelectedHoleId: (id: string | null) => void;
   setexpandedHoleId: (id: string | null) => void;
@@ -36,7 +35,7 @@ export const useHoleNavigation = (
   }, []);
 
   const navigateToNextHole = useCallback((): void => {
-    if (isInputFocused() || holes.length === 0) {
+    if (holes.length === 0) {
       return;
     }
 
@@ -56,7 +55,7 @@ export const useHoleNavigation = (
   ]);
 
   const navigateToPreviousHole = useCallback((): void => {
-    if (isInputFocused() || holes.length === 0) {
+    if (holes.length === 0) {
       return;
     }
 

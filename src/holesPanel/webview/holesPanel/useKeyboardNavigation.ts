@@ -36,6 +36,7 @@ export const useKeyboardNavigation = (keyBindings: Partial<KeyBindings>) => {
     (event: KeyboardEvent) => {
       const { key } = event;
       const handler = keyBindings[key as keyof KeyBindings]!;
+
       handler(event);
     },
     [keyBindings],
