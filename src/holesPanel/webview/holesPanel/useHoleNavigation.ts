@@ -9,7 +9,7 @@ import { useCallback } from 'react';
 import { HoleState } from './holeState';
 interface HoleNavigationActions {
   setSelectedHoleId: (id: string | null) => void;
-  setexpandedHoleId: (id: string | null) => void;
+  setExpandedHoleId: (id: string | null) => void;
 }
 
 export const useHoleNavigation = (
@@ -17,7 +17,7 @@ export const useHoleNavigation = (
   actions: HoleNavigationActions,
 ) => {
   const { holes, selectedHoleId, expandedHoleId } = state;
-  const { setSelectedHoleId, setexpandedHoleId } = actions;
+  const { setSelectedHoleId, setExpandedHoleId } = actions;
 
   const getCurrentIndex = useCallback((): number => {
     if (selectedHoleId) {
@@ -43,13 +43,13 @@ export const useHoleNavigation = (
     const nextIndex = currentIndex < holes.length - 1 ? currentIndex + 1 : 0;
     const nextHole = holes[nextIndex]!;
 
-    setexpandedHoleId(null);
+    setExpandedHoleId(null);
     setSelectedHoleId(nextHole.id);
     scrollToHole(nextHole.id);
   }, [
     holes,
     getCurrentIndex,
-    setexpandedHoleId,
+    setExpandedHoleId,
     setSelectedHoleId,
     scrollToHole,
   ]);
@@ -63,13 +63,13 @@ export const useHoleNavigation = (
     const prevIndex = currentIndex > 0 ? currentIndex - 1 : holes.length - 1;
     const prevHole = holes[prevIndex]!;
 
-    setexpandedHoleId(null);
+    setExpandedHoleId(null);
     setSelectedHoleId(prevHole.id);
     scrollToHole(prevHole.id);
   }, [
     holes,
     getCurrentIndex,
-    setexpandedHoleId,
+    setExpandedHoleId,
     setSelectedHoleId,
     scrollToHole,
   ]);
