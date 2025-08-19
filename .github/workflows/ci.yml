@@ -26,6 +26,9 @@ jobs:
 
     - name: Run Prettier Check
       run: npm run format:check
+
+    - name: Run Tests
+      run: npm test
       
     - name: Package VSCode extension into .vsix file
       run: vsce package
