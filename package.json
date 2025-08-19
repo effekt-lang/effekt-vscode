@@ -164,6 +164,11 @@
           "type": "boolean",
           "default": false,
           "description": "Show a panel with information about all typed holes in the program"
+        },
+        "effekt.agentSupport": {
+          "type": "boolean",
+          "default": false,
+          "markdownDescription": "Enable the following agentic AI features:\n* MCP server for Effekt\n* GitHub Copilot instructions\n* Button to solve holes in programs\n\n**Requires a restart of the extension.**"
         }
       }
     },
@@ -236,10 +241,12 @@
     "format:check": "prettier --config .prettierrc \"**/*.{ts,tsx,json,css}\" --check"
   },
   "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.16.0",
     "@vscode/codicons": "^0.0.36",
     "compare-versions": "^6.1.1",
     "esbuild-plugin-copy": "^2.1.1",
-    "minisearch": "^7.1.0",
+    "fuzzysort": "^3.1.0",
+    "minisearch": "^7.1.2",
     "vscode-languageclient": "^8.1.0"
   },
   "devDependencies": {
