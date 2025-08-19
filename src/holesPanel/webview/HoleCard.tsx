@@ -12,7 +12,7 @@ interface HoleCardProps {
 
 export const HoleCard: React.FC<HoleCardProps> = ({
   hole,
-  expanded: expanded,
+  expanded,
   selected,
   onJump,
   onDeselect,
