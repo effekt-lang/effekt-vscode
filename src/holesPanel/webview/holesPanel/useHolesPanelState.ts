@@ -26,7 +26,7 @@ export const useHolesPanelState = (initShowHoles: boolean) => {
       switch (msg.command) {
         case 'updateHoles':
           setHoles(msg.holes);
-          setexpandedHoleId(null);
+          setExpandedHoleId(null);
           setSelectedHoleId(null);
           break;
         case 'highlightHole':
