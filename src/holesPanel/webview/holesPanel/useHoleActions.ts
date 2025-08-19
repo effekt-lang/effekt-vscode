@@ -10,7 +10,7 @@ import { HoleState } from './holeState';
 import { isInputFocused, blurActiveInput } from './useKeyboardNavigation';
 interface HoleActionsCallbacks {
   setSelectedHoleId: (id: string | null) => void;
-  setexpandedHoleId: (id: string | null) => void;
+  setExpandedHoleId: (id: string | null) => void;
   handleJump: (id: string) => void;
   selectFirstHole: () => void;
 }
@@ -20,7 +20,7 @@ export const useHoleActions = (
   callbacks: HoleActionsCallbacks,
 ) => {
   const { selectedHoleId, expandedHoleId } = state;
-  const { setSelectedHoleId, setexpandedHoleId, handleJump, selectFirstHole } =
+  const { setSelectedHoleId, setExpandedHoleId, handleJump, selectFirstHole } =
     callbacks;
 
   const expandSelectedHole = useCallback((): void => {
@@ -30,14 +30,14 @@ export const useHoleActions = (
 
     if (selectedHoleId) {
       if (expandedHoleId === selectedHoleId) {
-        setexpandedHoleId(null);
+        setExpandedHoleId(null);
       } else {
         handleJump(selectedHoleId);
       }
     } else if (expandedHoleId) {
       // If hole is expanded but no selection, select it and then collapse
       setSelectedHoleId(expandedHoleId);
-      setexpandedHoleId(null);
+      setExpandedHoleId(null);
     } else {
       // No hole selected or expanded - default
       selectFirstHole();
@@ -45,7 +45,7 @@ export const useHoleActions = (
   }, [
     selectedHoleId,
     expandedHoleId,
-    setexpandedHoleId,
+    setExpandedHoleId,
     handleJump,
     setSelectedHoleId,
     selectFirstHole,
@@ -57,11 +57,11 @@ export const useHoleActions = (
         blurActiveInput();
         event?.preventDefault();
       } else {
-        setexpandedHoleId(null);
+        setExpandedHoleId(null);
         setSelectedHoleId(null);
       }
     },
-    [setexpandedHoleId, setSelectedHoleId],
+    [setExpandedHoleId, setSelectedHoleId],
   );
 
   return {
