@@ -7,6 +7,7 @@
 
 import { useCallback } from 'react';
 import { HoleState } from './holeState';
+import { isInputFocused, blurActiveInput } from './useKeyboardNavigation';
 interface HoleActionsCallbacks {
   setSelectedHoleId: (id: string | null) => void;
   setexpandedHoleId: (id: string | null) => void;
@@ -23,6 +24,10 @@ export const useHoleActions = (
     callbacks;
 
   const expandSelectedHole = useCallback((): void => {
+    if (isInputFocused()) {
+      return;
+    }
+
     if (selectedHoleId) {
       if (expandedHoleId === selectedHoleId) {
         setexpandedHoleId(null);
@@ -46,10 +51,18 @@ export const useHoleActions = (
     selectFirstHole,
   ]);
 
-  const clearSelection = useCallback((): void => {
-    setexpandedHoleId(null);
-    setSelectedHoleId(null);
-  }, [setexpandedHoleId, setSelectedHoleId]);
+  const clearSelection = useCallback(
+    (event?: KeyboardEvent): void => {
+      if (isInputFocused()) {
+        blurActiveInput();
+        event?.preventDefault();
+      } else {
+        setexpandedHoleId(null);
+        setSelectedHoleId(null);
+      }
+    },
+    [setexpandedHoleId, setSelectedHoleId],
+  );
 
   return {
     expandSelectedHole,

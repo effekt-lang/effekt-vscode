@@ -2,7 +2,7 @@
  * Hook for handling keyboard navigation in the holes panel
  *
  * Sets up global keyboard event listeners and manages key bindings
- * Prevents navigation when typing in input fields
+ * Moves all behavior logic to the individual key handlers
  */
 
 import { useEffect, useCallback } from 'react';
@@ -19,12 +19,12 @@ interface KeyBindings {
   ArrowRight: KeyHandler;
 }
 
-const isInputFocused = (): boolean => {
+export const isInputFocused = (): boolean => {
   const activeElement = document.activeElement;
   return activeElement?.tagName === 'INPUT';
 };
 
-const blurActiveInput = (): void => {
+export const blurActiveInput = (): void => {
   const activeElement = document.activeElement;
   if (activeElement?.tagName === 'INPUT') {
     (activeElement as HTMLInputElement)!.blur();
@@ -36,25 +36,7 @@ export const useKeyboardNavigation = (keyBindings: Partial<KeyBindings>) => {
     (event: KeyboardEvent) => {
       const { key } = event;
       const handler = keyBindings[key as keyof KeyBindings]!;
-
-      if (key === 'Escape') {
-        if (isInputFocused()) {
-          blurActiveInput();
-          event.preventDefault();
-        } else {
-          handler(event);
-        }
-        return;
-      }
-
-      if (key === 'ArrowUp' || key === 'ArrowDown') {
-        handler(event);
-        return;
-      }
-
-      if (!isInputFocused()) {
-        handler(event);
-      }
+      handler(event);
     },
     [keyBindings],
   );
