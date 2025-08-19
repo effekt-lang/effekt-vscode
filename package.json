@@ -164,6 +164,11 @@
           "type": "boolean",
           "default": false,
           "description": "Show a panel with information about all typed holes in the program"
+        },
+        "effekt.agentSupport": {
+          "type": "boolean",
+          "default": false,
+          "markdownDescription": "Enable the following agentic AI features:\n* MCP server for Effekt\n* GitHub Copilot instructions\n* Button to solve holes in programs\n\n**Requires a restart of the extension.**"
         }
       }
     },

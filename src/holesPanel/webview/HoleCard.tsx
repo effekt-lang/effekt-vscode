@@ -10,6 +10,7 @@ interface HoleCardProps {
   onJump: (id: string) => void;
   onDeselect: () => void;
   vscode: VSCodeAPI;
+  agentSupport: boolean;
 }
 
 export const HoleCard: React.FC<HoleCardProps> = ({
@@ -19,6 +20,7 @@ export const HoleCard: React.FC<HoleCardProps> = ({
   onJump,
   onDeselect,
   vscode,
+  agentSupport,
 }) => {
   const cardRef = useRef<HTMLDivElement>(null);
 
@@ -43,15 +45,17 @@ export const HoleCard: React.FC<HoleCardProps> = ({
     >
       <div className="hole-header">
         <span className="hole-id">Hole: {hole.id}</span>
-        <button
-          className="solve-button"
-          onClick={(e) => {
-            e.stopPropagation();
-            solveHole(hole, vscode);
-          }}
-        >
-          Solve
-        </button>
+        {agentSupport && (
+          <button
+            className="solve-button"
+            onClick={(e) => {
+              e.stopPropagation();
+              solveHole(hole, vscode);
+            }}
+          >
+            Solve
+          </button>
+        )}
       </div>
       {hole.expectedType && (
         <div className="hole-field" onClick={(e) => e.stopPropagation()}>

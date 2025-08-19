@@ -57,12 +57,19 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
     const showHoles =
       vscode.workspace.getConfiguration('effekt').get<boolean>('showHoles') ||
       false;
+
+    const agentSupport =
+      vscode.workspace
+        .getConfiguration('effekt')
+        .get<boolean>('agentSupport') || false;
+
     const cssUri = this.getCssUri()!;
     const jsUri = this.getJsUri()!;
     const codiconUri = this.getCodiconUri()!;
 
     webviewView.webview.html = webviewHtml(
       showHoles,
+      agentSupport,
       cssUri,
       jsUri,
       codiconUri,
@@ -190,6 +197,7 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
 
 export function webviewHtml(
   showHoles: boolean,
+  agentSupport: boolean,
   cssUri: vscode.Uri,
   jsUri: vscode.Uri,
   codiconUri: vscode.Uri,
@@ -207,7 +215,7 @@ export function webviewHtml(
 </head>
 
 <body>
-  <div id="react-root" data-show-holes="${showHoles}"></div>
+  <div id="react-root" data-show-holes="${showHoles}" data-agent-support="${agentSupport}"></div>
 	<script src="${jsUri}"></script>
 </body>
 

@@ -417,7 +417,11 @@ function initializeHoleDecorations(context: vscode.ExtensionContext) {
 }
 
 function promptForMCPServerInstallation() {
-  if (isMCPServerInstalled()) {
+  const agentSupport = vscode.workspace
+    .getConfiguration()
+    .get('effekt.agentSupport');
+
+  if (!agentSupport || isMCPServerInstalled()) {
     return;
   }
 
@@ -435,7 +439,11 @@ function promptForMCPServerInstallation() {
 }
 
 async function promptForEffektInstructions(context: vscode.ExtensionContext) {
-  if (await hasEffektInstructions()) {
+  const agentSupport = vscode.workspace
+    .getConfiguration()
+    .get('effekt.agentSupport');
+
+  if (!agentSupport || (await hasEffektInstructions())) {
     return;
   }
   const createInstructions = vscode.window.showInformationMessage(

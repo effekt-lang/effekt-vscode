@@ -6,4 +6,7 @@ if (!container) {
   throw new Error('Root container missing');
 }
 const showHoles = container.dataset.showHoles === 'true';
-createRoot(container).render(<HolesPanel initShowHoles={showHoles} />);
+const agentSupport = container.dataset.agentSupport === 'true';
+createRoot(container).render(
+  <HolesPanel initShowHoles={showHoles} agentSupport={agentSupport} />,
+);
