@@ -1,3 +1,10 @@
+/**
+ * Hook for navigating between holes in panel
+ *
+ * Provides functions to move between holes (next/previous), scroll to specific holes,
+ * and manage the current selection index. Handles circular navigation through the hole list
+ */
+
 import { useCallback } from 'react';
 import { HoleState } from './holeState';
 interface HoleNavigationActions {

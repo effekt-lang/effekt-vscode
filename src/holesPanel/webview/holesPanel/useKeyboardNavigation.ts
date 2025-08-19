@@ -1,3 +1,10 @@
+/**
+ * Hook for handling keyboard navigation in the holes panel
+ *
+ * Sets up global keyboard event listeners and manages key bindings
+ * Prevents navigation when typing in input fields
+ */
+
 import { useEffect, useCallback } from 'react';
 
 type KeyHandler = (event: KeyboardEvent) => void;

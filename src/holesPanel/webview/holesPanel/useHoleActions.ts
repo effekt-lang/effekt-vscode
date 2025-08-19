@@ -1,3 +1,10 @@
+/**
+ * Hook for handling user actions on holes
+ *
+ * Provides functions for expanding/collapsing holes, clearing selections
+ * and managing the interaction between selected and expanded states
+ */
+
 import { useCallback } from 'react';
 import { HoleState } from './holeState';
 interface HoleActionsCallbacks {

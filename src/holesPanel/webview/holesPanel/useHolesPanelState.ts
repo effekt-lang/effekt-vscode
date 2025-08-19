@@ -1,3 +1,10 @@
+/**
+ * Main state management hook for the Holes Panel.
+ *
+ * Handles communication with VS Code through message passing and provides
+ * actions for updating state and interacting with holes
+ */
+
 import { useState, useEffect, useCallback } from 'react';
 import { EffektHoleInfo } from '../../effektHoleInfo';
 import { IncomingMessage, OutgoingMessage } from '../messages';
