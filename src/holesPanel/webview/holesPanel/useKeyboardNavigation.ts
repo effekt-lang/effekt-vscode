@@ -2,7 +2,6 @@
  * Hook for handling keyboard navigation in the holes panel
  *
  * Sets up global keyboard event listeners and manages key bindings
- * Moves all behavior logic to the individual key handlers
  */
 
 import { useEffect, useCallback } from 'react';
