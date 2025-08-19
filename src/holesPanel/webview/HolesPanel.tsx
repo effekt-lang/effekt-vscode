@@ -80,10 +80,23 @@ export const HolesPanel: React.FC<{ initShowHoles: boolean }> = ({
     const expandKeys = ['Enter', ' ', 'ArrowRight', 'ArrowLeft'];
 
     const handleKeyDown = (e: KeyboardEvent) => {
+      const activeElement = document.activeElement;
+      const isInputFocused = activeElement?.tagName === 'INPUT';
+
       if (e.key === 'Escape') {
-        setHighlightedHoleId(null);
-        setSelectedHoleId(null);
-      } else if (navigationKeys.includes(e.key)) {
+        if (isInputFocused) {
+          (activeElement as HTMLInputElement).blur();
+          e.preventDefault();
+          return;
+        } else {
+          setHighlightedHoleId(null);
+          setSelectedHoleId(null);
+          e.preventDefault();
+          return;
+        }
+      }
+
+      if (navigationKeys.includes(e.key)) {
         if (holes.length === 0) {
           return;
         }
@@ -92,9 +105,12 @@ export const HolesPanel: React.FC<{ initShowHoles: boolean }> = ({
 
         setHighlightedHoleId(null);
 
-        const currentIndex = selectedHoleId
-          ? holes.findIndex((h) => h.id === selectedHoleId)
-          : -1;
+        let currentIndex = -1;
+        if (selectedHoleId) {
+          currentIndex = holes.findIndex((h) => h.id === selectedHoleId);
+        } else if (highlightedHoleId) {
+          currentIndex = holes.findIndex((h) => h.id === highlightedHoleId);
+        }
 
         let nextIndex: number;
         if (e.key === 'ArrowDown') {
@@ -109,7 +125,14 @@ export const HolesPanel: React.FC<{ initShowHoles: boolean }> = ({
           const holeElement = document.getElementById(`hole-${nextHole.id}`);
           holeElement!.scrollIntoView({ behavior: 'auto', block: 'start' });
         }
-      } else if (expandKeys.includes(e.key)) {
+        return;
+      }
+
+      if (isInputFocused) {
+        return;
+      }
+
+      if (expandKeys.includes(e.key)) {
         if (holes.length === 0) {
           return;
         }
@@ -122,7 +145,10 @@ export const HolesPanel: React.FC<{ initShowHoles: boolean }> = ({
           } else {
             handleJump(selectedHoleId);
           }
-        } else if (!highlightedHoleId) {
+        } else if (highlightedHoleId) {
+          setSelectedHoleId(highlightedHoleId);
+          setHighlightedHoleId(null);
+        } else {
           const firstHole = holes[0];
           if (firstHole) {
             setSelectedHoleId(firstHole.id);
