@@ -24,7 +24,7 @@ export const useHoleNavigation = (
 
   const scrollToHole = useCallback((holeId: string): void => {
     const holeElement = document.getElementById(`hole-${holeId}`);
-    holeElement!.scrollIntoView({ behavior: 'auto', block: 'start' });
+    holeElement!.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }, []);
 
   const navigateToNextHole = useCallback((): void => {
