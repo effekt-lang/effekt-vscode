@@ -42,28 +42,20 @@ interface HolesPanelProps {
 
 export const HolesPanel: React.FC<HolesPanelProps> = ({ initShowHoles }) => {
   const { state, actions } = useHolesPanelState(initShowHoles);
-  const { holes, highlightedHoleId, selectedHoleId, showHoles } = state;
-  const {
-    setSelectedHoleId,
-    setHighlightedHoleId,
+  const { showHoles } = state;
+  const { handleJump, handleDeselect } = actions;
+
+  const navigation = useHoleNavigation(state, {
+    setSelectedHoleId: actions.setSelectedHoleId,
+    setHighlightedHoleId: actions.setHighlightedHoleId,
+  });
+
+  const holeActions = useHoleActions(state, {
+    setSelectedHoleId: actions.setSelectedHoleId,
+    setHighlightedHoleId: actions.setHighlightedHoleId,
     handleJump,
-    handleDeselect,
-  } = actions;
-
-  const navigation = useHoleNavigation(
-    { holes, selectedHoleId, highlightedHoleId },
-    { setSelectedHoleId, setHighlightedHoleId },
-  );
-
-  const holeActions = useHoleActions(
-    { holes, selectedHoleId, highlightedHoleId },
-    {
-      setSelectedHoleId,
-      setHighlightedHoleId,
-      handleJump,
-      selectFirstHole: navigation.selectFirstHole,
-    },
-  );
+    selectFirstHole: navigation.selectFirstHole,
+  });
 
   useKeyboardNavigation({
     Escape: holeActions.clearSelection,
@@ -80,7 +72,7 @@ export const HolesPanel: React.FC<HolesPanelProps> = ({ initShowHoles }) => {
       return <Warning />;
     }
 
-    if (holes.length === 0) {
+    if (state.holes.length === 0) {
       return (
         <>
           <div className="empty">There are no holes in this file.</div>
@@ -89,12 +81,12 @@ export const HolesPanel: React.FC<HolesPanelProps> = ({ initShowHoles }) => {
       );
     }
 
-    return holes.map((hole) => (
+    return state.holes.map((hole) => (
       <HoleCard
         key={hole.id}
         hole={hole}
-        highlighted={hole.id === highlightedHoleId}
-        selected={hole.id === selectedHoleId}
+        highlighted={hole.id === state.highlightedHoleId}
+        selected={hole.id === state.selectedHoleId}
         onJump={handleJump}
         onDeselect={handleDeselect}
       />

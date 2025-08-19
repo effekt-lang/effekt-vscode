@@ -1,17 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
 import { EffektHoleInfo } from '../../effektHoleInfo';
 import { IncomingMessage, OutgoingMessage } from '../messages';
+import { HoleState } from './holeState';
 
 declare function acquireVsCodeApi<T>(): { postMessage(msg: T): void };
 
 const vscode = acquireVsCodeApi<OutgoingMessage>();
-
-interface HolesPanelState {
-  holes: EffektHoleInfo[];
-  highlightedHoleId: string | null;
-  selectedHoleId: string | null;
-  showHoles: boolean;
-}
 
 export const useHolesPanelState = (initShowHoles: boolean) => {
   const [holes, setHoles] = useState<EffektHoleInfo[]>([]);
@@ -54,7 +48,7 @@ export const useHolesPanelState = (initShowHoles: boolean) => {
     setSelectedHoleId(null);
   }, []);
 
-  const state: HolesPanelState = {
+  const state: HoleState = {
     holes,
     highlightedHoleId,
     selectedHoleId,
