@@ -9,9 +9,7 @@ const vscode = acquireVsCodeApi<OutgoingMessage>();
 
 export const useHolesPanelState = (initShowHoles: boolean) => {
   const [holes, setHoles] = useState<EffektHoleInfo[]>([]);
-  const [highlightedHoleId, setHighlightedHoleId] = useState<string | null>(
-    null,
-  );
+  const [expandedHoleId, setexpandedHoleId] = useState<string | null>(null);
   const [selectedHoleId, setSelectedHoleId] = useState<string | null>(null);
   const [showHoles, setShowHoles] = useState<boolean>(initShowHoles);
 
@@ -21,11 +19,11 @@ export const useHolesPanelState = (initShowHoles: boolean) => {
       switch (msg.command) {
         case 'updateHoles':
           setHoles(msg.holes);
-          setHighlightedHoleId(null);
+          setexpandedHoleId(null);
           setSelectedHoleId(null);
           break;
         case 'highlightHole':
-          setHighlightedHoleId(msg.holeId);
+          setexpandedHoleId(msg.holeId);
           setSelectedHoleId(null);
           break;
         case 'setShowHoles':
@@ -38,25 +36,25 @@ export const useHolesPanelState = (initShowHoles: boolean) => {
   }, []);
 
   const handleJump = useCallback((id: string) => {
-    setHighlightedHoleId(id);
+    setexpandedHoleId(id);
     setSelectedHoleId(null);
     vscode.postMessage({ command: 'jumpToHole', holeId: id });
   }, []);
 
   const handleDeselect = useCallback(() => {
-    setHighlightedHoleId(null);
+    setexpandedHoleId(null);
     setSelectedHoleId(null);
   }, []);
 
   const state: HoleState = {
     holes,
-    highlightedHoleId,
+    expandedHoleId,
     selectedHoleId,
     showHoles,
   };
   const actions = {
     setHoles,
-    setHighlightedHoleId,
+    setexpandedHoleId,
     setSelectedHoleId,
     setShowHoles,
     handleJump,

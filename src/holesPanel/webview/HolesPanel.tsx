@@ -45,12 +45,12 @@ export const HolesPanel: React.FC<HolesPanelProps> = ({ initShowHoles }) => {
 
   const navigation = useHoleNavigation(state, {
     setSelectedHoleId: actions.setSelectedHoleId,
-    setHighlightedHoleId: actions.setHighlightedHoleId,
+    setexpandedHoleId: actions.setexpandedHoleId,
   });
 
   const holeActions = useHoleActions(state, {
     setSelectedHoleId: actions.setSelectedHoleId,
-    setHighlightedHoleId: actions.setHighlightedHoleId,
+    setexpandedHoleId: actions.setexpandedHoleId,
     handleJump: actions.handleJump,
     selectFirstHole: navigation.selectFirstHole,
   });
@@ -83,7 +83,7 @@ export const HolesPanel: React.FC<HolesPanelProps> = ({ initShowHoles }) => {
       <HoleCard
         key={hole.id}
         hole={hole}
-        highlighted={hole.id === state.highlightedHoleId}
+        expanded={hole.id === state.expandedHoleId}
         selected={hole.id === state.selectedHoleId}
         onJump={actions.handleJump}
         onDeselect={actions.handleDeselect}

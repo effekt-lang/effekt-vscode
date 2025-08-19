@@ -45,11 +45,11 @@ pre {
     border-color 0.2s ease;
 }
 
-.hole-card:not(.highlighted):hover {
+.hole-card:not(.expanded):hover {
   background-color: var(--highlight);
 }
 
-.hole-card.highlighted {
+.hole-card.expanded {
   border: 2px solid
     var(--vscode-editorSuggestWidget-highlightForeground, #007acc);
   background-color: rgba(0, 122, 204, 0.05);

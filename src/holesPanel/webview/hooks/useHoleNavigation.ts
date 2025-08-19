@@ -2,25 +2,25 @@ import { useCallback } from 'react';
 import { HoleState } from './holeState';
 interface HoleNavigationActions {
   setSelectedHoleId: (id: string | null) => void;
-  setHighlightedHoleId: (id: string | null) => void;
+  setexpandedHoleId: (id: string | null) => void;
 }
 
 export const useHoleNavigation = (
   state: HoleState,
   actions: HoleNavigationActions,
 ) => {
-  const { holes, selectedHoleId, highlightedHoleId } = state;
-  const { setSelectedHoleId, setHighlightedHoleId } = actions;
+  const { holes, selectedHoleId, expandedHoleId } = state;
+  const { setSelectedHoleId, setexpandedHoleId } = actions;
 
   const getCurrentIndex = useCallback((): number => {
     if (selectedHoleId) {
       return holes.findIndex((h) => h.id === selectedHoleId);
     }
-    if (highlightedHoleId) {
-      return holes.findIndex((h) => h.id === highlightedHoleId);
+    if (expandedHoleId) {
+      return holes.findIndex((h) => h.id === expandedHoleId);
     }
     return -1;
-  }, [holes, selectedHoleId, highlightedHoleId]);
+  }, [holes, selectedHoleId, expandedHoleId]);
 
   const scrollToHole = useCallback((holeId: string): void => {
     const holeElement = document.getElementById(`hole-${holeId}`);
@@ -36,13 +36,13 @@ export const useHoleNavigation = (
     const nextIndex = currentIndex < holes.length - 1 ? currentIndex + 1 : 0;
     const nextHole = holes[nextIndex]!;
 
-    setHighlightedHoleId(null);
+    setexpandedHoleId(null);
     setSelectedHoleId(nextHole.id);
     scrollToHole(nextHole.id);
   }, [
     holes,
     getCurrentIndex,
-    setHighlightedHoleId,
+    setexpandedHoleId,
     setSelectedHoleId,
     scrollToHole,
   ]);
@@ -56,13 +56,13 @@ export const useHoleNavigation = (
     const prevIndex = currentIndex > 0 ? currentIndex - 1 : holes.length - 1;
     const prevHole = holes[prevIndex]!;
 
-    setHighlightedHoleId(null);
+    setexpandedHoleId(null);
     setSelectedHoleId(prevHole.id);
     scrollToHole(prevHole.id);
   }, [
     holes,
     getCurrentIndex,
-    setHighlightedHoleId,
+    setexpandedHoleId,
     setSelectedHoleId,
     scrollToHole,
   ]);

@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import { HoleState } from './holeState';
 interface HoleActionsCallbacks {
   setSelectedHoleId: (id: string | null) => void;
-  setHighlightedHoleId: (id: string | null) => void;
+  setexpandedHoleId: (id: string | null) => void;
   handleJump: (id: string) => void;
   selectFirstHole: () => void;
 }
@@ -11,42 +11,38 @@ export const useHoleActions = (
   state: HoleState,
   callbacks: HoleActionsCallbacks,
 ) => {
-  const { selectedHoleId, highlightedHoleId } = state;
-  const {
-    setSelectedHoleId,
-    setHighlightedHoleId,
-    handleJump,
-    selectFirstHole,
-  } = callbacks;
+  const { selectedHoleId, expandedHoleId } = state;
+  const { setSelectedHoleId, setexpandedHoleId, handleJump, selectFirstHole } =
+    callbacks;
 
   const expandSelectedHole = useCallback((): void => {
     if (selectedHoleId) {
-      if (highlightedHoleId === selectedHoleId) {
-        setHighlightedHoleId(null);
+      if (expandedHoleId === selectedHoleId) {
+        setexpandedHoleId(null);
       } else {
         handleJump(selectedHoleId);
       }
-    } else if (highlightedHoleId) {
-      // If hole is highlighted but no selection, select it and then collapse
-      setSelectedHoleId(highlightedHoleId);
-      setHighlightedHoleId(null);
+    } else if (expandedHoleId) {
+      // If hole is expanded but no selection, select it and then collapse
+      setSelectedHoleId(expandedHoleId);
+      setexpandedHoleId(null);
     } else {
-      // No hole selected or highlighted - default
+      // No hole selected or expanded - default
       selectFirstHole();
     }
   }, [
     selectedHoleId,
-    highlightedHoleId,
-    setHighlightedHoleId,
+    expandedHoleId,
+    setexpandedHoleId,
     handleJump,
     setSelectedHoleId,
     selectFirstHole,
   ]);
 
   const clearSelection = useCallback((): void => {
-    setHighlightedHoleId(null);
+    setexpandedHoleId(null);
     setSelectedHoleId(null);
-  }, [setHighlightedHoleId, setSelectedHoleId]);
+  }, [setexpandedHoleId, setSelectedHoleId]);
 
   return {
     expandSelectedHole,

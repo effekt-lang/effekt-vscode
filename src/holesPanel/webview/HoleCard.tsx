@@ -4,7 +4,7 @@ import { BindingsSection } from './BindingsSection';
 
 interface HoleCardProps {
   hole: EffektHoleInfo;
-  highlighted: boolean;
+  expanded: boolean;
   selected: boolean;
   onJump: (id: string) => void;
   onDeselect: () => void;
@@ -12,7 +12,7 @@ interface HoleCardProps {
 
 export const HoleCard: React.FC<HoleCardProps> = ({
   hole,
-  highlighted,
+  expanded: expanded,
   selected,
   onJump,
   onDeselect,
@@ -20,18 +20,18 @@ export const HoleCard: React.FC<HoleCardProps> = ({
   const cardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (highlighted) {
+    if (expanded) {
       cardRef.current?.scrollIntoView({ behavior: 'auto', block: 'start' });
     }
-  }, [highlighted]);
+  }, [expanded]);
 
   return (
     <section
       ref={cardRef}
-      className={`hole-card${highlighted ? ' highlighted' : ''}${selected ? ' selected' : ''}`}
+      className={`hole-card${expanded ? ' expanded' : ''}${selected ? ' selected' : ''}`}
       id={`hole-${hole.id}`}
       onClick={() => {
-        if (highlighted) {
+        if (expanded) {
           onDeselect();
         } else {
           onJump(hole.id);
@@ -56,7 +56,7 @@ export const HoleCard: React.FC<HoleCardProps> = ({
       <BindingsSection
         scope={hole.scope}
         holeId={hole.id}
-        isActive={highlighted}
+        isActive={expanded}
       />
     </section>
   );
