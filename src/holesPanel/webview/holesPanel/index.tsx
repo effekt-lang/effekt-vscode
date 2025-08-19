@@ -1,11 +1,9 @@
 import React from 'react';
-import { HoleCard } from './HoleCard';
-import {
-  useHolesPanelState,
-  useHoleNavigation,
-  useHoleActions,
-  useKeyboardNavigation,
-} from './hooks';
+import { HoleCard } from '../HoleCard';
+import { useHolesPanelState } from './useHolesPanelState';
+import { useHoleNavigation } from './useHoleNavigation';
+import { useHoleActions } from './useHoleActions';
+import { useKeyboardNavigation } from './useKeyboardNavigation';
 
 const Description: React.FC = () => (
   <div className="desc" data-holes-panel-desc>
