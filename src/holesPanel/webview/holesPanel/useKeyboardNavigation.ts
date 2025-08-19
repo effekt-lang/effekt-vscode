@@ -28,11 +28,7 @@ export const useKeyboardNavigation = (keyBindings: Partial<KeyBindings>) => {
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {
       const { key } = event;
-      const handler = keyBindings[key as keyof KeyBindings];
-
-      if (!handler) {
-        return;
-      }
+      const handler = keyBindings[key as keyof KeyBindings]!;
 
       if (key === 'Escape') {
         if (isInputFocused()) {
