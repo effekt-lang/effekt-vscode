@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { EffektHoleInfo } from '../effektHoleInfo';
+import React from 'react';
 import { HoleCard } from './HoleCard';
-import { OutgoingMessage, IncomingMessage } from './messages';
-
-declare function acquireVsCodeApi<T>(): { postMessage(msg: T): void };
-
-const vscode = acquireVsCodeApi<OutgoingMessage>();
+import {
+  useHolesPanelState,
+  useHoleNavigation,
+  useHoleActions,
+  useKeyboardNavigation,
+} from './hooks';
 
 const Description: React.FC = () => (
   <div className="desc" data-holes-panel-desc>
@@ -36,151 +36,70 @@ const Warning: React.FC = () => (
   </div>
 );
 
-export const HolesPanel: React.FC<{ initShowHoles: boolean }> = ({
-  initShowHoles,
-}) => {
-  const [holes, setHoles] = useState<EffektHoleInfo[]>([]);
-  const [highlightedHoleId, setHighlightedHoleId] = useState<string | null>(
-    null,
+interface HolesPanelProps {
+  initShowHoles: boolean;
+}
+
+export const HolesPanel: React.FC<HolesPanelProps> = ({ initShowHoles }) => {
+  const { state, actions } = useHolesPanelState(initShowHoles);
+  const { holes, highlightedHoleId, selectedHoleId, showHoles } = state;
+  const {
+    setSelectedHoleId,
+    setHighlightedHoleId,
+    handleJump,
+    handleDeselect,
+  } = actions;
+
+  const navigation = useHoleNavigation(
+    { holes, selectedHoleId, highlightedHoleId },
+    { setSelectedHoleId, setHighlightedHoleId },
   );
-  const [selectedHoleId, setSelectedHoleId] = useState<string | null>(null);
-  const [showHoles, setShowHoles] = useState<boolean>(initShowHoles);
 
-  useEffect(() => {
-    const handler = (event: MessageEvent<IncomingMessage>) => {
-      const msg = event.data;
-      if (msg.command === 'updateHoles') {
-        setHoles(msg.holes);
-        setHighlightedHoleId(null);
-        setSelectedHoleId(null);
-      } else if (msg.command === 'highlightHole') {
-        setHighlightedHoleId(msg.holeId);
-        setSelectedHoleId(null);
-      } else if (msg.command === 'setShowHoles') {
-        setShowHoles(msg.show);
-      }
-    };
-    window.addEventListener('message', handler);
-    return () => window.removeEventListener('message', handler);
-  }, []);
-
-  const handleJump = useCallback((id: string) => {
-    setHighlightedHoleId(id);
-    setSelectedHoleId(null);
-    vscode.postMessage({ command: 'jumpToHole', holeId: id });
-  }, []);
-
-  const handleDeselect = useCallback(() => {
-    setHighlightedHoleId(null);
-    setSelectedHoleId(null);
-  }, []);
-
-  useEffect(() => {
-    const navigationKeys = ['ArrowDown', 'ArrowUp'];
-    const expandKeys = ['Enter', ' ', 'ArrowRight', 'ArrowLeft'];
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      const activeElement = document.activeElement;
-      const isInputFocused = activeElement?.tagName === 'INPUT';
-
-      if (e.key === 'Escape') {
-        if (isInputFocused) {
-          (activeElement as HTMLInputElement).blur();
-          e.preventDefault();
-          return;
-        } else {
-          setHighlightedHoleId(null);
-          setSelectedHoleId(null);
-          e.preventDefault();
-          return;
-        }
-      }
-
-      if (navigationKeys.includes(e.key)) {
-        if (holes.length === 0) {
-          return;
-        }
-
-        e.preventDefault();
-
-        setHighlightedHoleId(null);
-
-        let currentIndex = -1;
-        if (selectedHoleId) {
-          currentIndex = holes.findIndex((h) => h.id === selectedHoleId);
-        } else if (highlightedHoleId) {
-          currentIndex = holes.findIndex((h) => h.id === highlightedHoleId);
-        }
-
-        let nextIndex: number;
-        if (e.key === 'ArrowDown') {
-          nextIndex = currentIndex < holes.length - 1 ? currentIndex + 1 : 0;
-        } else {
-          nextIndex = currentIndex > 0 ? currentIndex - 1 : holes.length - 1;
-        }
-
-        const nextHole = holes[nextIndex];
-        if (nextHole) {
-          setSelectedHoleId(nextHole.id);
-          const holeElement = document.getElementById(`hole-${nextHole.id}`);
-          holeElement!.scrollIntoView({ behavior: 'auto', block: 'start' });
-        }
-        return;
-      }
-
-      if (isInputFocused) {
-        return;
-      }
-
-      if (expandKeys.includes(e.key)) {
-        if (holes.length === 0) {
-          return;
-        }
-
-        e.preventDefault();
-
-        if (selectedHoleId) {
-          if (highlightedHoleId === selectedHoleId) {
-            setHighlightedHoleId(null);
-          } else {
-            handleJump(selectedHoleId);
-          }
-        } else if (highlightedHoleId) {
-          setSelectedHoleId(highlightedHoleId);
-          setHighlightedHoleId(null);
-        } else {
-          const firstHole = holes[0];
-          if (firstHole) {
-            setSelectedHoleId(firstHole.id);
-            const holeElement = document.getElementById(`hole-${firstHole.id}`);
-            holeElement!.scrollIntoView({ behavior: 'auto', block: 'start' });
-          }
-        }
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [holes, highlightedHoleId, selectedHoleId, handleJump]);
-
-  return (
-    <div className="holes-list">
-      {!showHoles && <Warning />}
-      {holes.length === 0 ? (
-        <div className="empty">There are no holes in this file.</div>
-      ) : (
-        holes.map((h) => (
-          <HoleCard
-            key={h.id}
-            hole={h}
-            highlighted={h.id === highlightedHoleId}
-            selected={h.id === selectedHoleId}
-            onJump={handleJump}
-            onDeselect={handleDeselect}
-          />
-        ))
-      )}
-      {holes.length === 0 && <Description />}
-    </div>
+  const holeActions = useHoleActions(
+    { holes, selectedHoleId, highlightedHoleId },
+    {
+      setSelectedHoleId,
+      setHighlightedHoleId,
+      handleJump,
+      selectFirstHole: navigation.selectFirstHole,
+    },
   );
+
+  useKeyboardNavigation({
+    Escape: holeActions.clearSelection,
+    ArrowUp: navigation.navigateToPreviousHole,
+    ArrowDown: navigation.navigateToNextHole,
+    Enter: holeActions.expandSelectedHole,
+    ' ': holeActions.expandSelectedHole,
+    ArrowLeft: holeActions.expandSelectedHole,
+    ArrowRight: holeActions.expandSelectedHole,
+  });
+
+  const renderContent = () => {
+    if (!showHoles) {
+      return <Warning />;
+    }
+
+    if (holes.length === 0) {
+      return (
+        <>
+          <div className="empty">There are no holes in this file.</div>
+          <Description />
+        </>
+      );
+    }
+
+    return holes.map((hole) => (
+      <HoleCard
+        key={hole.id}
+        hole={hole}
+        highlighted={hole.id === highlightedHoleId}
+        selected={hole.id === selectedHoleId}
+        onJump={handleJump}
+        onDeselect={handleDeselect}
+      />
+    ));
+  };
+
+  return <div className="holes-list">{renderContent()}</div>;
 };
