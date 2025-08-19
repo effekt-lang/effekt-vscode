@@ -1,5 +1,5 @@
 import { createRoot } from 'react-dom/client';
-import { HolesPanel } from './HolesPanel';
+import { HolesPanel } from './holesPanel';
 
 const container = document.getElementById('react-root');
 if (!container) {
