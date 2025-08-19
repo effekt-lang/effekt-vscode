@@ -96,7 +96,7 @@ async function getHoleById(
 }
 
 /**
- * Truncate the scope to only exclude imported bindings, up to a maximum of 10.
+ * Truncate the scope to only show locally defined bindings, up to a maximum of 10.
  */
 function truncateScope(scope: ScopeInfo): {
   bindings: BindingInfo[];

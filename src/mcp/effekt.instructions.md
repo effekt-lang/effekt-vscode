@@ -12,7 +12,7 @@ applyTo: '**/*.effekt'
 ## Basic Operations
 - Negate boolean `x` with `x.not`
 - Get list length with `l.size`, first element with `l.head`
-- Create single-constructor data types: `type MyType { MyType(field1: Type1, field2: Type2) }`
+- Create single-constructor data types as follows: `type MyType { MyType(field1: Type1, field2: Type2) }`
 
 ## Effect Handling
 The main function (`def main()`) cannot have effects in its signature. So no `def main() : Unit / { io } ` for example. Handle effects within the function body.
@@ -36,9 +36,9 @@ codeThatCanRaiseMyError
 with handler
 code
 ```
-This is syntactic sugar for `handler { code }`. 
+This is syntactic sugar for `handler { code }`.
 
-**Important:** 
+**Important:**
 - Do NOT parenthesize the code block: `with handler { code }` is invalid
 - Do NOT use parentheses around the code after `with`
 
