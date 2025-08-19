@@ -42,8 +42,6 @@ interface HolesPanelProps {
 
 export const HolesPanel: React.FC<HolesPanelProps> = ({ initShowHoles }) => {
   const { state, actions } = useHolesPanelState(initShowHoles);
-  const { showHoles } = state;
-  const { handleJump, handleDeselect } = actions;
 
   const navigation = useHoleNavigation(state, {
     setSelectedHoleId: actions.setSelectedHoleId,
@@ -53,7 +51,7 @@ export const HolesPanel: React.FC<HolesPanelProps> = ({ initShowHoles }) => {
   const holeActions = useHoleActions(state, {
     setSelectedHoleId: actions.setSelectedHoleId,
     setHighlightedHoleId: actions.setHighlightedHoleId,
-    handleJump,
+    handleJump: actions.handleJump,
     selectFirstHole: navigation.selectFirstHole,
   });
 
@@ -68,7 +66,7 @@ export const HolesPanel: React.FC<HolesPanelProps> = ({ initShowHoles }) => {
   });
 
   const renderContent = () => {
-    if (!showHoles) {
+    if (!state.showHoles) {
       return <Warning />;
     }
 
@@ -87,8 +85,8 @@ export const HolesPanel: React.FC<HolesPanelProps> = ({ initShowHoles }) => {
         hole={hole}
         highlighted={hole.id === state.highlightedHoleId}
         selected={hole.id === state.selectedHoleId}
-        onJump={handleJump}
-        onDeselect={handleDeselect}
+        onJump={actions.handleJump}
+        onDeselect={actions.handleDeselect}
       />
     ));
   };
