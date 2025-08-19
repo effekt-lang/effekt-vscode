@@ -224,6 +224,7 @@
   },
   "scripts": {
     "compile": "npm run check-types && node esbuild.js",
+    "compile-tests": "tsc -p tsconfig.test.json",
     "check-types": "tsc --noEmit",
     "watch": "npm run compile && npm-run-all -p watch:*",
     "watch:esbuild": "node esbuild.js --watch",
@@ -234,8 +235,7 @@
     "lint:fix": "eslint 'src/**/*.ts' --fix",
     "format": "prettier --config .prettierrc \"**/*.{ts,tsx,json,css}\" --write",
     "format:check": "prettier --config .prettierrc \"**/*.{ts,tsx,json,css}\" --check",
-    "pretest": "npm run compile && tsc -p . --outDir out",
-    "test": "node ./out/test/runTest.js"
+    "test": "npm run compile-tests && node ./out/test/runTest.js"
   },
   "dependencies": {
     "@vscode/codicons": "^0.0.36",
