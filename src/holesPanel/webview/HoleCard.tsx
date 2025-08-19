@@ -5,6 +5,7 @@ import { BindingsSection } from './BindingsSection';
 interface HoleCardProps {
   hole: EffektHoleInfo;
   highlighted: boolean;
+  selected: boolean;
   onJump: (id: string) => void;
   onDeselect: () => void;
 }
@@ -12,6 +13,7 @@ interface HoleCardProps {
 export const HoleCard: React.FC<HoleCardProps> = ({
   hole,
   highlighted,
+  selected,
   onJump,
   onDeselect,
 }) => {
@@ -26,7 +28,7 @@ export const HoleCard: React.FC<HoleCardProps> = ({
   return (
     <section
       ref={cardRef}
-      className={`hole-card${highlighted ? ' highlighted' : ''}`}
+      className={`hole-card${highlighted ? ' highlighted' : ''}${selected ? ' selected' : ''}`}
       id={`hole-${hole.id}`}
       onClick={() => {
         if (highlighted) {
