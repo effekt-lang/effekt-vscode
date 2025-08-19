@@ -20,7 +20,7 @@ const isInputFocused = (): boolean => {
 const blurActiveInput = (): void => {
   const activeElement = document.activeElement;
   if (activeElement?.tagName === 'INPUT') {
-    (activeElement as HTMLInputElement).blur();
+    (activeElement as HTMLInputElement)!.blur();
   }
 };
 
@@ -38,9 +38,9 @@ export const useKeyboardNavigation = (keyBindings: Partial<KeyBindings>) => {
         if (isInputFocused()) {
           blurActiveInput();
           event.preventDefault();
-          return;
+        } else {
+          handler(event);
         }
-        handler(event);
         return;
       }
 

@@ -24,9 +24,7 @@ export const useHoleNavigation = (
 
   const scrollToHole = useCallback((holeId: string): void => {
     const holeElement = document.getElementById(`hole-${holeId}`);
-    if (holeElement) {
-      holeElement.scrollIntoView({ behavior: 'auto', block: 'start' });
-    }
+    holeElement!.scrollIntoView({ behavior: 'auto', block: 'start' });
   }, []);
 
   const navigateToNextHole = useCallback((): void => {
@@ -36,13 +34,11 @@ export const useHoleNavigation = (
 
     const currentIndex = getCurrentIndex();
     const nextIndex = currentIndex < holes.length - 1 ? currentIndex + 1 : 0;
-    const nextHole = holes[nextIndex];
+    const nextHole = holes[nextIndex]!;
 
-    if (nextHole) {
-      setHighlightedHoleId(null);
-      setSelectedHoleId(nextHole.id);
-      scrollToHole(nextHole.id);
-    }
+    setHighlightedHoleId(null);
+    setSelectedHoleId(nextHole.id);
+    scrollToHole(nextHole.id);
   }, [
     holes,
     getCurrentIndex,
@@ -58,13 +54,11 @@ export const useHoleNavigation = (
 
     const currentIndex = getCurrentIndex();
     const prevIndex = currentIndex > 0 ? currentIndex - 1 : holes.length - 1;
-    const prevHole = holes[prevIndex];
+    const prevHole = holes[prevIndex]!;
 
-    if (prevHole) {
-      setHighlightedHoleId(null);
-      setSelectedHoleId(prevHole.id);
-      scrollToHole(prevHole.id);
-    }
+    setHighlightedHoleId(null);
+    setSelectedHoleId(prevHole.id);
+    scrollToHole(prevHole.id);
   }, [
     holes,
     getCurrentIndex,
