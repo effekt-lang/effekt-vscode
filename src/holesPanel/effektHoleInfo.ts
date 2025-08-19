@@ -18,8 +18,8 @@ export interface TermBinding {
   qualifier: string[];
   name: string;
   origin: BindingOrigin;
-  type?: string;
-  typeHtml?: string;
+  signature?: string;
+  signatureHtml?: string;
   kind: typeof BINDING_KIND_TERM;
 }
 
@@ -27,8 +27,8 @@ export interface TypeBinding {
   qualifier: string[];
   name: string;
   origin: BindingOrigin;
-  definition: string;
-  definitionHtml?: string;
+  signature?: string;
+  signatureHtml?: string;
   kind: typeof BINDING_KIND_TYPE;
 }
 
