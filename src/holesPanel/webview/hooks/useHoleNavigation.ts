@@ -1,19 +1,12 @@
 import { useCallback } from 'react';
-import { EffektHoleInfo } from '../../effektHoleInfo';
-
-interface HoleNavigationState {
-  holes: EffektHoleInfo[];
-  selectedHoleId: string | null;
-  highlightedHoleId: string | null;
-}
-
+import { HoleState } from './holeState';
 interface HoleNavigationActions {
   setSelectedHoleId: (id: string | null) => void;
   setHighlightedHoleId: (id: string | null) => void;
 }
 
 export const useHoleNavigation = (
-  state: HoleNavigationState,
+  state: HoleState,
   actions: HoleNavigationActions,
 ) => {
   const { holes, selectedHoleId, highlightedHoleId } = state;
