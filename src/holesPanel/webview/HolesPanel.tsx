@@ -76,11 +76,14 @@ export const HolesPanel: React.FC<{ initShowHoles: boolean }> = ({
   }, []);
 
   useEffect(() => {
+    const navigationKeys = ['ArrowDown', 'ArrowUp'];
+    const expandKeys = ['Enter', ' ', 'ArrowRight', 'ArrowLeft'];
+
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         setHighlightedHoleId(null);
         setSelectedHoleId(null);
-      } else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      } else if (navigationKeys.includes(e.key)) {
         if (holes.length === 0) {
           return;
         }
@@ -106,14 +109,19 @@ export const HolesPanel: React.FC<{ initShowHoles: boolean }> = ({
           const holeElement = document.getElementById(`hole-${nextHole.id}`);
           holeElement!.scrollIntoView({ behavior: 'auto', block: 'start' });
         }
-      } else if (e.key === 'Enter') {
+      } else if (expandKeys.includes(e.key)) {
         if (holes.length === 0) {
           return;
         }
 
         e.preventDefault();
+
         if (selectedHoleId) {
-          handleJump(selectedHoleId);
+          if (highlightedHoleId === selectedHoleId) {
+            setHighlightedHoleId(null);
+          } else {
+            handleJump(selectedHoleId);
+          }
         } else if (!highlightedHoleId) {
           const firstHole = holes[0];
           if (firstHole) {
