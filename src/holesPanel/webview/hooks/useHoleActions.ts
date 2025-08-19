@@ -31,15 +31,14 @@ export const useHoleActions = (
       if (highlightedHoleId === selectedHoleId) {
         setHighlightedHoleId(null);
       } else {
-        // Not expanded, expand it
         handleJump(selectedHoleId);
       }
     } else if (highlightedHoleId) {
-      // If there's a highlighted hole but no selection, select it and then collapse
+      // If hole is highlighted but no selection, select it and then collapse
       setSelectedHoleId(highlightedHoleId);
       setHighlightedHoleId(null);
     } else {
-      // No hole selected or highlighted, select first hole
+      // No hole selected or highlighted - default
       selectFirstHole();
     }
   }, [
