@@ -43,12 +43,12 @@ export const HolesPanel: React.FC<HolesPanelProps> = ({ initShowHoles }) => {
 
   const navigation = useHoleNavigation(state, {
     setSelectedHoleId: actions.setSelectedHoleId,
-    setexpandedHoleId: actions.setexpandedHoleId,
+    setexpandedHoleId: actions.setExpandedHoleId,
   });
 
   const holeActions = useHoleActions(state, {
     setSelectedHoleId: actions.setSelectedHoleId,
-    setexpandedHoleId: actions.setexpandedHoleId,
+    setexpandedHoleId: actions.setExpandedHoleId,
     handleJump: actions.handleJump,
     selectFirstHole: navigation.selectFirstHole,
   });
