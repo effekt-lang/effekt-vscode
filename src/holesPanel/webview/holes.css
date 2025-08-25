@@ -191,6 +191,8 @@ code {
 
 .binding {
   background: var(--code-bg);
+  font-family: var(--vscode-editor-font-family);
+  font-size: 12;
 }
 
 /* Effekt Syntax Highlighting in the holes panel
