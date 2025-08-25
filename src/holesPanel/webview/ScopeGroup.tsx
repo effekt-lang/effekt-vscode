@@ -46,7 +46,7 @@ export const ScopeGroup: React.FC<ScopeGroupProps> = ({
             <span className="scope-label-text">{scopeLabel(scope, false)}</span>
           </div>
 
-          <div>{renderList(defined)}</div>
+          <div className="bindings-list">{renderList(defined)}</div>
         </>
       )}
       {imported.some((b) => filteredBindings.includes(b)) && (
@@ -54,7 +54,7 @@ export const ScopeGroup: React.FC<ScopeGroupProps> = ({
           <div className="scope-label-line">
             <span className="scope-label-text">{scopeLabel(scope, true)}</span>
           </div>
-          <div>{renderList(imported)}</div>
+          <div className="bindings-list">{renderList(imported)}</div>
         </>
       )}
     </div>
