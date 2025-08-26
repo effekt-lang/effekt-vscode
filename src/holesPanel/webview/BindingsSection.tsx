@@ -96,16 +96,13 @@ export const BindingsSection: React.FC<BindingsSectionProps> = ({
         </span>
       </div>
       {isActive && (
-        <div className="bindings-body">
+        <div className="scopes-body">
           <FilterBox
             ref={filterInputRef}
             filter={filter}
             onFilterChange={setFilter}
           />
-          <div
-            className="bindings-list"
-            id={`bindings-dropdown-list-${holeId}`}
-          >
+          <div className="scopes-list" id={`bindings-dropdown-list-${holeId}`}>
             {flattenScopes(scope).map((s, si) => (
               <ScopeGroup
                 key={si}
