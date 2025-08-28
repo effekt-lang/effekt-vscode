@@ -1,5 +1,4 @@
 import React from 'react';
-import './keyboard-shortcut-tutorial.css';
 
 export const KeyboardShortcutTutorial: React.FC = () => (
   <div className="keyboard-shortcut-tutorial">
