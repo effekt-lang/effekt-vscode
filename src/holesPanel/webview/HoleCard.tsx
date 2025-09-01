@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { EffektHoleInfo } from '../effektHoleInfo';
+import { EffektHoleInfo, BindingInfo } from '../effektHoleInfo';
 import { BindingsSection } from './BindingsSection';
 
 interface HoleCardProps {
@@ -7,6 +7,7 @@ interface HoleCardProps {
   expanded: boolean;
   selected: boolean;
   onJump: (id: string) => void;
+  onJumpToDefinition: (binding: BindingInfo) => void;
   onDeselect: () => void;
 }
 
@@ -15,6 +16,7 @@ export const HoleCard: React.FC<HoleCardProps> = ({
   expanded,
   selected,
   onJump,
+  onJumpToDefinition,
   onDeselect,
 }) => {
   const cardRef = useRef<HTMLDivElement>(null);
@@ -57,6 +59,7 @@ export const HoleCard: React.FC<HoleCardProps> = ({
         scope={hole.scope}
         holeId={hole.id}
         isActive={expanded}
+        onJumpToDefinition={onJumpToDefinition}
       />
     </section>
   );

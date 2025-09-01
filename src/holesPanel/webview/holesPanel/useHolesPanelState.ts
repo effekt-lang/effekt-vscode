@@ -6,7 +6,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { EffektHoleInfo } from '../../effektHoleInfo';
+import { EffektHoleInfo, BindingInfo } from '../../effektHoleInfo';
 import { IncomingMessage, OutgoingMessage } from '../messages';
 import { HoleState } from './holeState';
 
@@ -48,6 +48,10 @@ export const useHolesPanelState = (initShowHoles: boolean) => {
     vscode.postMessage({ command: 'jumpToHole', holeId: id });
   }, []);
 
+  const handleJumpToDefinition = useCallback((binding: BindingInfo) => {
+    vscode.postMessage({ command: 'jumpToDefinition', binding });
+  }, []);
+
   const handleDeselect = useCallback(() => {
     setExpandedHoleId(null);
     setSelectedHoleId(null);
@@ -65,6 +69,7 @@ export const useHolesPanelState = (initShowHoles: boolean) => {
     setSelectedHoleId,
     setShowHoles,
     handleJump,
+    handleJumpToDefinition,
     handleDeselect,
   };
 
