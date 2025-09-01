@@ -201,6 +201,19 @@ code {
   font-size: 12;
 }
 
+.binding--clickable {
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.binding--clickable:hover {
+  background-color: var(--vscode-list-hoverBackground, var(--highlight));
+}
+
+.binding--clickable:active {
+  background-color: var(--vscode-list-activeSelectionBackground, var(--accent));
+}
+
 /* Effekt Syntax Highlighting in the holes panel
    This is very conservative as there is no good way to get the correct colors of the user theme:
    https://github.com/Microsoft/vscode/issues/32813

@@ -13,12 +13,14 @@ interface ScopeGroupProps {
   scope: ScopeInfo;
   filteredBindings: BindingInfo[];
   groupIndex: number;
+  onJumpToDefinition: (binding: BindingInfo) => void;
 }
 
 export const ScopeGroup: React.FC<ScopeGroupProps> = ({
   scope,
   filteredBindings,
   groupIndex,
+  onJumpToDefinition,
 }) => {
   const defined = scope.bindings.filter(
     (b) => b.origin === BINDING_ORIGIN_DEFINED,
@@ -31,9 +33,12 @@ export const ScopeGroup: React.FC<ScopeGroupProps> = ({
     list
       .filter((b) => filteredBindings.includes(b))
       .map((b, bi) => (
-        <BindingItem binding={b} key={`${scope.kind}-${groupIndex}-${bi}`} />
+        <BindingItem
+          binding={b}
+          key={`${scope.kind}-${groupIndex}-${bi}`}
+          onJumpToDefinition={onJumpToDefinition}
+        />
       ));
-
   if (![...renderList(defined), ...renderList(imported)].length) {
     return null;
   }

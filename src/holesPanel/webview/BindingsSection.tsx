@@ -14,12 +14,14 @@ interface BindingsSectionProps {
   scope?: ScopeInfo;
   holeId: string;
   isActive: boolean;
+  onJumpToDefinition: (binding: BindingInfo) => void;
 }
 
 export const BindingsSection: React.FC<BindingsSectionProps> = ({
   scope,
   holeId,
   isActive,
+  onJumpToDefinition,
 }) => {
   const [filter, setFilter] = useState('');
   const filterInputRef = useRef<HTMLInputElement>(null);
@@ -109,6 +111,7 @@ export const BindingsSection: React.FC<BindingsSectionProps> = ({
                 scope={s}
                 filteredBindings={filteredBindings}
                 groupIndex={si}
+                onJumpToDefinition={onJumpToDefinition}
               />
             ))}
           </div>
