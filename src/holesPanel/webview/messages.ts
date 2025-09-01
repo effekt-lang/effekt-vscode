@@ -1,9 +1,8 @@
-import { EffektHoleInfo } from '../effektHoleInfo';
+import { EffektHoleInfo, BindingInfo } from '../effektHoleInfo';
 
-export interface OutgoingMessage {
-  command: 'jumpToHole';
-  holeId?: string;
-}
+export type OutgoingMessage =
+  | { command: 'jumpToHole'; holeId?: string }
+  | { command: 'jumpToDefinition'; binding: BindingInfo };
 
 export type IncomingMessage =
   | { command: 'highlightHole'; holeId: string }
