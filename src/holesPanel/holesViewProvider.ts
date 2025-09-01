@@ -108,19 +108,17 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
         }
       } else if (message.command === 'jumpToDefinition') {
         const binding = message.binding;
-        if (binding.definitionLocation) {
-          const uri = vscode.Uri.parse(binding.definitionLocation.uri);
-          const range = new vscode.Range(
-            binding.definitionLocation.range.start.line,
-            binding.definitionLocation.range.start.character,
-            binding.definitionLocation.range.end.line,
-            binding.definitionLocation.range.end.character,
-          );
-          vscode.window.showTextDocument(uri, {
-            selection: range,
-            viewColumn: vscode.ViewColumn.Active,
-          });
-        }
+        const uri = vscode.Uri.parse(binding.definitionLocation!.uri);
+        const range = new vscode.Range(
+          binding.definitionLocation!.range.start.line,
+          binding.definitionLocation!.range.start.character,
+          binding.definitionLocation!.range.end.line,
+          binding.definitionLocation!.range.end.character,
+        );
+        vscode.window.showTextDocument(uri, {
+          selection: range,
+          viewColumn: vscode.ViewColumn.Active,
+        });
       }
     });
   }
