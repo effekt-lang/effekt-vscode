@@ -14,13 +14,20 @@ export type BindingOrigin =
 
 export type BindingInfo = TermBinding | TypeBinding;
 
+export interface DefinitionLocation {
+  uri: string;
+  range: LSPRange;
+}
+
 export interface TermBinding {
   qualifier: string[];
   name: string;
   origin: BindingOrigin;
   signature?: string;
   signatureHtml?: string;
+  uri?: string;
   kind: typeof BINDING_KIND_TERM;
+  definitionLocation?: DefinitionLocation;
 }
 
 export interface TypeBinding {
@@ -29,7 +36,9 @@ export interface TypeBinding {
   origin: BindingOrigin;
   signature?: string;
   signatureHtml?: string;
+  uri?: string;
   kind: typeof BINDING_KIND_TYPE;
+  definitionLocation?: DefinitionLocation;
 }
 
 export function fullyQualifiedName(binding: TermBinding | TypeBinding): string {
