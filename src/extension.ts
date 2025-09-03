@@ -14,6 +14,14 @@ import { EffektLanguageClient } from './effektLanguageClient';
 import { EffektHoleInfo } from './holesPanel/effektHoleInfo';
 import { HolesViewProvider } from './holesPanel/holesViewProvider';
 import * as net from 'net';
+import {
+  createEffektInstructions,
+  hasEffektInstructions,
+  installMCPServer,
+  isMCPServerInstalled,
+  startMCPServer,
+  stopMCPServer,
+} from './mcpManager';
 
 let client: EffektLanguageClient;
 let effektManager: EffektManager;
@@ -114,8 +122,12 @@ export async function activate(context: vscode.ExtensionContext) {
     // If Effekt is installed (no matter which version), start the language server
     await ensureEffektIsAvailable();
     await initializeLSPAndProviders(context);
+    await promptForMCPServerInstallation();
+    await promptForEffektInstructions(context);
+    await startEffektMCPServer();
 
-    handleEffektUpdates(); // Do not await handleEffektUpdates() so the holes panel and LSP features load immediately, even if the update prompt is open.
+    // Do not await handleEffektUpdates() so the holes panel and LSP features load immediately, even if the update prompt is open.
+    handleEffektUpdates();
   } catch (error) {
     if (error instanceof EffektExecutableNotFoundError) {
       // If Effekt is not installed, we prompt the user to install it
@@ -224,6 +236,16 @@ async function startEffektLanguageServer(context: vscode.ExtensionContext) {
 
   await client.start();
   context.subscriptions.push(client);
+}
+
+async function startEffektMCPServer() {
+  const agentSupport = vscode.workspace
+    .getConfiguration()
+    .get('effekt.agentSupport');
+
+  if (agentSupport && isMCPServerInstalled()) {
+    startMCPServer();
+  }
 }
 
 function registerCodeLensProviders(context: vscode.ExtensionContext) {
@@ -407,10 +429,60 @@ function initializeHoleDecorations(context: vscode.ExtensionContext) {
   scheduleDecorations();
 }
 
-export function deactivate(): Thenable<void> | undefined {
-  if (!client) {
-    return undefined;
+function promptForMCPServerInstallation() {
+  const agentSupport = vscode.workspace
+    .getConfiguration()
+    .get('effekt.agentSupport');
+
+  if (!agentSupport || isMCPServerInstalled()) {
+    return;
   }
-  effektManager.updateServerStatus('stopped');
-  return client.stop();
+
+  const installMCP = vscode.window.showInformationMessage(
+    'The Effekt MCP server is not installed. Would you like to install it now?',
+    {},
+    'Install',
+  );
+
+  installMCP.then((selection) => {
+    if (selection === 'Install') {
+      installMCPServer();
+    }
+  });
+}
+
+async function promptForEffektInstructions(context: vscode.ExtensionContext) {
+  const config = vscode.workspace.getConfiguration('effekt');
+  const agentSupport = config.get('agentSupport');
+  const agentInstructions = config.get('agentInstructions', true);
+
+  if (!agentSupport || !agentInstructions || (await hasEffektInstructions())) {
+    return;
+  }
+  const createInstructions = vscode.window.showInformationMessage(
+    'AI agents perform better with Effekt-specific instructions. Would you like to create the Effekt instructions file now?',
+    {},
+    'Create',
+    "Don't ask again",
+  );
+  createInstructions.then(async (selection) => {
+    switch (selection) {
+      case 'Create':
+        createEffektInstructions(context);
+        break;
+      case "Don't ask again":
+        await vscode.commands.executeCommand(
+          'workbench.action.openSettings',
+          'effekt.agentInstructions',
+        );
+    }
+  });
+}
+
+export async function deactivate(): Promise<void> {
+  if (client) {
+    effektManager.updateServerStatus('stopped');
+    await client.stop();
+  }
+  stopMCPServer();
 }

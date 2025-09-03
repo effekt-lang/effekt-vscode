@@ -164,6 +164,16 @@
           "type": "boolean",
           "default": false,
           "description": "Show a panel with information about all typed holes in the program"
+        },
+        "effekt.agentSupport": {
+          "type": "boolean",
+          "default": false,
+          "markdownDescription": "Enable the following agentic AI features:\n* MCP server for Effekt\n* GitHub Copilot instructions\n* Button to solve holes in programs\n\n**Requires a restart of the extension.**\n\n⚠️ **WARNING:** This option is experimental. Expect bugs and missing features."
+        },
+        "effekt.agentInstructions": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "On any Effekt project, suggest Effekt-specific instructions for GitHub Copilot."
         }
       }
     },
@@ -236,14 +246,16 @@
     "format:check": "prettier --config .prettierrc \"**/*.{ts,tsx,json,css}\" --check"
   },
   "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.16.0",
     "@vscode/codicons": "^0.0.36",
     "compare-versions": "^6.1.1",
     "esbuild-plugin-copy": "^2.1.1",
-    "minisearch": "^7.1.0",
+    "minisearch": "^7.1.2",
     "vscode-languageclient": "^8.1.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.26.0",
+    "@types/express": "^5.0.3",
     "@types/mocha": "^10.0.6",
     "@types/node": "^20.11.25",
     "@types/react": "^19.1.8",
@@ -251,10 +263,12 @@
     "@types/vscode": "^1.90.0",
     "@typescript-eslint/eslint-plugin": "^7.1.0",
     "@typescript-eslint/parser": "^7.1.0",
+    "commander": "^14.0.0",
     "esbuild": "^0.25.4",
     "eslint": "^8.57.1",
     "eslint-config-prettier": "^10.1.5",
     "eslint-plugin-prettier": "^5.4.0",
+    "express": "^5.1.0",
     "mocha": "^10.3.0",
     "npm-run-all": "^4.1.5",
     "prettier": "^3.5.3",

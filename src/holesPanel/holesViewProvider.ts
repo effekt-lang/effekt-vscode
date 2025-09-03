@@ -58,12 +58,19 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
     const showHoles =
       vscode.workspace.getConfiguration('effekt').get<boolean>('showHoles') ||
       false;
+
+    const agentSupport =
+      vscode.workspace
+        .getConfiguration('effekt')
+        .get<boolean>('agentSupport') || false;
+
     const cssUri = this.getCssUri()!;
     const jsUri = this.getJsUri()!;
     const codiconUri = this.getCodiconUri()!;
 
     webviewView.webview.html = webviewHtml(
       showHoles,
+      agentSupport,
       cssUri,
       jsUri,
       codiconUri,
@@ -120,8 +127,28 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
           selection: range,
           viewColumn: vscode.ViewColumn.Active,
         });
+      } else if (message.command === 'openCopilotChat') {
+        this.handleOpenCopilotChat(message);
       }
     });
+  }
+
+  private async handleOpenCopilotChat(request: {
+    holeId: string;
+  }): Promise<void> {
+    try {
+      const query = `Fill the hole with ID "${request.holeId}".`;
+
+      await vscode.commands.executeCommand('workbench.action.chat.open', {
+        query: query,
+        mode: 'agent',
+      });
+    } catch (error) {
+      console.error('Error opening copilot chat:', error);
+      vscode.window.showErrorMessage(
+        `Failed to open copilot chat: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      );
+    }
   }
 
   public updateHoles(holes: EffektHoleInfo[]) {
@@ -184,6 +211,7 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
 
 export function webviewHtml(
   showHoles: boolean,
+  agentSupport: boolean,
   cssUri: vscode.Uri,
   jsUri: vscode.Uri,
   codiconUri: vscode.Uri,
@@ -201,7 +229,7 @@ export function webviewHtml(
 </head>
 
 <body>
-  <div id="react-root" data-show-holes="${showHoles}"></div>
+  <div id="react-root" data-show-holes="${showHoles}" data-agent-support="${agentSupport}"></div>
 	<script src="${jsUri}"></script>
 </body>
 

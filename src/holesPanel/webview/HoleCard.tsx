@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { EffektHoleInfo } from '../effektHoleInfo';
 import { BindingsSection } from './BindingsSection';
 import { Location as LSPLocation } from 'vscode-languageserver-protocol';
+import { vscode } from './vscodeApi';
 
 interface HoleCardProps {
   hole: EffektHoleInfo;
@@ -10,6 +11,7 @@ interface HoleCardProps {
   onJump: (id: string) => void;
   onJumpToDefinition: (definitionLocation: LSPLocation) => void;
   onDeselect: () => void;
+  agentSupport: boolean;
 }
 
 export const HoleCard: React.FC<HoleCardProps> = ({
@@ -19,6 +21,7 @@ export const HoleCard: React.FC<HoleCardProps> = ({
   onJump,
   onJumpToDefinition,
   onDeselect,
+  agentSupport,
 }) => {
   const cardRef = useRef<HTMLDivElement>(null);
 
@@ -43,6 +46,17 @@ export const HoleCard: React.FC<HoleCardProps> = ({
     >
       <div className="hole-header">
         <span className="hole-id">Hole: {hole.id}</span>
+        {agentSupport && (
+          <button
+            className="solve-button"
+            onClick={(e) => {
+              e.stopPropagation();
+              solveHole(hole);
+            }}
+          >
+            Solve
+          </button>
+        )}
       </div>
       {hole.expectedType && (
         <div className="hole-field" onClick={(e) => e.stopPropagation()}>
@@ -64,4 +78,11 @@ export const HoleCard: React.FC<HoleCardProps> = ({
       />
     </section>
   );
+};
+
+const solveHole = async (hole: EffektHoleInfo): Promise<void> => {
+  vscode.postMessage({
+    command: 'openCopilotChat',
+    holeId: hole.id,
+  });
 };
