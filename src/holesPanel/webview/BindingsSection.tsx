@@ -9,17 +9,20 @@ import {
 import { ScopeGroup } from './ScopeGroup';
 import { FilterBox } from './FilterBox';
 import { IncomingMessage } from './messages';
+import { Location as LSPLocation } from 'vscode-languageserver-protocol';
 
 interface BindingsSectionProps {
   scope?: ScopeInfo;
   holeId: string;
   isActive: boolean;
+  onJumpToDefinition: (definitionLocation: LSPLocation) => void;
 }
 
 export const BindingsSection: React.FC<BindingsSectionProps> = ({
   scope,
   holeId,
   isActive,
+  onJumpToDefinition,
 }) => {
   const [filter, setFilter] = useState('');
   const filterInputRef = useRef<HTMLInputElement>(null);
@@ -109,6 +112,7 @@ export const BindingsSection: React.FC<BindingsSectionProps> = ({
                 scope={s}
                 filteredBindings={filteredBindings}
                 groupIndex={si}
+                onJumpToDefinition={onJumpToDefinition}
               />
             ))}
           </div>

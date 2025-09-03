@@ -1,9 +1,9 @@
 import { EffektHoleInfo } from '../effektHoleInfo';
+import { Location as LSPLocation } from 'vscode-languageserver-protocol';
 
-export interface OutgoingMessage {
-  command: 'jumpToHole';
-  holeId?: string;
-}
+export type OutgoingMessage =
+  | { command: 'jumpToHole'; holeId?: string }
+  | { command: 'jumpToDefinition'; definitionLocation: LSPLocation };
 
 export type IncomingMessage =
   | { command: 'highlightHole'; holeId: string }

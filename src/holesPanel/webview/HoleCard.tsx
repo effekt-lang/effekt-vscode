@@ -1,12 +1,14 @@
 import React, { useEffect, useRef } from 'react';
 import { EffektHoleInfo } from '../effektHoleInfo';
 import { BindingsSection } from './BindingsSection';
+import { Location as LSPLocation } from 'vscode-languageserver-protocol';
 
 interface HoleCardProps {
   hole: EffektHoleInfo;
   expanded: boolean;
   selected: boolean;
   onJump: (id: string) => void;
+  onJumpToDefinition: (definitionLocation: LSPLocation) => void;
   onDeselect: () => void;
 }
 
@@ -15,6 +17,7 @@ export const HoleCard: React.FC<HoleCardProps> = ({
   expanded,
   selected,
   onJump,
+  onJumpToDefinition,
   onDeselect,
 }) => {
   const cardRef = useRef<HTMLDivElement>(null);
@@ -57,6 +60,7 @@ export const HoleCard: React.FC<HoleCardProps> = ({
         scope={hole.scope}
         holeId={hole.id}
         isActive={expanded}
+        onJumpToDefinition={onJumpToDefinition}
       />
     </section>
   );

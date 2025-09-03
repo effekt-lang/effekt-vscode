@@ -9,6 +9,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { EffektHoleInfo } from '../../effektHoleInfo';
 import { IncomingMessage, OutgoingMessage } from '../messages';
 import { HoleState } from './holeState';
+import { Location as LSPLocation } from 'vscode-languageserver-protocol';
 
 declare function acquireVsCodeApi<T>(): { postMessage(msg: T): void };
 
@@ -48,6 +49,13 @@ export const useHolesPanelState = (initShowHoles: boolean) => {
     vscode.postMessage({ command: 'jumpToHole', holeId: id });
   }, []);
 
+  const handleJumpToDefinition = useCallback(
+    (definitionLocation: LSPLocation) => {
+      vscode.postMessage({ command: 'jumpToDefinition', definitionLocation });
+    },
+    [],
+  );
+
   const handleDeselect = useCallback(() => {
     setExpandedHoleId(null);
     setSelectedHoleId(null);
@@ -65,6 +73,7 @@ export const useHolesPanelState = (initShowHoles: boolean) => {
     setSelectedHoleId,
     setShowHoles,
     handleJump,
+    handleJumpToDefinition,
     handleDeselect,
   };
 

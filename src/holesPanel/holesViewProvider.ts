@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { EffektHoleInfo } from './effektHoleInfo';
+import { OutgoingMessage } from './webview/messages';
 
 export class HolesViewProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = 'effekt.holesView';
@@ -81,7 +82,7 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
       }
     });
 
-    webviewView.webview.onDidReceiveMessage((message) => {
+    webviewView.webview.onDidReceiveMessage((message: OutgoingMessage) => {
       if (message.command === 'jumpToHole') {
         const hole = this.holes.find((h) => h.id === message.holeId);
         if (hole) {
@@ -106,6 +107,19 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
             holeId: hole.id,
           });
         }
+      } else if (message.command === 'jumpToDefinition') {
+        const location = message.definitionLocation;
+        const uri = vscode.Uri.parse(location!.uri);
+        const range = new vscode.Range(
+          location!.range.start.line,
+          location!.range.start.character,
+          location!.range.end.line,
+          location!.range.end.character,
+        );
+        vscode.window.showTextDocument(uri, {
+          selection: range,
+          viewColumn: vscode.ViewColumn.Active,
+        });
       }
     });
   }

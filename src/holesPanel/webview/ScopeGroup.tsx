@@ -8,17 +8,20 @@ import {
   SCOPE_KIND_NAMESPACE,
 } from '../effektHoleInfo';
 import { BindingItem } from './BindingItem';
+import { Location as LSPLocation } from 'vscode-languageserver-protocol';
 
 interface ScopeGroupProps {
   scope: ScopeInfo;
   filteredBindings: BindingInfo[];
   groupIndex: number;
+  onJumpToDefinition: (definitionLocation: LSPLocation) => void;
 }
 
 export const ScopeGroup: React.FC<ScopeGroupProps> = ({
   scope,
   filteredBindings,
   groupIndex,
+  onJumpToDefinition,
 }) => {
   const defined = scope.bindings.filter(
     (b) => b.origin === BINDING_ORIGIN_DEFINED,
@@ -31,9 +34,12 @@ export const ScopeGroup: React.FC<ScopeGroupProps> = ({
     list
       .filter((b) => filteredBindings.includes(b))
       .map((b, bi) => (
-        <BindingItem binding={b} key={`${scope.kind}-${groupIndex}-${bi}`} />
+        <BindingItem
+          binding={b}
+          key={`${scope.kind}-${groupIndex}-${bi}`}
+          onJumpToDefinition={onJumpToDefinition}
+        />
       ));
-
   if (![...renderList(defined), ...renderList(imported)].length) {
     return null;
   }

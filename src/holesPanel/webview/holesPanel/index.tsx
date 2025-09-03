@@ -86,6 +86,7 @@ export const HolesPanel: React.FC<HolesPanelProps> = ({ initShowHoles }) => {
         expanded={hole.id === state.expandedHoleId}
         selected={hole.id === state.selectedHoleId}
         onJump={actions.handleJump}
+        onJumpToDefinition={actions.handleJumpToDefinition}
         onDeselect={actions.handleDeselect}
       />
     ));
