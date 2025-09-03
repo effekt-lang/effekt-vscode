@@ -1,9 +1,10 @@
 import React from 'react';
 import { BindingInfo } from '../effektHoleInfo';
+import { Location as LSPLocation } from 'vscode-languageserver-protocol';
 
 interface BindingItemProps {
   binding: BindingInfo;
-  onJumpToDefinition?: (binding: BindingInfo) => void;
+  onJumpToDefinition: (location: LSPLocation) => void;
 }
 
 export const BindingItem: React.FC<BindingItemProps> = ({
@@ -11,8 +12,8 @@ export const BindingItem: React.FC<BindingItemProps> = ({
   onJumpToDefinition,
 }) => {
   const handleClick = () => {
-    if (binding.definitionLocation && onJumpToDefinition) {
-      onJumpToDefinition(binding);
+    if (binding.definitionLocation) {
+      onJumpToDefinition(binding.definitionLocation);
     }
   };
 
@@ -20,7 +21,7 @@ export const BindingItem: React.FC<BindingItemProps> = ({
 
   return (
     <div
-      className={`binding ${canJumpToDefinition ? 'binding--clickable' : ''}`}
+      className={`binding ${canJumpToDefinition ? 'clickable' : ''}`}
       onClick={handleClick}
       title={
         canJumpToDefinition

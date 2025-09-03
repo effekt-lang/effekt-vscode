@@ -201,16 +201,16 @@ code {
   font-size: 12;
 }
 
-.binding--clickable {
+.binding.clickable {
   cursor: pointer;
   transition: background-color 0.2s ease;
 }
 
-.binding--clickable:hover {
+.binding.clickable:hover {
   background-color: var(--vscode-list-hoverBackground, var(--highlight));
 }
 
-.binding--clickable:active {
+.binding.clickable:active {
   background-color: var(--vscode-list-activeSelectionBackground, var(--accent));
 }
 

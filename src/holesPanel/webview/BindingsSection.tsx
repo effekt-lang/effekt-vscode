@@ -9,12 +9,13 @@ import {
 import { ScopeGroup } from './ScopeGroup';
 import { FilterBox } from './FilterBox';
 import { IncomingMessage } from './messages';
+import { Location as LSPLocation } from 'vscode-languageserver-protocol';
 
 interface BindingsSectionProps {
   scope?: ScopeInfo;
   holeId: string;
   isActive: boolean;
-  onJumpToDefinition: (binding: BindingInfo) => void;
+  onJumpToDefinition: (definitionLocation: LSPLocation) => void;
 }
 
 export const BindingsSection: React.FC<BindingsSectionProps> = ({

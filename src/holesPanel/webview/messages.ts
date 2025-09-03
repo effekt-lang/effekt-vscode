@@ -1,8 +1,9 @@
-import { EffektHoleInfo, BindingInfo } from '../effektHoleInfo';
+import { EffektHoleInfo } from '../effektHoleInfo';
+import { Location as LSPLocation } from 'vscode-languageserver-protocol';
 
 export type OutgoingMessage =
   | { command: 'jumpToHole'; holeId?: string }
-  | { command: 'jumpToDefinition'; binding: BindingInfo };
+  | { command: 'jumpToDefinition'; definitionLocation: LSPLocation };
 
 export type IncomingMessage =
   | { command: 'highlightHole'; holeId: string }

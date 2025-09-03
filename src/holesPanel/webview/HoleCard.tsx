@@ -1,13 +1,14 @@
 import React, { useEffect, useRef } from 'react';
-import { EffektHoleInfo, BindingInfo } from '../effektHoleInfo';
+import { EffektHoleInfo } from '../effektHoleInfo';
 import { BindingsSection } from './BindingsSection';
+import { Location as LSPLocation } from 'vscode-languageserver-protocol';
 
 interface HoleCardProps {
   hole: EffektHoleInfo;
   expanded: boolean;
   selected: boolean;
   onJump: (id: string) => void;
-  onJumpToDefinition: (binding: BindingInfo) => void;
+  onJumpToDefinition: (definitionLocation: LSPLocation) => void;
   onDeselect: () => void;
 }
 

@@ -8,12 +8,13 @@ import {
   SCOPE_KIND_NAMESPACE,
 } from '../effektHoleInfo';
 import { BindingItem } from './BindingItem';
+import { Location as LSPLocation } from 'vscode-languageserver-protocol';
 
 interface ScopeGroupProps {
   scope: ScopeInfo;
   filteredBindings: BindingInfo[];
   groupIndex: number;
-  onJumpToDefinition: (binding: BindingInfo) => void;
+  onJumpToDefinition: (definitionLocation: LSPLocation) => void;
 }
 
 export const ScopeGroup: React.FC<ScopeGroupProps> = ({

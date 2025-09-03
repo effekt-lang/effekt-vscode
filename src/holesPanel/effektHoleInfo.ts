@@ -1,4 +1,7 @@
-import { Range as LSPRange } from 'vscode-languageserver-protocol';
+import {
+  Range as LSPRange,
+  Location as LSPLocation,
+} from 'vscode-languageserver-protocol';
 
 export interface EffektHoleInfo {
   id: string;
@@ -27,7 +30,7 @@ export interface TermBinding {
   signatureHtml?: string;
   uri?: string;
   kind: typeof BINDING_KIND_TERM;
-  definitionLocation?: DefinitionLocation;
+  definitionLocation?: LSPLocation;
 }
 
 export interface TypeBinding {
@@ -38,7 +41,7 @@ export interface TypeBinding {
   signatureHtml?: string;
   uri?: string;
   kind: typeof BINDING_KIND_TYPE;
-  definitionLocation?: DefinitionLocation;
+  definitionLocation?: LSPLocation;
 }
 
 export function fullyQualifiedName(binding: TermBinding | TypeBinding): string {
