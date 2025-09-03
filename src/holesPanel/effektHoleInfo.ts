@@ -28,7 +28,6 @@ export interface TermBinding {
   origin: BindingOrigin;
   signature?: string;
   signatureHtml?: string;
-  uri?: string;
   kind: typeof BINDING_KIND_TERM;
   definitionLocation?: LSPLocation;
 }
@@ -39,7 +38,6 @@ export interface TypeBinding {
   origin: BindingOrigin;
   signature?: string;
   signatureHtml?: string;
-  uri?: string;
   kind: typeof BINDING_KIND_TYPE;
   definitionLocation?: LSPLocation;
 }
