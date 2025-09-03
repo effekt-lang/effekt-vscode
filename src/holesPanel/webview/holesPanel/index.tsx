@@ -4,6 +4,7 @@ import { useHolesPanelState } from './useHolesPanelState';
 import { useHoleNavigation } from './useHoleNavigation';
 import { useHoleActions } from './useHoleActions';
 import { useKeyboardNavigation } from './useKeyboardNavigation';
+import { KeyboardShortcutTutorial } from './KeyboardShortcutTutorial';
 
 const Description: React.FC = () => (
   <div className="desc" data-holes-panel-desc>
@@ -73,6 +74,7 @@ export const HolesPanel: React.FC<HolesPanelProps> = ({ initShowHoles }) => {
         <>
           <div className="empty">There are no holes in this file.</div>
           <Description />
+          <KeyboardShortcutTutorial />
         </>
       );
     }
