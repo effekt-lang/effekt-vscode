@@ -37,9 +37,13 @@ const Warning: React.FC = () => (
 
 interface HolesPanelProps {
   initShowHoles: boolean;
+  agentSupport: boolean;
 }
 
-export const HolesPanel: React.FC<HolesPanelProps> = ({ initShowHoles }) => {
+export const HolesPanel: React.FC<HolesPanelProps> = ({
+  initShowHoles,
+  agentSupport,
+}) => {
   const { state, actions } = useHolesPanelState(initShowHoles);
 
   const navigation = useHoleNavigation(state, {
@@ -88,6 +92,7 @@ export const HolesPanel: React.FC<HolesPanelProps> = ({ initShowHoles }) => {
         onJump={actions.handleJump}
         onJumpToDefinition={actions.handleJumpToDefinition}
         onDeselect={actions.handleDeselect}
+        agentSupport={agentSupport}
       />
     ));
   };

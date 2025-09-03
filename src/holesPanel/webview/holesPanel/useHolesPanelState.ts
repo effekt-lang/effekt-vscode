@@ -7,13 +7,9 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { EffektHoleInfo } from '../../effektHoleInfo';
-import { IncomingMessage, OutgoingMessage } from '../messages';
 import { HoleState } from './holeState';
 import { Location as LSPLocation } from 'vscode-languageserver-protocol';
-
-declare function acquireVsCodeApi<T>(): { postMessage(msg: T): void };
-
-const vscode = acquireVsCodeApi<OutgoingMessage>();
+import { vscode, IncomingMessage } from '../vscodeApi';
 
 export const useHolesPanelState = (initShowHoles: boolean) => {
   const [holes, setHoles] = useState<EffektHoleInfo[]>([]);
