@@ -1,5 +1,4 @@
-import { EffektHoleInfo } from '../effektHoleInfo';
-import { Location as LSPLocation } from 'vscode-languageserver-protocol';
+import { OutgoingMessage, IncomingMessage } from './messages';
 
 export interface VSCodeAPI {
   postMessage(msg: OutgoingMessage): void;
@@ -7,14 +6,7 @@ export interface VSCodeAPI {
 
 declare function acquireVsCodeApi(): VSCodeAPI;
 
-export type OutgoingMessage =
-  | { command: 'openCopilotChat'; holeId: string }
-  | { command: 'jumpToHole'; holeId: string }
-  | { command: 'jumpToDefinition'; definitionLocation: LSPLocation };
-
-export type IncomingMessage =
-  | { command: 'highlightHole'; holeId: string }
-  | { command: 'updateHoles'; holes: EffektHoleInfo[] }
-  | { command: 'setShowHoles'; show: boolean };
-
 export const vscode = acquireVsCodeApi();
+
+// Re-export types
+export type { OutgoingMessage, IncomingMessage };

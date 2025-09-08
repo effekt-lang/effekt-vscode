@@ -4,7 +4,8 @@ import { Location as LSPLocation } from 'vscode-languageserver-protocol';
 export type OutgoingMessage =
   | { command: 'jumpToHole'; holeId?: string }
   | { command: 'jumpToDefinition'; definitionLocation: LSPLocation }
-  | { command: 'openCopilotChat'; holeId: string };
+  | { command: 'openCopilotChat'; holeId: string }
+  | { command: 'createDraft' };
 
 export type IncomingMessage =
   | { command: 'highlightHole'; holeId: string }
