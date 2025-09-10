@@ -77,7 +77,6 @@ export const HolesPanel: React.FC<HolesPanelProps> = ({
     [],
   );
 
-  // Enhanced keyboard navigation that handles both hole and binding layers
   const handleArrowUp = useCallback(() => {
     if (bindingNavigation.isInBindingMode) {
       if (state.selectedBindingIndex === 0) {
