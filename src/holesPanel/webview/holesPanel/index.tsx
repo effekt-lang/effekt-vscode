@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import { HoleCard } from '../HoleCard';
 import { useHolesPanelState } from './useHolesPanelState';
 import { useHoleNavigation } from './useHoleNavigation';
 import { useHoleActions } from './useHoleActions';
 import { useKeyboardNavigation } from './useKeyboardNavigation';
+import { useBindingNavigation } from './useBindingNavigation';
 import { KeyboardShortcutTutorial } from './KeyboardShortcutTutorial';
+import { BindingInfo } from '../../effektHoleInfo';
 
 const Description: React.FC = () => (
   <div className="desc" data-holes-panel-desc>
@@ -45,6 +47,7 @@ export const HolesPanel: React.FC<HolesPanelProps> = ({
   agentSupport,
 }) => {
   const { state, actions } = useHolesPanelState(initShowHoles);
+  const [filteredBindings, setFilteredBindings] = useState<BindingInfo[]>([]);
 
   const navigation = useHoleNavigation(state, {
     setSelectedHoleId: actions.setSelectedHoleId,
@@ -58,12 +61,69 @@ export const HolesPanel: React.FC<HolesPanelProps> = ({
     selectFirstHole: navigation.selectFirstHole,
   });
 
+  const bindingNavigation = useBindingNavigation(
+    state,
+    {
+      setSelectedBindingIndex: actions.setSelectedBindingIndex,
+      handleJumpToDefinition: actions.handleJumpToDefinition,
+    },
+    filteredBindings,
+  );
+
+  const handleFilteredBindingsChange = useCallback(
+    (bindings: BindingInfo[]) => {
+      setFilteredBindings(bindings);
+    },
+    [],
+  );
+
+  // Enhanced keyboard navigation that handles both hole and binding layers
+  const handleArrowUp = useCallback(() => {
+    if (bindingNavigation.isInBindingMode) {
+      if (state.selectedBindingIndex === 0) {
+        // At top of bindings, exit to search bar
+        bindingNavigation.exitBindingMode();
+      } else {
+        bindingNavigation.navigateToPreviousBinding();
+      }
+    } else {
+      navigation.navigateToPreviousHole();
+    }
+  }, [bindingNavigation, navigation, state.selectedBindingIndex]);
+
+  const handleArrowDown = useCallback(() => {
+    if (bindingNavigation.isInBindingMode) {
+      bindingNavigation.navigateToNextBinding();
+    } else if (state.expandedHoleId && filteredBindings.length > 0) {
+      // Enter binding mode if hole is expanded and has bindings
+      bindingNavigation.enterBindingMode();
+    } else {
+      navigation.navigateToNextHole();
+    }
+  }, [bindingNavigation, navigation, state.expandedHoleId, filteredBindings]);
+
+  const handleEnterOrSpace = useCallback(() => {
+    if (bindingNavigation.isInBindingMode) {
+      bindingNavigation.jumpToSelectedBinding();
+    } else {
+      holeActions.expandSelectedHole();
+    }
+  }, [bindingNavigation, holeActions]);
+
+  const handleEscape = useCallback(() => {
+    if (bindingNavigation.isInBindingMode) {
+      bindingNavigation.exitBindingMode();
+    } else {
+      holeActions.clearSelection();
+    }
+  }, [bindingNavigation, holeActions]);
+
   useKeyboardNavigation({
-    Escape: holeActions.clearSelection,
-    ArrowUp: navigation.navigateToPreviousHole,
-    ArrowDown: navigation.navigateToNextHole,
-    Enter: holeActions.expandSelectedHole,
-    ' ': holeActions.expandSelectedHole,
+    Escape: handleEscape,
+    ArrowUp: handleArrowUp,
+    ArrowDown: handleArrowDown,
+    Enter: handleEnterOrSpace,
+    ' ': handleEnterOrSpace,
     ArrowLeft: holeActions.expandSelectedHole,
     ArrowRight: holeActions.expandSelectedHole,
   });
@@ -89,9 +149,17 @@ export const HolesPanel: React.FC<HolesPanelProps> = ({
         hole={hole}
         expanded={hole.id === state.expandedHoleId}
         selected={hole.id === state.selectedHoleId}
+        selectedBindingIndex={
+          hole.id === state.expandedHoleId ? state.selectedBindingIndex : null
+        }
         onJump={actions.handleJump}
         onJumpToDefinition={actions.handleJumpToDefinition}
         onDeselect={actions.handleDeselect}
+        onFilteredBindingsChange={
+          hole.id === state.expandedHoleId
+            ? handleFilteredBindingsChange
+            : undefined
+        }
         agentSupport={agentSupport}
       />
     ));

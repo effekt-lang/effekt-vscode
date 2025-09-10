@@ -15,14 +15,18 @@ interface BindingsSectionProps {
   scope?: ScopeInfo;
   holeId: string;
   isActive: boolean;
+  selectedBindingIndex?: number | null;
   onJumpToDefinition: (definitionLocation: LSPLocation) => void;
+  onFilteredBindingsChange?: (bindings: BindingInfo[]) => void;
 }
 
 export const BindingsSection: React.FC<BindingsSectionProps> = ({
   scope,
   holeId,
   isActive,
+  selectedBindingIndex,
   onJumpToDefinition,
+  onFilteredBindingsChange,
 }) => {
   const [filter, setFilter] = useState('');
   const filterInputRef = useRef<HTMLInputElement>(null);
@@ -88,6 +92,13 @@ export const BindingsSection: React.FC<BindingsSectionProps> = ({
   const totalCount = allBindings.length;
   const filteredCount = filteredBindings.length;
 
+  // Notify parent of filtered bindings changes
+  useEffect(() => {
+    if (onFilteredBindingsChange) {
+      onFilteredBindingsChange(filteredBindings);
+    }
+  }, [filteredBindings, onFilteredBindingsChange]);
+
   return (
     <div className="bindings-section" onClick={(e) => e.stopPropagation()}>
       <div
@@ -106,15 +117,33 @@ export const BindingsSection: React.FC<BindingsSectionProps> = ({
             onFilterChange={setFilter}
           />
           <div className="scopes-list" id={`bindings-dropdown-list-${holeId}`}>
-            {flattenScopes(scope).map((s, si) => (
-              <ScopeGroup
-                key={si}
-                scope={s}
-                filteredBindings={filteredBindings}
-                groupIndex={si}
-                onJumpToDefinition={onJumpToDefinition}
-              />
-            ))}
+            {flattenScopes(scope).map((s, si) => {
+              // Calculate the starting index for this scope group
+              const previousScopes = flattenScopes(scope).slice(0, si);
+              const startIndex = previousScopes.reduce((acc, prevScope) => {
+                const scopeFilteredBindings = [
+                  ...prevScope.bindings.filter(
+                    (b) => b.origin === BINDING_ORIGIN_DEFINED,
+                  ),
+                  ...prevScope.bindings.filter(
+                    (b) => b.origin === BINDING_ORIGIN_IMPORTED,
+                  ),
+                ].filter((b) => filteredBindings.includes(b));
+                return acc + scopeFilteredBindings.length;
+              }, 0);
+
+              return (
+                <ScopeGroup
+                  key={si}
+                  scope={s}
+                  filteredBindings={filteredBindings}
+                  groupIndex={si}
+                  selectedBindingIndex={selectedBindingIndex}
+                  bindingStartIndex={startIndex}
+                  onJumpToDefinition={onJumpToDefinition}
+                />
+              );
+            })}
           </div>
         </div>
       )}
