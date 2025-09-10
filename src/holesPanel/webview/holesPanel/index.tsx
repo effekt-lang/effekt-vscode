@@ -81,15 +81,23 @@ export const HolesPanel: React.FC<HolesPanelProps> = ({
   const handleArrowUp = useCallback(() => {
     if (bindingNavigation.isInBindingMode) {
       if (state.selectedBindingIndex === 0) {
-        // At top of bindings, exit to search bar
+        // At top of bindings, exit to search bar and scroll hole card into view
         bindingNavigation.exitBindingMode();
+        bindingNavigation.scrollHoleCardIntoView(
+          state.expandedHoleId ?? undefined,
+        );
       } else {
         bindingNavigation.navigateToPreviousBinding();
       }
     } else {
       navigation.navigateToPreviousHole();
     }
-  }, [bindingNavigation, navigation, state.selectedBindingIndex]);
+  }, [
+    bindingNavigation,
+    navigation,
+    state.selectedBindingIndex,
+    state.expandedHoleId,
+  ]);
 
   const handleArrowDown = useCallback(() => {
     if (bindingNavigation.isInBindingMode) {

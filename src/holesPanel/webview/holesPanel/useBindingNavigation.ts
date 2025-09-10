@@ -108,6 +108,7 @@ export const useBindingNavigation = (
     enterBindingMode,
     exitBindingMode,
     jumpToSelectedBinding,
+    scrollHoleCardIntoView,
   };
 };
 
@@ -116,8 +117,19 @@ function scrollToBinding(bindingIndex: number, holeId: string): void {
   const bindingElement = document.querySelector(
     `#bindings-dropdown-list-${holeId} .binding:nth-of-type(${bindingIndex + 1})`,
   );
-
   if (bindingElement) {
     bindingElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+}
+
+function scrollHoleCardIntoView(holeId?: string) {
+  // Scroll the parent hole card into view
+  let selector = '.hole-card.expanded';
+  if (holeId) {
+    selector = `#hole-${holeId}`;
+  }
+  const card = document.querySelector(selector);
+  if (card) {
+    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 }
