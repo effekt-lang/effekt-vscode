@@ -107,7 +107,12 @@ export const HolesPanel: React.FC<HolesPanelProps> = ({
     } else {
       navigation.navigateToNextHole();
     }
-  }, [bindingNavigation, navigation, state.expandedHoleId, filteredBindings]);
+  }, [
+    bindingNavigation,
+    navigation,
+    state.expandedHoleId,
+    filteredBindings.length,
+  ]);
 
   const handleEnterOrSpace = useCallback(() => {
     if (bindingNavigation.isInBindingMode) {

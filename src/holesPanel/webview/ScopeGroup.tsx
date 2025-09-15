@@ -36,8 +36,7 @@ export const ScopeGroup: React.FC<ScopeGroupProps> = ({
 
   const renderList = (list: BindingInfo[], isImported: boolean) => {
     let currentIndex = bindingStartIndex;
-    
-    // Count previous bindings in this scope group
+
     if (isImported) {
       const definedBindings = scope.bindings.filter(
         (b) =>
@@ -49,9 +48,8 @@ export const ScopeGroup: React.FC<ScopeGroupProps> = ({
     return list
       .filter((b) => filteredBindings.includes(b))
       .map((b, bi) => {
-        const globalIndex = currentIndex + bi;
-        const isSelected = selectedBindingIndex === globalIndex;
-        
+        const isSelected = selectedBindingIndex === currentIndex + bi;
+
         return (
           <BindingItem
             binding={b}
@@ -67,7 +65,7 @@ export const ScopeGroup: React.FC<ScopeGroupProps> = ({
   }
 
   return (
-    <div className="scope-group" key={groupIndex}>
+    <div className="scope-group">
       {defined.some((b) => filteredBindings.includes(b)) && (
         <>
           <div className="scope-label-line">

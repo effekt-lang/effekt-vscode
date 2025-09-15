@@ -38,7 +38,7 @@ export const useBindingNavigation = (
     scrollToBinding(nextIndex, expandedHoleId);
   }, [
     expandedHoleId,
-    filteredBindings,
+    filteredBindings.length,
     selectedBindingIndex,
     setSelectedBindingIndex,
   ]);
@@ -56,7 +56,7 @@ export const useBindingNavigation = (
     scrollToBinding(prevIndex, expandedHoleId);
   }, [
     expandedHoleId,
-    filteredBindings,
+    filteredBindings.length,
     selectedBindingIndex,
     setSelectedBindingIndex,
   ]);
@@ -68,16 +68,15 @@ export const useBindingNavigation = (
 
     setSelectedBindingIndex(0);
     scrollToBinding(0, expandedHoleId);
-  }, [expandedHoleId, filteredBindings, setSelectedBindingIndex]);
+  }, [expandedHoleId, filteredBindings.length, setSelectedBindingIndex]);
 
   const exitBindingMode = useCallback((): void => {
     setSelectedBindingIndex(null);
 
     // Focus the search bar
-    const holeId = expandedHoleId;
-    if (holeId) {
+    if (expandedHoleId) {
       const searchInput = document
-        .querySelector(`#bindings-dropdown-list-${holeId}`)
+        .querySelector(`#bindings-dropdown-list-${expandedHoleId}`)
         ?.closest('.bindings-section')
         ?.querySelector('input[type="text"]') as HTMLInputElement;
 
@@ -108,26 +107,21 @@ export const useBindingNavigation = (
     enterBindingMode,
     exitBindingMode,
     jumpToSelectedBinding,
-    scrollHoleCardIntoView,
+    scrollHoleCardIntoView: (holeId?: string) => scrollHoleCardIntoView(holeId),
   };
 };
 
 function scrollToBinding(bindingIndex: number, holeId: string): void {
-  // Find the binding element by index within the hole's bindings list
   const bindingElement = document.querySelector(
     `#bindings-dropdown-list-${holeId} .binding:nth-of-type(${bindingIndex + 1})`,
   );
   if (bindingElement) {
-    bindingElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    bindingElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 }
 
 function scrollHoleCardIntoView(holeId?: string) {
-  // Scroll the parent hole card into view
-  let selector = '.hole-card.expanded';
-  if (holeId) {
-    selector = `#hole-${holeId}`;
-  }
+  const selector = holeId ? `#hole-${holeId}` : '.hole-card.expanded';
   const card = document.querySelector(selector);
   if (card) {
     card.scrollIntoView({ behavior: 'smooth', block: 'center' });

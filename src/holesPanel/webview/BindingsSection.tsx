@@ -118,18 +118,14 @@ export const BindingsSection: React.FC<BindingsSectionProps> = ({
           />
           <div className="scopes-list" id={`bindings-dropdown-list-${holeId}`}>
             {flattenScopes(scope).map((s, si) => {
-              // Calculate the starting index for this scope group
+              // Calculate start index for this scope group
               const previousScopes = flattenScopes(scope).slice(0, si);
               const startIndex = previousScopes.reduce((acc, prevScope) => {
-                const scopeFilteredBindings = [
-                  ...prevScope.bindings.filter(
-                    (b) => b.origin === BINDING_ORIGIN_DEFINED,
-                  ),
-                  ...prevScope.bindings.filter(
-                    (b) => b.origin === BINDING_ORIGIN_IMPORTED,
-                  ),
-                ].filter((b) => filteredBindings.includes(b));
-                return acc + scopeFilteredBindings.length;
+                return (
+                  acc +
+                  prevScope.bindings.filter((b) => filteredBindings.includes(b))
+                    .length
+                );
               }, 0);
 
               return (
