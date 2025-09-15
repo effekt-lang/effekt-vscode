@@ -94,9 +94,7 @@ export const BindingsSection: React.FC<BindingsSectionProps> = ({
 
   // Notify parent of filtered bindings changes
   useEffect(() => {
-    if (onFilteredBindingsChange) {
-      onFilteredBindingsChange(filteredBindings);
-    }
+    onFilteredBindingsChange!(filteredBindings);
   }, [filteredBindings, onFilteredBindingsChange]);
 
   return (
