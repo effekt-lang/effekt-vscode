@@ -49,15 +49,18 @@
     "definitions": {
       "patterns": [
         {
-          "begin": "\\s*(extern)\\s+((?:(?:\\{[^\\}]*\\}|[a-zA-Z][a-z-A-Z0-9_$]*)\\s+)?)\\s*(def)\\s+([a-zA-Z][a-z-A-Z0-9_$]*)\\b",
+          "begin": "\\s*(extern)\\s+(def)\\s+([a-zA-Z][a-z-A-Z0-9_$]*)\\b",
           "end": "(?=\\n)|(?<=\\S)\\s*(?==(?!>))",
           "captures": {
             "1": { "name": "storage.modifier.extern.effekt" },
-            "2": { "patterns": [{ "include": "#capabilities" }] },
-            "3": { "name": "keyword.declaration.function.extern.effekt" },
-            "4": { "name": "entity.name.function.effekt" }
+            "2": { "name": "keyword.declaration.function.extern.effekt" },
+            "3": { "name": "entity.name.function.effekt" }
           },
-          "patterns": [{ "include": "#parameters" }, { "include": "#comments" }]
+          "patterns": [
+            { "include": "#parameters" },
+            { "include": "#comments" },
+            { "include": "#boxed_types" }
+          ]
         },
         {
           "begin": "\\s*(def)\\s+([a-zA-Z][a-z-A-Z0-9_$]*)\\b",
@@ -66,7 +69,11 @@
             "1": { "name": "keyword.declaration.function.effekt" },
             "2": { "name": "entity.name.function.effekt" }
           },
-          "patterns": [{ "include": "#parameters" }, { "include": "#comments" }]
+          "patterns": [
+            { "include": "#parameters" },
+            { "include": "#comments" },
+            { "include": "#boxed_types" }
+          ]
         },
         {
           "match": "\\s*(val)\\s+([a-zA-Z][a-z-A-Z0-9_$]*)\\b",
@@ -138,14 +145,32 @@
       ]
     },
     "boxed_types": {
-      "comment": "Used for boxed types like 'at {}', 'at {io}', 'at {io, global}', etc.",
+      "comment": "Used for boxed types like 'at io' 'at {}', 'at {io}', 'at {io, global}', etc.",
       "patterns": [
         {
           "begin": "\\b(at)\\s*\\{",
           "beginCaptures": {
-            "1": { "name": "keyword.other.at.effekt" }
+            "1": {
+              "name": "keyword.other.at.effekt"
+            }
           },
           "end": "\\}",
+          "patterns": [
+            {
+              "include": "#capabilities"
+            }
+          ]
+        },
+        {
+          "match": "\\b(at)\\s+([a-zA-Z][a-zA-Z0-9_]*)",
+          "captures": {
+            "1": {
+              "name": "keyword.other.at.effekt"
+            },
+            "2": {
+              "name": "variable.other.capability.effekt"
+            }
+          },
           "patterns": [
             {
               "include": "#capabilities"
