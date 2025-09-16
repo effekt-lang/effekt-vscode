@@ -145,7 +145,7 @@
       ]
     },
     "boxed_types": {
-      "comment": "Used for boxed types like 'at io' 'at {}', 'at {io}', 'at {io, global}', etc.",
+      "comment": "Used for boxed types like 'at io', 'at {}', 'at {io}', 'at {io, global}', etc.",
       "patterns": [
         {
           "begin": "\\b(at)\\s*\\{",
