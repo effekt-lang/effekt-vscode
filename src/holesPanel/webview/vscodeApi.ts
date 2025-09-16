@@ -8,13 +8,14 @@ export interface VSCodeAPI {
 declare function acquireVsCodeApi(): VSCodeAPI;
 
 export type OutgoingMessage =
-  | { command: 'openCopilotChat'; holeId: string }
-  | { command: 'jumpToHole'; holeId: string }
-  | { command: 'jumpToDefinition'; definitionLocation: LSPLocation };
+  | { command: 'jumpToHole'; holeId?: string }
+  | { command: 'jumpToDefinition'; definitionLocation: LSPLocation }
+  | { command: 'openCopilotChat'; holeId: string };
 
 export type IncomingMessage =
   | { command: 'highlightHole'; holeId: string }
   | { command: 'updateHoles'; holes: EffektHoleInfo[] }
-  | { command: 'setShowHoles'; show: boolean };
+  | { command: 'setShowHoles'; show: boolean }
+  | { command: 'focusPanel' };
 
 export const vscode = acquireVsCodeApi();
