@@ -215,6 +215,13 @@ code {
   background-color: var(--vscode-list-activeSelectionBackground, var(--accent));
 }
 
+.binding.selected {
+  background-color: var(--vscode-list-activeSelectionBackground, var(--accent));
+  color: var(--vscode-list-activeSelectionForeground, white);
+  outline: 2px solid var(--vscode-focusBorder, var(--accent));
+  outline-offset: -2px;
+}
+
 /* Effekt Syntax Highlighting in the holes panel
    This is very conservative as there is no good way to get the correct colors of the user theme:
    https://github.com/Microsoft/vscode/issues/32813

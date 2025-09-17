@@ -8,9 +8,11 @@ interface HoleCardProps {
   hole: EffektHoleInfo;
   expanded: boolean;
   selected: boolean;
+  selectedBindingIndex?: number | null;
   onJump: (id: string) => void;
   onJumpToDefinition: (definitionLocation: LSPLocation) => void;
   onDeselect: () => void;
+  onFilteredBindingsChange?: (bindings: any[]) => void;
   agentSupport: boolean;
 }
 
@@ -18,9 +20,11 @@ export const HoleCard: React.FC<HoleCardProps> = ({
   hole,
   expanded,
   selected,
+  selectedBindingIndex,
   onJump,
   onJumpToDefinition,
   onDeselect,
+  onFilteredBindingsChange,
   agentSupport,
 }) => {
   const cardRef = useRef<HTMLDivElement>(null);
@@ -74,7 +78,9 @@ export const HoleCard: React.FC<HoleCardProps> = ({
         scope={hole.scope}
         holeId={hole.id}
         isActive={expanded}
+        selectedBindingIndex={selectedBindingIndex}
         onJumpToDefinition={onJumpToDefinition}
+        onFilteredBindingsChange={onFilteredBindingsChange}
       />
     </section>
   );
