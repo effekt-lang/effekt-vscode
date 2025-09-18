@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { EffektHoleInfo } from './effektHoleInfo';
-import { OutgoingMessage } from './webview/messages';
+import { OutgoingMessage } from './webview/vscodeApi';
 
 export class HolesViewProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = 'effekt.holesView';
