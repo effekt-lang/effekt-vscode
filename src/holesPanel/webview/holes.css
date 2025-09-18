@@ -271,3 +271,12 @@ code {
   outline: 1px solid var(--vscode-focusBorder);
   outline-offset: 2px;
 }
+.draft-container {
+  display: flex;
+  justify-content: flex-end;
+  margin: 12px 0;
+}
+
+.draft-button {
+  margin-left: auto;
+}
