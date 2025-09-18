@@ -30,7 +30,7 @@ const Description: React.FC = () => (
       def foo() = &lt;{'{'} println("foo"); 42 {'}'}&gt;
     </pre>
     <p>
-      <strong>Tipp:</strong> Use "Create Draft" to generate function signatures
+      <strong>Tip:</strong> Use "Create Draft" to generate function signatures
       with descriptive holes for your program structure, then use "Solve All" to
       implement them systematically.
     </p>
