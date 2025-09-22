@@ -72,14 +72,11 @@ export const useBindingNavigation = (
 
   const exitBindingMode = useCallback((): void => {
     setSelectedBindingIndex(null);
-
-    // Focus the search bar
     if (expandedHoleId) {
       const searchInput = document
         .querySelector(`#bindings-dropdown-list-${expandedHoleId}`)
         ?.closest('.bindings-section')
         ?.querySelector('input[type="text"]') as HTMLInputElement;
-
       if (searchInput) {
         searchInput.focus();
       }
@@ -116,7 +113,7 @@ function scrollToBinding(bindingIndex: number, holeId: string): void {
     `#bindings-dropdown-list-${holeId} .binding:nth-of-type(${bindingIndex + 1})`,
   );
   if (bindingElement) {
-    bindingElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    bindingElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 }
 

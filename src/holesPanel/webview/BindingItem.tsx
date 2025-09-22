@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { BindingInfo } from '../effektHoleInfo';
 import { Location as LSPLocation } from 'vscode-languageserver-protocol';
 
@@ -13,6 +13,14 @@ export const BindingItem: React.FC<BindingItemProps> = ({
   isSelected = false,
   onJumpToDefinition,
 }) => {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (isSelected && ref.current) {
+      ref.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }, [isSelected]);
+
   const handleClick = () => {
     if (binding.definitionLocation) {
       onJumpToDefinition(binding.definitionLocation);
@@ -23,6 +31,7 @@ export const BindingItem: React.FC<BindingItemProps> = ({
 
   return (
     <div
+      ref={ref}
       className={`binding ${canJumpToDefinition ? 'clickable' : ''} ${isSelected ? 'selected' : ''}`}
       onClick={handleClick}
       title={

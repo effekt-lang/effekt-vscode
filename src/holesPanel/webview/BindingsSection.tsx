@@ -117,29 +117,31 @@ export const BindingsSection: React.FC<BindingsSectionProps> = ({
             onFilterChange={setFilter}
           />
           <div className="scopes-list" id={`bindings-dropdown-list-${holeId}`}>
-            {flattenScopes(scope).map((s, si) => {
-              // Calculate start index for this scope group
-              const previousScopes = flattenScopes(scope).slice(0, si);
-              const startIndex = previousScopes.reduce((acc, prevScope) => {
+            {(() => {
+              // Compute start index for each group so transition is seamless
+              const scopes = flattenScopes(scope);
+              let runningIndex = 0;
+              return scopes.map((s, si) => {
+                // Count how many filtered bindings are in previous scopes
+                const startIndex = runningIndex;
+                // Count for this group
+                const groupCount = s.bindings.filter((b) =>
+                  filteredBindings.includes(b),
+                ).length;
+                runningIndex += groupCount;
                 return (
-                  acc +
-                  prevScope.bindings.filter((b) => filteredBindings.includes(b))
-                    .length
+                  <ScopeGroup
+                    key={si}
+                    scope={s}
+                    filteredBindings={filteredBindings}
+                    groupIndex={si}
+                    selectedBindingIndex={selectedBindingIndex}
+                    bindingStartIndex={startIndex}
+                    onJumpToDefinition={onJumpToDefinition}
+                  />
                 );
-              }, 0);
-
-              return (
-                <ScopeGroup
-                  key={si}
-                  scope={s}
-                  filteredBindings={filteredBindings}
-                  groupIndex={si}
-                  selectedBindingIndex={selectedBindingIndex}
-                  bindingStartIndex={startIndex}
-                  onJumpToDefinition={onJumpToDefinition}
-                />
-              );
-            })}
+              });
+            })()}
           </div>
         </div>
       )}
