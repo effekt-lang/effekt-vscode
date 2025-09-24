@@ -166,8 +166,8 @@ Instructions:
 - Consider the types and effects that would be appropriate for each function
 
 Example of what to generate:
-def processInput(input: String): Result / { IO, Console } = ?"process the input string and return appropriate result"
-def validateData(data: Data): Boolean / { Error } = ?"validate the data and return true if valid"
+def processInput(input: String): Result / { IO, Console } = <"process the input string and return appropriate result">
+def validateData(data: Data): Boolean / { Error } = <"validate the data and return true if valid">
 
 Please analyze the current file and suggest a draft structure with function signatures and descriptive holes.`;
 
