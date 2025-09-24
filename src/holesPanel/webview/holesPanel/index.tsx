@@ -84,27 +84,6 @@ export const HolesPanel: React.FC<HolesPanelProps> = ({
       return <Warning />;
     }
 
-    if (state.holes.length === 0) {
-      return (
-        <>
-          <div className="empty">There are no holes in this file.</div>
-          <Description />
-          {agentSupport && (
-            <div className="draft-container">
-              <button
-                className="solve-button draft-button"
-                onClick={handleCreateDraft}
-                title="Create function signatures with descriptive holes to draft your program structure"
-              >
-                Create Draft
-              </button>
-            </div>
-          )}
-          <KeyboardShortcutTutorial />
-        </>
-      );
-    }
-
     return (
       <>
         {agentSupport && (
@@ -118,18 +97,26 @@ export const HolesPanel: React.FC<HolesPanelProps> = ({
             </button>
           </div>
         )}
-        {state.holes.map((hole) => (
-          <HoleCard
-            key={hole.id}
-            hole={hole}
-            expanded={hole.id === state.expandedHoleId}
-            selected={hole.id === state.selectedHoleId}
-            onJump={actions.handleJump}
-            onJumpToDefinition={actions.handleJumpToDefinition}
-            onDeselect={actions.handleDeselect}
-            agentSupport={agentSupport}
-          />
-        ))}
+        {state.holes.length === 0 ? (
+          <>
+            <div className="empty">There are no holes in this file.</div>
+            <Description />
+            <KeyboardShortcutTutorial />
+          </>
+        ) : (
+          state.holes.map((hole) => (
+            <HoleCard
+              key={hole.id}
+              hole={hole}
+              expanded={hole.id === state.expandedHoleId}
+              selected={hole.id === state.selectedHoleId}
+              onJump={actions.handleJump}
+              onJumpToDefinition={actions.handleJumpToDefinition}
+              onDeselect={actions.handleDeselect}
+              agentSupport={agentSupport}
+            />
+          ))
+        )}
       </>
     );
   };
