@@ -31,8 +31,7 @@ const Description: React.FC = () => (
     </pre>
     <p>
       <strong>Tip:</strong> Use "Create Draft" to generate function signatures
-      with descriptive holes for your program structure, then use "Solve All" to
-      implement them systematically.
+      with descriptive holes for your program structure.
     </p>
   </div>
 );
