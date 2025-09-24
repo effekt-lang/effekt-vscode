@@ -17,7 +17,7 @@ export const BindingItem: React.FC<BindingItemProps> = ({
 
   useEffect(() => {
     if (isSelected && ref.current) {
-      ref.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      ref.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
   }, [isSelected]);
 

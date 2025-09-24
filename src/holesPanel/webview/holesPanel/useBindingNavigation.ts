@@ -113,7 +113,7 @@ function scrollToBinding(bindingIndex: number, holeId: string): void {
     `#bindings-dropdown-list-${holeId} .binding:nth-of-type(${bindingIndex + 1})`,
   );
   if (bindingElement) {
-    bindingElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    bindingElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 }
 
