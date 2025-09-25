@@ -35,7 +35,6 @@ export const useBindingNavigation = (
       currentIndex < filteredBindings.length - 1 ? currentIndex + 1 : 0;
 
     setSelectedBindingIndex(nextIndex);
-    scrollToBinding(nextIndex, expandedHoleId);
   }, [
     expandedHoleId,
     filteredBindings.length,
@@ -53,7 +52,6 @@ export const useBindingNavigation = (
       currentIndex > 0 ? currentIndex - 1 : filteredBindings.length - 1;
 
     setSelectedBindingIndex(prevIndex);
-    scrollToBinding(prevIndex, expandedHoleId);
   }, [
     expandedHoleId,
     filteredBindings.length,
@@ -67,7 +65,6 @@ export const useBindingNavigation = (
     }
 
     setSelectedBindingIndex(0);
-    scrollToBinding(0, expandedHoleId);
   }, [expandedHoleId, filteredBindings.length, setSelectedBindingIndex]);
 
   const exitBindingMode = useCallback((): void => {
@@ -108,19 +105,10 @@ export const useBindingNavigation = (
   };
 };
 
-function scrollToBinding(bindingIndex: number, holeId: string): void {
-  const bindingElement = document.querySelector(
-    `#bindings-dropdown-list-${holeId} .binding:nth-of-type(${bindingIndex + 1})`,
-  );
-  if (bindingElement) {
-    bindingElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }
-}
-
 function scrollHoleCardIntoView(holeId?: string) {
   const selector = holeId ? `#hole-${holeId}` : '.hole-card.expanded';
   const card = document.querySelector(selector);
   if (card) {
-    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    card.scrollIntoView({ behavior: 'instant', block: 'center' });
   }
 }
