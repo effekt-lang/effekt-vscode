@@ -159,7 +159,7 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
       // Read the draft creation prompt from markdown file
       const promptPath = path.join(
         this.context.extensionPath,
-        'src',
+        'dist',
         'mcp',
         'draft-creation.prompt.md',
       );
