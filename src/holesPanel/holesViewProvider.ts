@@ -156,7 +156,6 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
   }
   private async handleCreateDraft(): Promise<void> {
     try {
-      // Read the draft creation prompt from markdown file
       const promptPath = path.join(
         this.context.extensionPath,
         'dist',
