@@ -1,10 +1,8 @@
-# Draft Creation Prompt
-
 Create a draft structure for this Effekt file. Generate only function/method signatures with descriptive holes that explain what each function should do.
 
 ## Instructions:
 - Analyze the existing code to understand the intended program structure
-- If the context is unclear or the file is empty/minimal, ask the user what kind of program they want to create 
+- If the context is unclear or the file is empty/minimal, ask the user what kind of program they want to create
 - Create function signatures for missing functionality
 - Use descriptive holes like "description of what this function should return" instead of empty holes
 - Focus on creating a logical program structure with clear interfaces
