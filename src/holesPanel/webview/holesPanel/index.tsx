@@ -1,10 +1,16 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { HoleCard } from '../HoleCard';
 import { useHolesPanelState } from './useHolesPanelState';
 import { useHoleNavigation } from './useHoleNavigation';
 import { useHoleActions } from './useHoleActions';
 import { useKeyboardNavigation } from './useKeyboardNavigation';
 import { KeyboardShortcutTutorial } from './KeyboardShortcutTutorial';
+import { vscode } from '../vscodeApi';
+
+interface HolesPanelProps {
+  initShowHoles: boolean;
+  agentSupport: boolean;
+}
 
 const Description: React.FC = () => (
   <div className="desc" data-holes-panel-desc>
@@ -23,6 +29,10 @@ const Description: React.FC = () => (
     <pre>
       def foo() = &lt;{'{'} println("foo"); 42 {'}'}&gt;
     </pre>
+    <p>
+      <strong>Tip:</strong> Use "Create Draft" to generate function signatures
+      with descriptive holes for your program structure.
+    </p>
   </div>
 );
 
@@ -34,11 +44,6 @@ const Warning: React.FC = () => (
     </div>
   </div>
 );
-
-interface HolesPanelProps {
-  initShowHoles: boolean;
-  agentSupport: boolean;
-}
 
 export const HolesPanel: React.FC<HolesPanelProps> = ({
   initShowHoles,
@@ -58,6 +63,12 @@ export const HolesPanel: React.FC<HolesPanelProps> = ({
     selectFirstHole: navigation.selectFirstHole,
   });
 
+  const handleCreateDraft = useCallback(() => {
+    vscode.postMessage({
+      command: 'createDraft',
+    });
+  }, []);
+
   useKeyboardNavigation({
     Escape: holeActions.clearSelection,
     ArrowUp: navigation.navigateToPreviousHole,
@@ -73,28 +84,41 @@ export const HolesPanel: React.FC<HolesPanelProps> = ({
       return <Warning />;
     }
 
-    if (state.holes.length === 0) {
-      return (
-        <>
-          <div className="empty">There are no holes in this file.</div>
-          <Description />
-          <KeyboardShortcutTutorial />
-        </>
-      );
-    }
-
-    return state.holes.map((hole) => (
-      <HoleCard
-        key={hole.id}
-        hole={hole}
-        expanded={hole.id === state.expandedHoleId}
-        selected={hole.id === state.selectedHoleId}
-        onJump={actions.handleJump}
-        onJumpToDefinition={actions.handleJumpToDefinition}
-        onDeselect={actions.handleDeselect}
-        agentSupport={agentSupport}
-      />
-    ));
+    return (
+      <>
+        {agentSupport && (
+          <div className="draft-container">
+            <button
+              className="solve-button draft-button"
+              onClick={handleCreateDraft}
+              title="Create function signatures with descriptive holes to draft your program structure"
+            >
+              Create Draft
+            </button>
+          </div>
+        )}
+        {state.holes.length === 0 ? (
+          <>
+            <div className="empty">There are no holes in this file.</div>
+            <Description />
+            <KeyboardShortcutTutorial />
+          </>
+        ) : (
+          state.holes.map((hole) => (
+            <HoleCard
+              key={hole.id}
+              hole={hole}
+              expanded={hole.id === state.expandedHoleId}
+              selected={hole.id === state.selectedHoleId}
+              onJump={actions.handleJump}
+              onJumpToDefinition={actions.handleJumpToDefinition}
+              onDeselect={actions.handleDeselect}
+              agentSupport={agentSupport}
+            />
+          ))
+        )}
+      </>
+    );
   };
 
   return <div className="holes-list">{renderContent()}</div>;

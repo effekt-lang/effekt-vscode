@@ -1,4 +1,6 @@
 import * as vscode from 'vscode';
+import * as fs from 'fs';
+import * as path from 'path';
 import { EffektHoleInfo } from './effektHoleInfo';
 import { OutgoingMessage } from './webview/vscodeApi';
 
@@ -129,6 +131,8 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
         });
       } else if (message.command === 'openCopilotChat') {
         this.handleOpenCopilotChat(message);
+      } else if (message.command === 'createDraft') {
+        this.handleCreateDraft();
       }
     });
   }
@@ -150,7 +154,27 @@ export class HolesViewProvider implements vscode.WebviewViewProvider {
       );
     }
   }
+  private async handleCreateDraft(): Promise<void> {
+    try {
+      const promptPath = path.join(
+        this.context.extensionPath,
+        'dist',
+        'mcp',
+        'draft-creation.prompt.md',
+      );
+      const query = await fs.promises.readFile(promptPath, 'utf8');
 
+      await vscode.commands.executeCommand('workbench.action.chat.open', {
+        query: query,
+        mode: 'agent',
+      });
+    } catch (error) {
+      console.error('Error creating draft:', error);
+      vscode.window.showErrorMessage(
+        `Failed to create draft: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      );
+    }
+  }
   public updateHoles(holes: EffektHoleInfo[]) {
     this.holes = holes;
     this.webviewView?.webview.postMessage({
