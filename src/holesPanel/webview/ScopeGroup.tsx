@@ -14,6 +14,8 @@ interface ScopeGroupProps {
   scope: ScopeInfo;
   filteredBindings: BindingInfo[];
   groupIndex: number;
+  selectedBindingIndex?: number | null;
+  bindingStartIndex?: number;
   onJumpToDefinition: (definitionLocation: LSPLocation) => void;
 }
 
@@ -21,6 +23,8 @@ export const ScopeGroup: React.FC<ScopeGroupProps> = ({
   scope,
   filteredBindings,
   groupIndex,
+  selectedBindingIndex,
+  bindingStartIndex = 0,
   onJumpToDefinition,
 }) => {
   const defined = scope.bindings.filter(
@@ -30,29 +34,42 @@ export const ScopeGroup: React.FC<ScopeGroupProps> = ({
     (b) => b.origin === BINDING_ORIGIN_IMPORTED,
   );
 
-  const renderList = (list: BindingInfo[]) =>
-    list
+  const renderList = (list: BindingInfo[], isImported: boolean) => {
+    let currentIndex = bindingStartIndex;
+
+    if (isImported) {
+      const definedBindings = scope.bindings.filter(
+        (b) =>
+          b.origin === BINDING_ORIGIN_DEFINED && filteredBindings.includes(b),
+      );
+      currentIndex += definedBindings.length;
+    }
+
+    return list
       .filter((b) => filteredBindings.includes(b))
-      .map((b, bi) => (
-        <BindingItem
-          binding={b}
-          key={`${scope.kind}-${groupIndex}-${bi}`}
-          onJumpToDefinition={onJumpToDefinition}
-        />
-      ));
-  if (![...renderList(defined), ...renderList(imported)].length) {
-    return null;
-  }
+      .map((b, bi) => {
+        const isSelected = selectedBindingIndex === currentIndex + bi;
+
+        return (
+          <BindingItem
+            binding={b}
+            key={`${scope.kind}-${groupIndex}-${bi}`}
+            isSelected={isSelected}
+            onJumpToDefinition={onJumpToDefinition}
+          />
+        );
+      });
+  };
 
   return (
-    <div className="scope-group" key={groupIndex}>
+    <div className="scope-group">
       {defined.some((b) => filteredBindings.includes(b)) && (
         <>
           <div className="scope-label-line">
             <span className="scope-label-text">{scopeLabel(scope, false)}</span>
           </div>
 
-          <div className="bindings-list">{renderList(defined)}</div>
+          <div className="bindings-list">{renderList(defined, false)}</div>
         </>
       )}
       {imported.some((b) => filteredBindings.includes(b)) && (
@@ -60,7 +77,7 @@ export const ScopeGroup: React.FC<ScopeGroupProps> = ({
           <div className="scope-label-line">
             <span className="scope-label-text">{scopeLabel(scope, true)}</span>
           </div>
-          <div className="bindings-list">{renderList(imported)}</div>
+          <div className="bindings-list">{renderList(imported, true)}</div>
         </>
       )}
     </div>
