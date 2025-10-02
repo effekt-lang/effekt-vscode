@@ -60,9 +60,6 @@ export const ScopeGroup: React.FC<ScopeGroupProps> = ({
         );
       });
   };
-  if (![...renderList(defined, false), ...renderList(imported, true)].length) {
-    return null;
-  }
 
   return (
     <div className="scope-group">

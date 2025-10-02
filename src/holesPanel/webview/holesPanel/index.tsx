@@ -159,11 +159,7 @@ export const HolesPanel: React.FC<HolesPanelProps> = ({
         onJump={actions.handleJump}
         onJumpToDefinition={actions.handleJumpToDefinition}
         onDeselect={actions.handleDeselect}
-        onFilteredBindingsChange={
-          hole.id === state.expandedHoleId
-            ? handleFilteredBindingsChange
-            : undefined
-        }
+        onFilteredBindingsChange={handleFilteredBindingsChange}
         agentSupport={agentSupport}
       />
     ));
