@@ -57,7 +57,9 @@ async function main() {
     },
     jsx: 'automatic',
     define: {
-      'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'production')
+      'process.env.NODE_ENV': JSON.stringify(
+        process.env.NODE_ENV || 'production',
+      ),
     },
     outfile: 'dist/holesPanel/holes.js',
     minify: false,
@@ -78,6 +80,12 @@ async function main() {
     plugins: [
       copyPlugin({
         assets: {
+          from: ['src/mcp/draft-creation.prompt.md'],
+          to: ['.'],
+        },
+      }),
+      copyPlugin({
+        assets: {
           from: ['src/mcp/effekt.instructions.md'],
           to: ['.'],
         },
@@ -93,7 +101,6 @@ async function main() {
   }
 }
 
-
 /**
  * @type {import('esbuild').Plugin}
  */
@@ -107,7 +114,9 @@ const esbuildProblemMatcherPlugin = {
     build.onEnd((result) => {
       result.errors.forEach(({ text, location }) => {
         console.error(`✘ [ERROR] ${text}`);
-        console.error(`    ${location.file}:${location.line}:${location.column}:`);
+        console.error(
+          `    ${location.file}:${location.line}:${location.column}:`,
+        );
       });
       console.log('[watch] build finished');
     });

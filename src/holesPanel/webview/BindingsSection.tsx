@@ -8,7 +8,7 @@ import {
 } from '../effektHoleInfo';
 import { ScopeGroup } from './ScopeGroup';
 import { FilterBox } from './FilterBox';
-import { IncomingMessage } from './messages';
+import { IncomingMessage } from './vscodeApi';
 import { Location as LSPLocation } from 'vscode-languageserver-protocol';
 
 interface BindingsSectionProps {
