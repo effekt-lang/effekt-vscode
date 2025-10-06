@@ -49,15 +49,15 @@ export const BindingsSection: React.FC<BindingsSectionProps> = ({
     return () => window.removeEventListener('message', handler);
   }, [isActive]);
 
+  const scopes = useMemo(() => flattenScopes(scope), [scope]);
   const allBindings = useMemo(() => {
-    const scopes = flattenScopes(scope);
     return scopes.reduce<BindingInfo[]>((acc, s) => {
       return acc.concat(
         s.bindings.filter((b) => b.origin === BINDING_ORIGIN_DEFINED),
         s.bindings.filter((b) => b.origin === BINDING_ORIGIN_IMPORTED),
       );
     }, []);
-  }, [scope]);
+  }, [scopes]);
 
   const miniSearch = useMemo(() => {
     const search = new MiniSearch({
@@ -89,6 +89,11 @@ export const BindingsSection: React.FC<BindingsSectionProps> = ({
     return searchResults.map((result) => allBindings[result.id]);
   }, [allBindings, filter, miniSearch]);
 
+  const filteredSet = useMemo(
+    () => new Set(filteredBindings),
+    [filteredBindings],
+  );
+
   const totalCount = allBindings.length;
   const filteredCount = filteredBindings.length;
 
@@ -119,21 +124,20 @@ export const BindingsSection: React.FC<BindingsSectionProps> = ({
           <div className="scopes-list" id={`bindings-dropdown-list-${holeId}`}>
             {(() => {
               // Compute start index for each group so transition is seamless
-              const scopes = flattenScopes(scope);
               let runningIndex = 0;
               return scopes.map((s, si) => {
-                // Count how many filtered bindings are in previous scopes
+                const groupCount = s.bindings.reduce(
+                  (cnt, b) => cnt + (filteredSet.has(b) ? 1 : 0),
+                  0,
+                );
                 const startIndex = runningIndex;
-                // Count for this group
-                const groupCount = s.bindings.filter((b) =>
-                  filteredBindings.includes(b),
-                ).length;
                 runningIndex += groupCount;
+
                 return (
                   <ScopeGroup
                     key={si}
                     scope={s}
-                    filteredBindings={filteredBindings}
+                    filteredSet={filteredSet}
                     groupIndex={si}
                     selectedBindingIndex={selectedBindingIndex}
                     bindingStartIndex={startIndex}
