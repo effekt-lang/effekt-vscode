@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   ScopeInfo,
   BindingInfo,
@@ -12,77 +12,89 @@ import { Location as LSPLocation } from 'vscode-languageserver-protocol';
 
 interface ScopeGroupProps {
   scope: ScopeInfo;
-  filteredBindings: BindingInfo[];
+  filteredSet: Set<BindingInfo>;
   groupIndex: number;
   selectedBindingIndex?: number | null;
   bindingStartIndex?: number;
   onJumpToDefinition: (definitionLocation: LSPLocation) => void;
 }
 
-export const ScopeGroup: React.FC<ScopeGroupProps> = ({
-  scope,
-  filteredBindings,
-  groupIndex,
-  selectedBindingIndex,
-  bindingStartIndex = 0,
-  onJumpToDefinition,
-}) => {
-  const defined = scope.bindings.filter(
-    (b) => b.origin === BINDING_ORIGIN_DEFINED,
-  );
-  const imported = scope.bindings.filter(
-    (b) => b.origin === BINDING_ORIGIN_IMPORTED,
-  );
+export const ScopeGroup: React.FC<ScopeGroupProps> = React.memo(
+  ({
+    scope,
+    filteredSet,
+    groupIndex,
+    selectedBindingIndex,
+    bindingStartIndex = 0,
+    onJumpToDefinition,
+  }) => {
+    const defined = useMemo(
+      () => scope.bindings.filter((b) => b.origin === BINDING_ORIGIN_DEFINED),
+      [scope.bindings],
+    );
+    const imported = useMemo(
+      () => scope.bindings.filter((b) => b.origin === BINDING_ORIGIN_IMPORTED),
+      [scope.bindings],
+    );
 
-  const renderList = (list: BindingInfo[], isImported: boolean) => {
-    let currentIndex = bindingStartIndex;
+    const definedFiltered = useMemo(
+      () => defined.filter((b) => filteredSet.has(b)),
+      [defined, filteredSet],
+    );
+    const importedFiltered = useMemo(
+      () => imported.filter((b) => filteredSet.has(b)),
+      [imported, filteredSet],
+    );
 
-    if (isImported) {
-      const definedBindings = scope.bindings.filter(
-        (b) =>
-          b.origin === BINDING_ORIGIN_DEFINED && filteredBindings.includes(b),
-      );
-      currentIndex += definedBindings.length;
-    }
-
-    return list
-      .filter((b) => filteredBindings.includes(b))
-      .map((b, bi) => {
-        const isSelected = selectedBindingIndex === currentIndex + bi;
+    const renderList = (list: BindingInfo[], offset: number) =>
+      list.map((b, bi) => {
+        const absoluteIndex = offset + bi;
+        const isSelected = selectedBindingIndex === absoluteIndex;
 
         return (
           <BindingItem
             binding={b}
-            key={`${scope.kind}-${groupIndex}-${bi}`}
+            key={`${scope.kind}-${groupIndex}-${absoluteIndex}`}
             isSelected={isSelected}
             onJumpToDefinition={onJumpToDefinition}
           />
         );
       });
-  };
 
-  return (
-    <div className="scope-group">
-      {defined.some((b) => filteredBindings.includes(b)) && (
-        <>
-          <div className="scope-label-line">
-            <span className="scope-label-text">{scopeLabel(scope, false)}</span>
-          </div>
+    const definedStart = bindingStartIndex;
+    const importedStart = bindingStartIndex + definedFiltered.length;
 
-          <div className="bindings-list">{renderList(defined, false)}</div>
-        </>
-      )}
-      {imported.some((b) => filteredBindings.includes(b)) && (
-        <>
-          <div className="scope-label-line">
-            <span className="scope-label-text">{scopeLabel(scope, true)}</span>
-          </div>
-          <div className="bindings-list">{renderList(imported, true)}</div>
-        </>
-      )}
-    </div>
-  );
-};
+    return (
+      <div className="scope-group">
+        {definedFiltered.length > 0 && (
+          <>
+            <div className="scope-label-line">
+              <span className="scope-label-text">
+                {scopeLabel(scope, false)}
+              </span>
+            </div>
+
+            <div className="bindings-list">
+              {renderList(definedFiltered, definedStart)}
+            </div>
+          </>
+        )}
+        {importedFiltered.length > 0 && (
+          <>
+            <div className="scope-label-line">
+              <span className="scope-label-text">
+                {scopeLabel(scope, true)}
+              </span>
+            </div>
+            <div className="bindings-list">
+              {renderList(importedFiltered, importedStart)}
+            </div>
+          </>
+        )}
+      </div>
+    );
+  },
+);
 
 function scopeLabel(scope: ScopeInfo, imported: boolean): string {
   let label: string;
