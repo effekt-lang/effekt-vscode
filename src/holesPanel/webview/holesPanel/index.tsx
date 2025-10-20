@@ -14,7 +14,7 @@ interface HolesPanelProps {
   agentSupport: boolean;
 }
 
-const Description: React.FC = () => (
+const Description: React.FC<{ agentSupport: boolean }> = ({ agentSupport }) => (
   <div className="desc" data-holes-panel-desc>
     This panel shows information about the types and terms in scope for each
     typed hole. Holes are placeholders for missing code used for type-driven
@@ -31,10 +31,12 @@ const Description: React.FC = () => (
     <pre>
       def foo() = &lt;{'{'} println("foo"); 42 {'}'}&gt;
     </pre>
-    <p>
-      <strong>Tip:</strong> Use "Create Draft" to generate function signatures
-      with descriptive holes for your program structure.
-    </p>
+    {agentSupport && (
+      <p>
+        <strong>Tip:</strong> Use "Create Draft" to generate function signatures
+        with descriptive holes for your program structure.
+      </p>
+    )}
   </div>
 );
 
@@ -151,7 +153,7 @@ export const HolesPanel: React.FC<HolesPanelProps> = ({
       return (
         <>
           <div className="empty">There are no holes in this file.</div>
-          <Description />
+          <Description agentSupport={agentSupport} />
           <KeyboardShortcutTutorial />
         </>
       );
@@ -173,7 +175,7 @@ export const HolesPanel: React.FC<HolesPanelProps> = ({
         {state.holes.length === 0 ? (
           <>
             <div className="empty">There are no holes in this file.</div>
-            <Description />
+            <Description agentSupport={agentSupport} />
             <KeyboardShortcutTutorial />
           </>
         ) : (
