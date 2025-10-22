@@ -75,7 +75,7 @@ pre {
 
 .hole-field {
   margin: 12px 0;
-  display: inline-block;
+  display: block;
   cursor: default;
 }
 
