@@ -117,6 +117,10 @@ class EffektRunCodeLensProvider implements vscode.CodeLensProvider {
 }
 
 export async function activate(context: vscode.ExtensionContext) {
+  if (!(await checkWorkspacePreconditions())) {
+    return;
+  }
+
   effektManager = new EffektManager();
   try {
     // If Effekt is installed (no matter which version), start the language server
@@ -141,6 +145,30 @@ export async function activate(context: vscode.ExtensionContext) {
       );
     }
   }
+}
+
+export async function checkWorkspacePreconditions(): Promise<boolean> {
+  const isWindows = process.platform === 'win32';
+  const folders = vscode.workspace.workspaceFolders ?? [];
+  const hasSpaces = folders.some((f) => f.uri.fsPath.includes(' '));
+
+  if (isWindows && hasSpaces) {
+    const issueUrl = 'https://github.com/effekt-lang/effekt-vscode/issues/30';
+    const learnMore = 'Learn more';
+
+    const choice = await vscode.window.showErrorMessage(
+      'Effekt: Running in a path that contains spaces is currently not supported. Please move your workspace to a path without spaces.',
+      { modal: true },
+      learnMore,
+    );
+
+    if (choice === learnMore) {
+      await vscode.env.openExternal(vscode.Uri.parse(issueUrl));
+    }
+    return false;
+  }
+
+  return true;
 }
 
 async function ensureEffektIsAvailable() {
