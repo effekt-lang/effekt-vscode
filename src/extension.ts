@@ -9,7 +9,6 @@ import {
 } from 'vscode-languageclient/node';
 import { EffektManager, EffektExecutableNotFoundError } from './effektManager';
 import { EffektIRContentProvider } from './irProvider';
-import { InlayHintProvider } from './inlayHintsProvider';
 import { EffektLanguageClient } from './effektLanguageClient';
 import { EffektHoleInfo } from './holesPanel/effektHoleInfo';
 import { HolesViewProvider } from './holesPanel/holesViewProvider';
@@ -180,7 +179,6 @@ async function initializeLSPAndProviders(context: vscode.ExtensionContext) {
   registerCommands(context);
   registerCodeLensProviders(context);
   registerIRProvider(context);
-  registerInlayProvider();
   initializeHoleDecorations(context);
   initializeHolesView(context);
 }
@@ -365,17 +363,6 @@ function initializeHolesView(context: vscode.ExtensionContext) {
   });
 }
 
-function registerInlayProvider() {
-  vscode.languages.registerInlayHintsProvider(
-    { scheme: 'file', language: LANG_ID_EFFEKT },
-    new InlayHintProvider(client),
-  );
-
-  vscode.languages.registerInlayHintsProvider(
-    { scheme: 'file', language: LANG_ID_LITERATE_EFFEKT },
-    new InlayHintProvider(client),
-  );
-}
 // Decorate holes
 // ---
 // It would be nice if there was a way to reuse the scopes of the tmLanguage file
