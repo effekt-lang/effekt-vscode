@@ -6,10 +6,10 @@ import {
   ServerOptions,
   StreamInfo,
   State as ClientState,
+  LanguageClient,
 } from 'vscode-languageclient/node';
 import { EffektManager, EffektExecutableNotFoundError } from './effektManager';
 import { EffektIRContentProvider } from './irProvider';
-import { EffektLanguageClient } from './effektLanguageClient';
 import { EffektHoleInfo } from './holesPanel/effektHoleInfo';
 import { HolesViewProvider } from './holesPanel/holesViewProvider';
 import * as net from 'net';
@@ -22,7 +22,7 @@ import {
   stopMCPServer,
 } from './mcpManager';
 
-let client: EffektLanguageClient;
+let client: LanguageClient;
 let effektManager: EffektManager;
 const outputChannel = vscode.window.createOutputChannel('Effekt Extension');
 export const LANG_ID_EFFEKT = 'effekt';
@@ -243,7 +243,7 @@ async function startEffektLanguageServer(context: vscode.ExtensionContext) {
     },
   };
 
-  client = new EffektLanguageClient(
+  client = new LanguageClient(
     'effektLanguageServer',
     'Effekt Language Server',
     serverOptions,
