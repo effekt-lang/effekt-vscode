@@ -5,7 +5,7 @@ import { compare as compareVersion } from 'compare-versions';
 import { URL } from 'url';
 import * as path from 'path';
 import * as fs from 'fs/promises';
-import { EffektLanguageClient } from './effektLanguageClient';
+import { LanguageClient } from 'vscode-languageclient/node';
 
 interface InstallationResult {
   success: boolean;
@@ -228,7 +228,7 @@ export class EffektManager {
    */
   private async installOrUpdateEffekt(
     action: 'install' | 'update',
-    client?: EffektLanguageClient,
+    client?: LanguageClient,
   ): Promise<string> {
     if (!(await this.checkJava())) {
       this.logMessage('INFO', 'Java is not installed.');
@@ -394,7 +394,7 @@ export class EffektManager {
    * @returns A promise that resolves with the current Effekt version.
    */
   public async checkForUpdatesAndInstall(
-    client?: EffektLanguageClient,
+    client?: LanguageClient,
   ): Promise<string> {
     try {
       const currentVersion = await this.getEffektVersion();
@@ -465,7 +465,7 @@ export class EffektManager {
   private async promptForAction(
     version: string,
     action: 'install' | 'update',
-    client?: EffektLanguageClient,
+    client?: LanguageClient,
   ): Promise<string> {
     const message =
       action === 'update'

@@ -6,11 +6,10 @@ import {
   ServerOptions,
   StreamInfo,
   State as ClientState,
+  LanguageClient,
 } from 'vscode-languageclient/node';
 import { EffektManager, EffektExecutableNotFoundError } from './effektManager';
 import { EffektIRContentProvider } from './irProvider';
-import { InlayHintProvider } from './inlayHintsProvider';
-import { EffektLanguageClient } from './effektLanguageClient';
 import { EffektHoleInfo } from './holesPanel/effektHoleInfo';
 import { HolesViewProvider } from './holesPanel/holesViewProvider';
 import * as net from 'net';
@@ -23,7 +22,7 @@ import {
   stopMCPServer,
 } from './mcpManager';
 
-let client: EffektLanguageClient;
+let client: LanguageClient;
 let effektManager: EffektManager;
 const outputChannel = vscode.window.createOutputChannel('Effekt Extension');
 export const LANG_ID_EFFEKT = 'effekt';
@@ -180,7 +179,6 @@ async function initializeLSPAndProviders(context: vscode.ExtensionContext) {
   registerCommands(context);
   registerCodeLensProviders(context);
   registerIRProvider(context);
-  registerInlayProvider();
   initializeHoleDecorations(context);
   initializeHolesView(context);
 }
@@ -245,7 +243,7 @@ async function startEffektLanguageServer(context: vscode.ExtensionContext) {
     },
   };
 
-  client = new EffektLanguageClient(
+  client = new LanguageClient(
     'effektLanguageServer',
     'Effekt Language Server',
     serverOptions,
@@ -365,17 +363,6 @@ function initializeHolesView(context: vscode.ExtensionContext) {
   });
 }
 
-function registerInlayProvider() {
-  vscode.languages.registerInlayHintsProvider(
-    { scheme: 'file', language: LANG_ID_EFFEKT },
-    new InlayHintProvider(client),
-  );
-
-  vscode.languages.registerInlayHintsProvider(
-    { scheme: 'file', language: LANG_ID_LITERATE_EFFEKT },
-    new InlayHintProvider(client),
-  );
-}
 // Decorate holes
 // ---
 // It would be nice if there was a way to reuse the scopes of the tmLanguage file

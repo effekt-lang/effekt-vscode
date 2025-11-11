@@ -240,8 +240,8 @@
     "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
     "vscode:prepublish": "npm run package",
     "package": "npm run check-types && node esbuild.js",
-    "lint": "eslint 'src/**/*.ts'",
-    "lint:fix": "eslint 'src/**/*.ts' --fix",
+    "lint": "eslint \"src/**/*.ts\"",
+    "lint:fix": "eslint \"src/**/*.ts\" --fix",
     "format": "prettier --config .prettierrc \"**/*.{ts,tsx,json,css}\" --write",
     "format:check": "prettier --config .prettierrc \"**/*.{ts,tsx,json,css}\" --check"
   },
