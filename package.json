@@ -160,6 +160,11 @@
           "default": true,
           "markdownDescription": "Show inlay hints for function return types:\n\n ```effekt\ndef foo()': Int / { raise }' = { do raise(); 5 } \n```"
         },
+        "effekt.inlayHints.accurate": {
+          "type": "boolean",
+          "default": false,
+          "markdownDescription": "Remove inaccurate inlay hints after file changes"
+        },
         "effekt.showHoles": {
           "type": "boolean",
           "default": false,
