@@ -40,6 +40,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 
 
       - name: Download VSCode artifact
         uses: actions/download-artifact@v4
@@ -47,28 +49,17 @@ jobs:
           name: effekt-vscode
           path: distribution/
 
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
+      - name: Create Release and release assets
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          release_name: Release ${{ github.ref }}
-          tag_name: ${{ github.ref }}
-          body: Automatic release for ${{ github.ref }}
-          draft: false
-          prerelease: false
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.ref_name }}
+        run: |
+            gh release create "$TAG" \
+              -t "Release $TAG" \
+              --verify-tag \
+              --generate-notes \
+              "./distribution/effekt.vsix#effekt-vscode-extension.vsix"
 
-      - name: Upload vsix file
-        id: upload_vsix
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./distribution/effekt.vsix
-          asset_name: effekt-vscode-extension.vsix
-          asset_content_type: application/zip
 
   deploy:
     name: Deploy to VSCode Marketplace
