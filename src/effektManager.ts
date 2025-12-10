@@ -706,8 +706,7 @@ export class EffektManager {
     // works in PowerShell, cmd.exe and Git Bash.
     folders.forEach((folder) => args.push('--includes', folder.uri.path));
 
-	effektFlags.split(' ').map((arg) => args.push(arg));
-
+    effektFlags.split(' ').map((arg) => args.push(arg));
     return args;
   }
 }
