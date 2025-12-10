@@ -68,11 +68,11 @@
     "keywords": {
       "patterns": [
         {
-          "match": "\\b(module|import|def|fun|val|var|effect|type|match|case|record|extern|include|box|unbox|in|region|new|let|stack)\\b",
+          "match": "\\b(module|import|export|def|fun|val|var|effect|type|match|case|record|extern|include|box|unbox|in|region|new|let|stack|get|put|interface|loadVar|storeVar|invoke|coerce)\\b",
           "name": "keyword.syntax"
         },
         {
-          "match": "\\b(resume|while|try|with|if|else|do|return|switch|push|jump|shift0)\\b",
+          "match": "\\b(resume|while|try|with|if|else|do|return|reset|shift|switch|jump)\\b",
           "name": "keyword.control"
         }
       ]
