@@ -689,6 +689,7 @@ export class EffektManager {
     const args: string[] = [];
     const effektBackend = this.config.get<string>('backend');
     const effektLib = this.config.get<string>('lib');
+    const effektFlags = this.config.get<string>('flags');
 
     if (effektBackend) {
       args.push('--backend', effektBackend);
@@ -704,6 +705,8 @@ export class EffektManager {
     // Using folder.uri.path rather than folder.uri.fsPath means that Effekt tasks
     // works in PowerShell, cmd.exe and Git Bash.
     folders.forEach((folder) => args.push('--includes', folder.uri.path));
+
+	effektFlags.split(" ").map((arg) => args.push(arg));
 
     return args;
   }
