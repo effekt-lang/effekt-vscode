@@ -7,7 +7,7 @@
     "url": "https://github.com/effekt-lang/effekt-vscode.git"
   },
   "icon": "icon.png",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "publisher": "effekt-lang",
   "engines": {
     "vscode": "^1.90.0",
