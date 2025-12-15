@@ -698,6 +698,10 @@ export class EffektManager {
       args.push('--lib', effektLib);
     }
 
+    if (effektFlags && effektFlags.trim() !== '') {
+      effektFlags.split(' ').map((arg) => args.push(arg));
+    }
+
     const folders = vscode.workspace.workspaceFolders || [];
     // We deliberately use folder.uri.path rather than folder.uri.fsPath
     // While the effekt binary is able to handle either, Git Bash on Windows
@@ -706,7 +710,6 @@ export class EffektManager {
     // works in PowerShell, cmd.exe and Git Bash.
     folders.forEach((folder) => args.push('--includes', folder.uri.path));
 
-    effektFlags.split(' ').map((arg) => args.push(arg));
     return args;
   }
 }
