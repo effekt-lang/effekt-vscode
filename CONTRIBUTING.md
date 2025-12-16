@@ -57,10 +57,10 @@ Then, in a separate instance of VSCode, test the extension on some Effekt code.
 
 This section describes how to release a new version of the Effekt VSCode extension to the VSCode Marketplace.
 
-Make sure you're on the latest `master` by running:
+Make sure you're on the latest `main` by running:
 
 ```sh
-git checkout master && git pull
+git checkout main && git pull
 ```
 
 Depending on whether the new change is minor or a patch (choose one), run:
