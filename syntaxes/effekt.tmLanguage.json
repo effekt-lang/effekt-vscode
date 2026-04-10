@@ -4,15 +4,33 @@
   "foldingStartMarker": "(?<![\"'])(/\\*\\*|\\{\\s*$)",
   "foldingStopMarker": "(?<![\"'])(\\*\\*/|^\\s*\\})",
   "patterns": [
-    { "include": "#comments" },
-    { "include": "#definitions" },
-    { "include": "#regions" },
-    { "include": "#keywords" },
-    { "include": "#boxed_types" },
-    { "include": "#literals" },
-    { "include": "#names" },
-    { "include": "#holes" },
-    { "include": "#operators" }
+    {
+      "include": "#comments"
+    },
+    {
+      "include": "#definitions"
+    },
+    {
+      "include": "#regions"
+    },
+    {
+      "include": "#keywords"
+    },
+    {
+      "include": "#boxed_types"
+    },
+    {
+      "include": "#literals"
+    },
+    {
+      "include": "#names"
+    },
+    {
+      "include": "#holes"
+    },
+    {
+      "include": "#operators"
+    }
   ],
   "repository": {
     "comments": {
@@ -21,7 +39,9 @@
           "begin": "///",
           "end": "\\n",
           "beginCaptures": {
-            "0": { "name": "punctuation.definition.comment.effekt" }
+            "0": {
+              "name": "punctuation.definition.comment.effekt"
+            }
           },
           "name": "comment.line.documentation.effekt"
         },
@@ -29,18 +49,24 @@
           "begin": "//",
           "end": "\\n",
           "beginCaptures": {
-            "0": { "name": "punctuation.definition.comment.effekt" }
+            "0": {
+              "name": "punctuation.definition.comment.effekt"
+            }
           },
           "name": "comment.line.double-slash.effekt"
         },
         {
           "begin": "/\\*",
           "beginCaptures": {
-            "0": { "name": "punctuation.definition.comment.effekt" }
+            "0": {
+              "name": "punctuation.definition.comment.effekt"
+            }
           },
           "end": "\\*/",
           "endCaptures": {
-            "0": { "name": "punctuation.definition.comment.effekt" }
+            "0": {
+              "name": "punctuation.definition.comment.effekt"
+            }
           },
           "name": "comment.block.effekt"
         }
@@ -52,48 +78,80 @@
           "begin": "\\s*(extern)\\s+(def)\\s+([a-zA-Z][a-z-A-Z0-9_$]*)\\b",
           "end": "(?=\\n)|(?<=\\S)\\s*(?==(?!>))",
           "captures": {
-            "1": { "name": "storage.modifier.extern.effekt" },
-            "2": { "name": "keyword.declaration.function.extern.effekt" },
-            "3": { "name": "entity.name.function.effekt" }
+            "1": {
+              "name": "storage.modifier.extern.effekt"
+            },
+            "2": {
+              "name": "keyword.declaration.function.extern.effekt"
+            },
+            "3": {
+              "name": "entity.name.function.effekt"
+            }
           },
           "patterns": [
-            { "include": "#parameters" },
-            { "include": "#comments" },
-            { "include": "#boxed_types" }
+            {
+              "include": "#parameters"
+            },
+            {
+              "include": "#comments"
+            },
+            {
+              "include": "#boxed_types"
+            }
           ]
         },
         {
           "begin": "\\s*(def)\\s+([a-zA-Z][a-z-A-Z0-9_$]*)\\b",
           "end": "(?=\\n)|(?<=\\S)\\s*(?==(?!>))",
           "captures": {
-            "1": { "name": "keyword.declaration.function.effekt" },
-            "2": { "name": "entity.name.function.effekt" }
+            "1": {
+              "name": "keyword.declaration.function.effekt"
+            },
+            "2": {
+              "name": "entity.name.function.effekt"
+            }
           },
           "patterns": [
-            { "include": "#parameters" },
-            { "include": "#comments" },
-            { "include": "#boxed_types" }
+            {
+              "include": "#parameters"
+            },
+            {
+              "include": "#comments"
+            },
+            {
+              "include": "#boxed_types"
+            }
           ]
         },
         {
           "match": "\\s*(val)\\s+([a-zA-Z][a-z-A-Z0-9_$]*)\\b",
           "captures": {
-            "1": { "name": "keyword.declaration.val.effekt" },
-            "2": { "name": "variable.other.effekt" }
+            "1": {
+              "name": "keyword.declaration.val.effekt"
+            },
+            "2": {
+              "name": "variable.other.effekt"
+            }
           }
         },
         {
           "begin": "\\s*(var)\\s+([a-zA-Z][a-z-A-Z0-9_$]*)\\b",
           "beginCaptures": {
-            "1": { "name": "keyword.declaration.var.effekt" },
-            "2": { "name": "variable.other.effekt" }
+            "1": {
+              "name": "keyword.declaration.var.effekt"
+            },
+            "2": {
+              "name": "variable.other.effekt"
+            }
           },
           "end": "(?:;|(?=\\n)|(?<=\\S)\\s*(?==(?!>)))",
           "patterns": [
             {
               "match": "\\s+(in)\\s+([a-zA-Z][a-z-A-Z0-9_$]*)\\b",
               "captures": {
-                "1": { "name": "keyword.other.in.effekt" },
+                "1": {
+                  "name": "keyword.other.in.effekt"
+                },
                 "2": {
                   "patterns": [
                     {
@@ -116,30 +174,48 @@
         {
           "match": "\\s*(extern)?\\s*(type|effect|interface|resource)\\s+([a-zA-Z][a-z-A-Z0-9_$]*)\\b",
           "captures": {
-            "1": { "name": "storage.modifier.extern.effekt" },
-            "2": { "name": "keyword.declaration.type.effekt" },
-            "3": { "name": "entity.name.type.effekt" }
+            "1": {
+              "name": "storage.modifier.extern.effekt"
+            },
+            "2": {
+              "name": "keyword.declaration.type.effekt"
+            },
+            "3": {
+              "name": "entity.name.type.effekt"
+            }
           }
         },
         {
           "match": "\\s*(namespace)\\s+([a-zA-Z][a-z-A-Z0-9_$]*)\\b",
           "captures": {
-            "1": { "name": "keyword.declaration.namespace.effekt" },
-            "2": { "name": "entity.name.namespace.effekt" }
+            "1": {
+              "name": "keyword.declaration.namespace.effekt"
+            },
+            "2": {
+              "name": "entity.name.namespace.effekt"
+            }
           }
         },
         {
           "match": "\\s*(module)\\s+((?:[a-zA-Z][a-zA-Z0-9_]*(?:/[a-zA-Z][a-zA-Z0-9_]*)*))\\b",
           "captures": {
-            "1": { "name": "keyword.declaration.module.effekt" },
-            "2": { "name": "entity.name.module.effekt" }
+            "1": {
+              "name": "keyword.declaration.module.effekt"
+            },
+            "2": {
+              "name": "entity.name.module.effekt"
+            }
           }
         },
         {
           "match": "\\s*(import)\\s+((?:[a-zA-Z][a-zA-Z0-9_]*(?:/[a-zA-Z][a-zA-Z0-9_]*)*))\\b",
           "captures": {
-            "1": { "name": "keyword.other.import.effekt" },
-            "2": { "name": "entity.name.module.import.effekt" }
+            "1": {
+              "name": "keyword.other.import.effekt"
+            },
+            "2": {
+              "name": "entity.name.module.import.effekt"
+            }
           }
         }
       ]
@@ -257,6 +333,14 @@
           "name": "constant.numeric.integer.effekt"
         },
         {
+          "match": "\\b0x(?:(?![0-9A-Fa-f])|[0-9A-Fa-f](?![0-9A-Fa-f])|[0-9A-Fa-f]{3,}|[^0-9A-Fa-f]\\w*)",
+          "name": "invalid.illegal.byte.effekt"
+        },
+        {
+          "match": "\\b0x[0-9A-Fa-f]{2}(?![0-9A-Fa-f])",
+          "name": "constant.numeric.byte.effekt"
+        },
+        {
           "include": "#characters"
         },
         {
@@ -336,7 +420,9 @@
         {
           "match": "\\b([a-z][a-zA-Z0-9_]*)\\b[\\s]*[({\\[]",
           "captures": {
-            "1": { "name": "entity.name.function.effekt" }
+            "1": {
+              "name": "entity.name.function.effekt"
+            }
           }
         },
         {
@@ -358,10 +444,16 @@
       },
       "end": "\\}",
       "endCaptures": {
-        "0": { "name": "punctuation.definition.template-expression.end.effekt" }
+        "0": {
+          "name": "punctuation.definition.template-expression.end.effekt"
+        }
       },
       "name": "meta.embedded.line.effekt",
-      "patterns": [{ "include": "$self" }]
+      "patterns": [
+        {
+          "include": "$self"
+        }
+      ]
     },
     "punctuation": {
       "patterns": [
@@ -414,7 +506,9 @@
         {
           "match": "\\b(region)\\s+([a-zA-Z][a-zA-Z0-9_]*)\\b",
           "captures": {
-            "1": { "name": "keyword.other.region.effekt" },
+            "1": {
+              "name": "keyword.other.region.effekt"
+            },
             "2": {
               "name": "variable.other.capability.effekt entity.name.region.effekt"
             }
