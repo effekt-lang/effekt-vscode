@@ -524,11 +524,15 @@
           "name": "keyword.operator.comparison.effekt"
         },
         {
-          "match": "\\+\\+",
+          "match": "\\.\\.\\.|\\.\\.|~>|<~|~",
+          "name": "keyword.operator.range.effekt"
+        },
+        {
+          "match": "\\+\\+|--",
           "name": "keyword.operator.concatenation.effekt"
         },
         {
-          "match": "\\+|-|\\*|/",
+          "match": "\\+|-|\\*|/|<<|>>|\\^\\^|\\^",
           "name": "keyword.operator.arithmetic.effekt"
         },
         {
@@ -538,6 +542,10 @@
         {
           "match": "=>",
           "name": "keyword.operator.arrow.effekt"
+        },
+        {
+          "match": ":=|\\+=|-=|\\*=|/=|=",
+          "name": "keyword.operator.assignment.effekt"
         }
       ]
     },
