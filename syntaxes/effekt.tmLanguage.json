@@ -359,6 +359,9 @@
           "include": "#characters"
         },
         {
+          "include": "#holeStrings"
+        },
+        {
           "include": "#strings"
         }
       ]
@@ -418,6 +421,32 @@
               "include": "#stringTemplates"
             }
           ]
+        }
+      ]
+    },
+    "holeStrings": {
+      "name": "string.quoted.double.hole.effekt",
+      "begin": "<\"",
+      "beginCaptures": {
+        "0": {
+          "name": "punctuation.definition.string.begin.effekt"
+        }
+      },
+      "end": "\">",
+      "endCaptures": {
+        "0": {
+          "name": "punctuation.definition.string.end.effekt"
+        }
+      },
+      "patterns": [
+        {
+          "include": "#escapes"
+        },
+        {
+          "include": "#invalidEscapes"
+        },
+        {
+          "include": "#stringTemplates"
         }
       ]
     },
