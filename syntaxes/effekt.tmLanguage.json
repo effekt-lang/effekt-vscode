@@ -312,7 +312,7 @@
     "keywords": {
       "patterns": [
         {
-          "match": "\\b(module|import|def|fun|val|var|effect|type|record|box|unbox|region|new|resource|interface|namespace|module|include|export)\\b",
+          "match": "\\b(module|import|def|fun|val|var|effect|type|record|box|unbox|region|new|resource|interface|namespace|include|export)\\b",
           "name": "keyword.other.effekt"
         },
         {
@@ -324,7 +324,7 @@
           "name": "keyword.control.effect.effekt"
         },
         {
-          "match": "\\b(while|match|case|if|else|is|and)\\b",
+          "match": "\\b(while|match|case|if|else|is|and|as)\\b",
           "name": "keyword.control.flow.effekt"
         },
         {
