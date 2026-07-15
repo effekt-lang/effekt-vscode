@@ -86,7 +86,7 @@
     "definitions": {
       "patterns": [
         {
-          "begin": "\\s*(extern)\\s+(def)\\s+([a-zA-Z][a-zA-Z0-9_!?$]*)\\b",
+          "begin": "\\s*(extern)\\s+(def)\\s+([a-zA-Z][a-zA-Z0-9_!?$]*)",
           "end": "(?=\\n)|(?<=\\S)\\s*(?==(?!>))",
           "captures": {
             "1": {
@@ -112,7 +112,7 @@
           ]
         },
         {
-          "begin": "\\s*(def)\\s+([a-zA-Z][a-zA-Z0-9_!?$]*)\\b",
+          "begin": "\\s*(def)\\s+([a-zA-Z][a-zA-Z0-9_!?$]*)",
           "end": "(?=\\n)|(?<=\\S)\\s*(?==(?!>))",
           "captures": {
             "1": {
@@ -135,7 +135,7 @@
           ]
         },
         {
-          "match": "\\s*(val)\\s+([a-zA-Z][a-zA-Z0-9_!?$]*)\\b",
+          "match": "\\s*(val)\\s+([a-zA-Z][a-zA-Z0-9_!?$]*)",
           "captures": {
             "1": {
               "name": "keyword.declaration.val.effekt"
@@ -146,7 +146,7 @@
           }
         },
         {
-          "begin": "\\s*(var)\\s+([a-zA-Z][a-zA-Z0-9_!?$]*)\\b",
+          "begin": "\\s*(var)\\s+([a-zA-Z][a-zA-Z0-9_!?$]*)",
           "beginCaptures": {
             "1": {
               "name": "keyword.declaration.var.effekt"
@@ -158,7 +158,7 @@
           "end": "(?:;|(?=\\n)|(?<=\\S)\\s*(?==(?!>)))",
           "patterns": [
             {
-              "match": "\\s+(in)\\s+([a-zA-Z][a-zA-Z0-9_!?$]*)\\b",
+              "match": "\\s+(in)\\s+([a-zA-Z][a-zA-Z0-9_!?$]*)",
               "captures": {
                 "1": {
                   "name": "keyword.other.in.effekt"
@@ -183,7 +183,7 @@
           ]
         },
         {
-          "match": "\\s*(extern)?\\s*(type|effect|interface|resource)\\s+([a-zA-Z][a-zA-Z0-9_!?$]*)\\b",
+          "match": "\\s*(extern)?\\s*(type|effect|interface|resource)\\s+([a-zA-Z][a-zA-Z0-9_!?$]*)",
           "captures": {
             "1": {
               "name": "storage.modifier.extern.effekt"
@@ -197,7 +197,7 @@
           }
         },
         {
-          "match": "\\s*(namespace)\\s+([a-zA-Z][a-zA-Z0-9_!?$]*)\\b",
+          "match": "\\s*(namespace)\\s+([a-zA-Z][a-zA-Z0-9_!?$]*)",
           "captures": {
             "1": {
               "name": "keyword.declaration.namespace.effekt"
