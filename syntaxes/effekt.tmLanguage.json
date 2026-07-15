@@ -451,7 +451,7 @@
       ]
     },
     "escapes": {
-      "match": "\\\\([btnfr\\\\\"']|u[0-9A-Fa-f]{4})",
+      "match": "\\\\([btnfr\\\\\"'$]|u[0-9A-Fa-f]{4})",
       "name": "constant.character.escape.effekt"
     },
     "invalidEscapes": {
