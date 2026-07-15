@@ -5,6 +5,9 @@
   "foldingStopMarker": "(?<![\"'])(\\*\\*/|^\\s*\\})",
   "patterns": [
     {
+      "include": "#shebang"
+    },
+    {
       "include": "#comments"
     },
     {
@@ -33,6 +36,14 @@
     }
   ],
   "repository": {
+    "shebang": {
+      "patterns": [
+        {
+          "match": "\\A#!.*$",
+          "name": "comment.line.shebang.effekt"
+        }
+      ]
+    },
     "comments": {
       "patterns": [
         {
