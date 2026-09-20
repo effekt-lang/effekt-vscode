@@ -521,7 +521,7 @@ export class EffektManager {
   private async checkJava(): Promise<boolean> {
     try {
       const javaVersion = await this.getJavaVersion();
-      const minJavaVersion = '11.0.0'; // Minimum supported Java version
+      const minJavaVersion = '17.0.0'; // Minimum supported Java version
 
       if (compareVersion(javaVersion, minJavaVersion, '<')) {
         this.showErrorWithLogs(
