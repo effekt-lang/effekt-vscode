@@ -5,6 +5,9 @@
   "foldingStopMarker": "(?<![\"'])(\\*\\*/|^\\s*\\})",
   "patterns": [
     {
+      "include": "#shebang"
+    },
+    {
       "include": "#comments"
     },
     {
@@ -33,6 +36,14 @@
     }
   ],
   "repository": {
+    "shebang": {
+      "patterns": [
+        {
+          "match": "\\A#!.*$",
+          "name": "comment.line.shebang.effekt"
+        }
+      ]
+    },
     "comments": {
       "patterns": [
         {
@@ -75,7 +86,7 @@
     "definitions": {
       "patterns": [
         {
-          "begin": "\\s*(extern)\\s+(def)\\s+([a-zA-Z][a-z-A-Z0-9_$]*)\\b",
+          "begin": "\\s*(extern)\\s+(def)\\s+([a-zA-Z][a-zA-Z0-9_!?$]*)",
           "end": "(?=\\n)|(?<=\\S)\\s*(?==(?!>))",
           "captures": {
             "1": {
@@ -101,7 +112,7 @@
           ]
         },
         {
-          "begin": "\\s*(def)\\s+([a-zA-Z][a-z-A-Z0-9_$]*)\\b",
+          "begin": "\\s*(def)\\s+([a-zA-Z][a-zA-Z0-9_!?$]*)",
           "end": "(?=\\n)|(?<=\\S)\\s*(?==(?!>))",
           "captures": {
             "1": {
@@ -124,7 +135,7 @@
           ]
         },
         {
-          "match": "\\s*(val)\\s+([a-zA-Z][a-z-A-Z0-9_$]*)\\b",
+          "match": "\\s*(val)\\s+([a-zA-Z][a-zA-Z0-9_!?$]*)",
           "captures": {
             "1": {
               "name": "keyword.declaration.val.effekt"
@@ -135,7 +146,7 @@
           }
         },
         {
-          "begin": "\\s*(var)\\s+([a-zA-Z][a-z-A-Z0-9_$]*)\\b",
+          "begin": "\\s*(var)\\s+([a-zA-Z][a-zA-Z0-9_!?$]*)",
           "beginCaptures": {
             "1": {
               "name": "keyword.declaration.var.effekt"
@@ -147,7 +158,7 @@
           "end": "(?:;|(?=\\n)|(?<=\\S)\\s*(?==(?!>)))",
           "patterns": [
             {
-              "match": "\\s+(in)\\s+([a-zA-Z][a-z-A-Z0-9_$]*)\\b",
+              "match": "\\s+(in)\\s+([a-zA-Z][a-zA-Z0-9_!?$]*)",
               "captures": {
                 "1": {
                   "name": "keyword.other.in.effekt"
@@ -159,7 +170,7 @@
                       "name": "support.constant.effekt variable.other.capability.effekt entity.name.region.effekt"
                     },
                     {
-                      "match": "[a-zA-Z][a-z-A-Z0-9_$]*",
+                      "match": "[a-zA-Z][a-zA-Z0-9_!?$]*",
                       "name": "variable.other.capability.effekt entity.name.region.effekt"
                     }
                   ]
@@ -172,7 +183,7 @@
           ]
         },
         {
-          "match": "\\s*(extern)?\\s*(type|effect|interface|resource)\\s+([a-zA-Z][a-z-A-Z0-9_$]*)\\b",
+          "match": "\\s*(extern)?\\s*(type|effect|interface|resource)\\s+([a-zA-Z][a-zA-Z0-9_!?$]*)",
           "captures": {
             "1": {
               "name": "storage.modifier.extern.effekt"
@@ -186,7 +197,7 @@
           }
         },
         {
-          "match": "\\s*(namespace)\\s+([a-zA-Z][a-z-A-Z0-9_$]*)\\b",
+          "match": "\\s*(namespace)\\s+([a-zA-Z][a-zA-Z0-9_!?$]*)",
           "captures": {
             "1": {
               "name": "keyword.declaration.namespace.effekt"
@@ -261,11 +272,15 @@
           "include": "#boxed_types"
         },
         {
-          "match": "\\b([a-z][a-zA-Z0-9_$]*)(?:)",
+          "match": "(?<![a-zA-Z0-9_!?$])\\?(?=[a-zA-Z_])",
+          "name": "punctuation.definition.parameter.implicit.effekt"
+        },
+        {
+          "match": "\\b[a-z][a-zA-Z0-9_!?$]*",
           "name": "variable.parameter.effekt"
         },
         {
-          "match": "\\b([A-Z][a-zA-Z0-9_$]*)(?:)",
+          "match": "\\b[A-Z][a-zA-Z0-9_!?$]*",
           "name": "entity.name.type.effekt"
         }
       ]
@@ -297,7 +312,7 @@
     "keywords": {
       "patterns": [
         {
-          "match": "\\b(module|import|def|fun|val|var|effect|type|record|box|unbox|region|new|resource|interface|namespace|module|include|export)\\b",
+          "match": "\\b(module|import|def|fun|val|var|effect|type|record|box|unbox|region|new|resource|interface|namespace|include|export)\\b",
           "name": "keyword.other.effekt"
         },
         {
@@ -309,7 +324,7 @@
           "name": "keyword.control.effect.effekt"
         },
         {
-          "match": "\\b(while|match|case|if|else|is|and)\\b",
+          "match": "\\b(while|match|case|if|else|is|and|as)\\b",
           "name": "keyword.control.flow.effekt"
         },
         {
@@ -342,6 +357,9 @@
         },
         {
           "include": "#characters"
+        },
+        {
+          "include": "#holeStrings"
         },
         {
           "include": "#strings"
@@ -406,8 +424,34 @@
         }
       ]
     },
+    "holeStrings": {
+      "name": "string.quoted.double.hole.effekt",
+      "begin": "<\"",
+      "beginCaptures": {
+        "0": {
+          "name": "punctuation.definition.string.begin.effekt"
+        }
+      },
+      "end": "\">",
+      "endCaptures": {
+        "0": {
+          "name": "punctuation.definition.string.end.effekt"
+        }
+      },
+      "patterns": [
+        {
+          "include": "#escapes"
+        },
+        {
+          "include": "#invalidEscapes"
+        },
+        {
+          "include": "#stringTemplates"
+        }
+      ]
+    },
     "escapes": {
-      "match": "\\\\([btnfr\\\\\"']|u[0-9A-Fa-f]{4})",
+      "match": "\\\\([btnfr\\\\\"'$]|u[0-9A-Fa-f]{4})",
       "name": "constant.character.escape.effekt"
     },
     "invalidEscapes": {
@@ -418,19 +462,15 @@
     "names": {
       "patterns": [
         {
-          "match": "\\b([a-z][a-zA-Z0-9_]*)\\b[\\s]*[({\\[]",
-          "captures": {
-            "1": {
-              "name": "entity.name.function.effekt"
-            }
-          }
+          "match": "\\b[a-z][a-zA-Z0-9_!?$]*(?=[\\s]*[({\\[])",
+          "name": "entity.name.function.effekt"
         },
         {
-          "match": "\\b[a-z][a-zA-Z0-9_]*\\b",
+          "match": "\\b[a-z][a-zA-Z0-9_!?$]*",
           "name": "variable.other.effekt"
         },
         {
-          "match": "\\b[A-Z][a-zA-Z0-9_]*\\b",
+          "match": "\\b[A-Z][a-zA-Z0-9_!?$]*",
           "name": "entity.name.type.effekt"
         }
       ]
@@ -480,15 +520,27 @@
           "name": "keyword.operator.logical.effekt"
         },
         {
-          "match": "==|!=|<=|>=|<|>",
-          "name": "keyword.operator.comparison.effekt"
+          "match": ":=|\\+=|-=|\\*=|/=",
+          "name": "keyword.operator.assignment.effekt"
         },
         {
-          "match": "\\+\\+",
+          "match": "=>",
+          "name": "keyword.operator.arrow.effekt"
+        },
+        {
+          "match": "\\.\\.\\.|\\.\\.|~>|<~",
+          "name": "keyword.operator.range.effekt"
+        },
+        {
+          "match": "\\+\\+|--",
           "name": "keyword.operator.concatenation.effekt"
         },
         {
-          "match": "\\+|-|\\*|/",
+          "match": "==|!=|<=|>=",
+          "name": "keyword.operator.comparison.effekt"
+        },
+        {
+          "match": "<<|>>|\\^\\^",
           "name": "keyword.operator.arithmetic.effekt"
         },
         {
@@ -496,8 +548,20 @@
           "name": "keyword.operator.namespace.effekt"
         },
         {
-          "match": "=>",
-          "name": "keyword.operator.arrow.effekt"
+          "match": "<|>",
+          "name": "keyword.operator.comparison.effekt"
+        },
+        {
+          "match": "~",
+          "name": "keyword.operator.range.effekt"
+        },
+        {
+          "match": "\\+|-|\\*|/|\\^",
+          "name": "keyword.operator.arithmetic.effekt"
+        },
+        {
+          "match": "=",
+          "name": "keyword.operator.assignment.effekt"
         }
       ]
     },
